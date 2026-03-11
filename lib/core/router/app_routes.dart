@@ -23,9 +23,15 @@ abstract class AppRoutes {
   static const String sessionCreate = '/enterprises/:id/sessions/new';
   static const String evidenceUpload = '/sessions/:sessionId/evidence';
 
+  // Coaches (Supervisor Management)
+  static const String coachList = '/coaches';
+  static const String addCoach = '/coaches/new';
+  static const String coachProfile = '/coaches/:id';
+
   // Progress
   static const String progressDashboard = '/enterprises/:id/progress';
 
   // Reports
   static const String supervisorReports = '/reports';
 }
+

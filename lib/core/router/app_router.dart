@@ -11,6 +11,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_form_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/add_coach_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -53,6 +54,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.supervisorReports,
         builder: (context, state) => const SupervisorDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.addCoach,
+        builder: (context, state) => const AddCoachScreen(),
       ),
     ],
   );
