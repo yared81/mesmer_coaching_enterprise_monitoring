@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
-import '../../../../core/storage/secure_storage.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/repositories/auth_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({

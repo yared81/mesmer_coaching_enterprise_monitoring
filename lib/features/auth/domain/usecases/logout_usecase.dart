@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
-import '../repositories/auth_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase {
   LogoutUseCase(this._repository);

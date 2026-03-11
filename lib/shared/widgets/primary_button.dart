@@ -1,4 +1,5 @@
-import '../../core/constants/app_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({

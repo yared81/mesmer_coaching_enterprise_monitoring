@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../shared/widgets/app_text_field.dart';
-import '../../../../shared/widgets/primary_button.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/app_text_field.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/primary_button.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import '../../../../core/constants/api_constants.dart';
-import '../models/auth_token_model.dart';
-import '../models/user_model.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/models/auth_token_model.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/models/user_model.dart';
 
 class AuthRemoteDatasource {
   AuthRemoteDatasource(this._dio);
