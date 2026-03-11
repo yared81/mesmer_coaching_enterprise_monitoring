@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/error/failures.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/data/datasources/dashboard_remote_datasource.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/entities/dashboard_stats_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/repositories/dashboard_repository.dart';

@@ -4,6 +4,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/data/da
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/entities/dashboard_stats_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 
 final dashboardRemoteDataSourceProvider = Provider<DashboardRemoteDataSource>((ref) {
   return DashboardRemoteDataSource(ref.watch(dioProvider));
