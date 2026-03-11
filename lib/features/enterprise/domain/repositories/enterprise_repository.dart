@@ -1,7 +1,16 @@
-// TODO: Enterprise repository interface
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/enterprise_entity.dart';
+
 abstract class EnterpriseRepository {
-  // TODO: Future<Either<Failure, List<EnterpriseEntity>>> getEnterprises()
-  // TODO: Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id)
-  // TODO: Future<Either<Failure, EnterpriseEntity>> registerEnterprise(EnterpriseEntity data)
-  // TODO: Future<Either<Failure, EnterpriseEntity>> updateEnterprise(EnterpriseEntity data)
+  Future<Either<Failure, List<EnterpriseEntity>>> getEnterprises({
+    String? search,
+    Sector? sector,
+  });
+  
+  Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id);
+  
+  Future<Either<Failure, EnterpriseEntity>> registerEnterprise(Map<String, dynamic> data);
+  
+  Future<Either<Failure, EnterpriseEntity>> updateEnterprise(String id, Map<String, dynamic> data);
 }

@@ -1,5 +1,16 @@
-// TODO: Get list of enterprises — GET /enterprises (filtered by coach for coach role)
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/enterprise_entity.dart';
+import '../repositories/enterprise_repository.dart';
+
 class GetEnterprisesUseCase {
-  // TODO: Inject EnterpriseRepository
-  // TODO: call() → Future<Either<Failure, List<EnterpriseEntity>>>
+  GetEnterprisesUseCase(this._repository);
+  final EnterpriseRepository _repository;
+
+  Future<Either<Failure, List<EnterpriseEntity>>> call({
+    String? search,
+    Sector? sector,
+  }) async {
+    return _repository.getEnterprises(search: search, sector: sector);
+  }
 }

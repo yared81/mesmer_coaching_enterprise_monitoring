@@ -12,7 +12,7 @@ abstract class AppRoutes {
   // Enterprise
   static const String enterpriseList = '/enterprises';
   static const String enterpriseDetail = '/enterprises/:id';
-  static const String enterpriseCreate = '/enterprises/new';
+  static const String enterpriseForm = '/enterprises/new';
 
   // Diagnosis
   static const String assessment = '/enterprises/:id/assessment';

@@ -1,5 +1,13 @@
-// TODO: Register a new enterprise — POST /enterprises
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/enterprise_entity.dart';
+import '../repositories/enterprise_repository.dart';
+
 class RegisterEnterpriseUseCase {
-  // TODO: Inject EnterpriseRepository
-  // TODO: call(EnterpriseEntity data) → Future<Either<Failure, EnterpriseEntity>>
+  RegisterEnterpriseUseCase(this._repository);
+  final EnterpriseRepository _repository;
+
+  Future<Either<Failure, EnterpriseEntity>> call(Map<String, dynamic> data) async {
+    return _repository.registerEnterprise(data);
+  }
 }

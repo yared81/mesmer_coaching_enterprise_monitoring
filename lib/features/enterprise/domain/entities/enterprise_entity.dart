@@ -1,8 +1,3 @@
-// TODO: EnterpriseEntity — pure domain object
-// Fields: id, businessName, ownerName, sector, employeeCount, location,
-//         phone, email, coachId, institutionId, registeredAt
-// Sectors: agriculture, manufacturing, trade, services, construction
-
 enum Sector { agriculture, manufacturing, trade, services, construction, other }
 
 class EnterpriseEntity {
@@ -32,5 +27,31 @@ class EnterpriseEntity {
   final String institutionId;
   final DateTime registeredAt;
 
-  // TODO: Add copyWith
+  EnterpriseEntity copyWith({
+    String? id,
+    String? businessName,
+    String? ownerName,
+    Sector? sector,
+    int? employeeCount,
+    String? location,
+    String? phone,
+    String? email,
+    String? coachId,
+    String? institutionId,
+    DateTime? registeredAt,
+  }) {
+    return EnterpriseEntity(
+      id: id ?? this.id,
+      businessName: businessName ?? this.businessName,
+      ownerName: ownerName ?? this.ownerName,
+      sector: sector ?? this.sector,
+      employeeCount: employeeCount ?? this.employeeCount,
+      location: location ?? this.location,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      coachId: coachId ?? this.coachId,
+      institutionId: institutionId ?? this.institutionId,
+      registeredAt: registeredAt ?? this.registeredAt,
+    );
+  }
 }

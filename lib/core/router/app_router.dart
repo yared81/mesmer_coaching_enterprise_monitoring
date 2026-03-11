@@ -10,6 +10,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_form_screen.dart';
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
@@ -27,9 +30,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // 2. If authenticated and on login page, redirect to appropriate dashboard
       if (authState.status == AuthStatus.authenticated && isLoggingIn) {
         final role = authState.user?.role;
-        if (role == UserRole.admin) return AppRoutes.dashboard; // Or specific admin route
+        if (role == UserRole.admin) return AppRoutes.dashboard;
         if (role == UserRole.supervisor) return AppRoutes.supervisorReports;
-        return AppRoutes.enterpriseList; // Default for Coach
+        return AppRoutes.enterpriseList;
       }
 
       return null;
@@ -39,7 +42,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
       ),
-      // Dashboard - Simplified for now, role-based logic handles which screen to show
       GoRoute(
         path: AppRoutes.dashboard,
         builder: (context, state) {
@@ -49,14 +51,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return const CoachDashboardScreen();
         },
       ),
-      // Placeholder routes for other features to avoid router errors
       GoRoute(
         path: AppRoutes.enterpriseList,
-        builder: (context, state) => const CoachDashboardScreen(), // TODO: Replace with real screens
+        builder: (context, state) => const EnterpriseListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.enterpriseForm,
+        builder: (context, state) => const EnterpriseFormScreen(),
       ),
       GoRoute(
         path: AppRoutes.supervisorReports,
-        builder: (context, state) => const SupervisorDashboardScreen(), // TODO: Replace
+        builder: (context, state) => const SupervisorDashboardScreen(),
       ),
     ],
   );
