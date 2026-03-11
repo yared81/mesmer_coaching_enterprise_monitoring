@@ -162,9 +162,7 @@ class CoachListScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Navigate to add coach form based on router definition
-          // (Requires setting up AppRoutes.addCoach)
-          // context.push(AppRoutes.addCoach);
+          context.push(AppRoutes.addCoach);
         },
         backgroundColor: AppColors.primary,
         icon: const Icon(Icons.person_add_rounded, color: Colors.white),

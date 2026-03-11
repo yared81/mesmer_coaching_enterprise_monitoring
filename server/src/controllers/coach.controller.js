@@ -11,7 +11,7 @@ exports.getCoaches = async (req, res, next) => {
       data: coaches,
     });
   } catch (error) {
-    next(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -26,7 +26,8 @@ exports.getCoachDetails = async (req, res, next) => {
       data: coach,
     });
   } catch (error) {
-    next(error);
+    const status = error.message.includes('not found') ? 404 : 500;
+    res.status(status).json({ success: false, message: error.message });
   }
 };
 
@@ -50,6 +51,8 @@ exports.registerCoach = async (req, res, next) => {
       data: newCoach,
     });
   } catch (error) {
-    next(error);
+    const status = error.message.includes('registered') ? 400 : 500;
+    res.status(status).json({ success: false, message: error.message });
   }
 };
+

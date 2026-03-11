@@ -1,5 +1,4 @@
 const User = require('../models/user.model');
-const AppError = require('../utils/appError');
 const bcrypt = require('bcryptjs');
 
 class CoachService {
@@ -34,7 +33,7 @@ class CoachService {
     });
 
     if (!coach) {
-      throw new AppError('Coach not found or not assigned to your institution', 404);
+      throw new Error('Coach not found or not assigned to your institution');
     }
 
     return coach;
@@ -47,7 +46,7 @@ class CoachService {
     // Check if email already exists
     const existingUser = await User.findOne({ where: { email: coachData.email } });
     if (existingUser) {
-      throw new AppError('Email is already registered in the system', 400);
+      throw new Error('Email is already registered in the system');
     }
 
     // Hash the provided default password
@@ -72,3 +71,4 @@ class CoachService {
 }
 
 module.exports = new CoachService();
+

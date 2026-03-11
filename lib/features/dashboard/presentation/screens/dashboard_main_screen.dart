@@ -6,6 +6,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/coach_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/profile_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
 
 class DashboardMainScreen extends ConsumerStatefulWidget {
   const DashboardMainScreen({super.key});
@@ -28,10 +29,40 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
     final authState = ref.watch(authProvider);
     final userRole = authState.user?.role;
 
-    final List<Widget> pages = [
-      _getDashboardBody(userRole),
-      const ProfileScreen(),
+    // Dynamically build the screens and navigation items based on role
+    List<Widget> pages = [_getDashboardBody(userRole)];
+    List<NavigationDestination> navItems = [
+      const NavigationDestination(
+        icon: Icon(Icons.dashboard_outlined),
+        selectedIcon: Icon(Icons.dashboard_rounded, color: Colors.blue),
+        label: 'Dashboard',
+      ),
     ];
+
+    if (userRole == UserRole.supervisor) {
+      pages.add(const CoachListScreen());
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.group_outlined),
+        selectedIcon: Icon(Icons.group_rounded, color: Colors.blue),
+        label: 'Coaches',
+      ));
+      
+      // Placeholder for Enterprise master list
+      pages.add(const Center(child: Text('Enterprise List Coming Soon')));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.storefront_outlined),
+        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
+        label: 'Enterprises',
+      ));
+    }
+
+    // Everyone gets a profile
+    pages.add(const ProfileScreen());
+    navItems.add(const NavigationDestination(
+      icon: Icon(Icons.person_outline_rounded),
+      selectedIcon: Icon(Icons.person_rounded, color: Colors.blue),
+      label: 'Profile',
+    ));
 
     return Scaffold(
       body: IndexedStack(
@@ -59,20 +90,10 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
           elevation: 0,
           indicatorColor: Theme.of(context).primaryColor.withOpacity(0.15),
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard_rounded, color: Colors.blue),
-              label: 'Dashboard',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              selectedIcon: Icon(Icons.person_rounded, color: Colors.blue),
-              label: 'Profile',
-            ),
-          ],
+          destinations: navItems,
         ),
       ),
     );
   }
 }
+
