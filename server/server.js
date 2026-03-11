@@ -12,18 +12,23 @@ const PORT = process.env.PORT || 3000;
 // Connect to Database
 connectDB();
 
-// Basic Middleware (Manual CORS for maximum compatibility)
+// 1. Logger (Incoming requests)
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  
-  // Handle Preflight
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
+  console.log(`\n--- Incoming Request ---`);
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Method: ${req.method}`);
+  console.log(`URL: ${req.url}`);
+  console.log(`Origin: ${req.headers.origin}`);
   next();
 });
+
+// 2. Ultra-Permissive CORS
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
+}));
 
 app.use(morgan('dev'));
 app.use(express.json());
