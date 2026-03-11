@@ -1,25 +1,26 @@
-# MESMER Coaching Enterprise Monitoring
+# 1. Clone & Enter
+git clone <repo-url> && cd mesmer_coaching_enterprise_monitoring
 
-Mobile app for the MESMER program — digitizing business coaching for Micro and Small Enterprises (MSEs).
+# 2. Database Creation (PostgreSQL)
+#   a. sudo -i -u postgres psql
+#   b. CREATE DATABASE mesmer_db;
+#   c. CREATE USER mesmer_user WITH PASSWORD 'your_pass';
+#   d. GRANT ALL PRIVILEGES ON DATABASE mesmer_db TO mesmer_user;
 
+# 3. Schema Initialization
+psql -h localhost -U mesmer_user -d mesmer_db -f docs/setup.sql
 
-## Quick Start
-
-```bash
-# 1. Clone and enter project
-git clone <repo-url>
-cd mesmer_coaching_enterprise_monitoring
-
-# 2. Install dependencies
+# 4. Flutter Setup
 flutter pub get
-
-# 3. Copy env config
 cp .env.example .env
-# Edit .env with your local backend URL
+# Edit .env: set API_BASE_URL and DB credentials
 
-# 4. Run the app
+# 4. Run
 flutter run --dart-define-from-file=.env
 ```
+
+> [!NOTE]
+> See `docs/setup.sql` for the full schema blueprint. This file is essential for team-wide database consistency.
 
 ---
 
@@ -65,19 +66,22 @@ feature/
 
 ---
 
-## Team Module Assignments
+## 🗺️ Development Roadmap (8-Phases)
 
-| Module | Owner | Status |
+*For progress reporting to mentors and stakeholders:*
+
+| Phase | Goal | Status |
 |---|---|---|
-| Auth & Navigation | — | 🔲 TODO |
-| Dashboard (role-based) | — | 🔲 TODO |
-| Enterprise Management | — | 🔲 TODO |
-| Business Diagnosis Tool | — | 🔲 TODO |
-| Coaching Sessions | — | 🔲 TODO |
-| Progress Tracking | — | 🔲 TODO |
-| Reports & Analytics | — | 🔲 TODO |
+| **1. Foundation** | Architecture, Core Infra, & 74-File Skeleton | ✅ COMPLETE |
+| **2. Auth & Security** | JWT flows, Roles & Protected Guards | 🔲 UPCOMING |
+| **3. Onboarding** | Multi-stepped Enterprise Registration | 🔲 TODO |
+| **4. Diagnosis** | Assessment Tool, Scoring & Result Summary | 🔲 TODO |
+| **5. Coaching** | Session Tracking, Tasks & R2 Evidence Upload | 🔲 TODO |
+| **6. Progress** | Data Visualization (Baseline vs Current Improvement) | 🔲 TODO |
+| **7. Oversight** | Supervisor Reports & Program Analytics | 🔲 TODO |
+| **8. Final Polish** | Brand consistency, Animations & Demo Prep | 🔲 TODO |
 
-> Assign names and update this table when work begins.
+Refer to [development_roadmap.md](file:///home/yared/.gemini/antigravity/brain/40be37db-b718-4908-b7ed-627ea5d23870/development_roadmap.md) for full phase details.
 
 ---
 

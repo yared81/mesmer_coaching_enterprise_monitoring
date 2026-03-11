@@ -1,7 +1,13 @@
-// TODO: Login use case — calls AuthRepository.login()
-// Returns Either<Failure, UserEntity>
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/user_entity.dart';
+import '../repositories/auth_repository.dart';
 
 class LoginUseCase {
-  // TODO: Inject AuthRepository
-  // TODO: call(String email, String password) → Future<Either<Failure, UserEntity>>
+  LoginUseCase(this._repository);
+  final AuthRepository _repository;
+
+  Future<Either<Failure, UserEntity>> call(String email, String password) {
+    return _repository.login(email, password);
+  }
 }

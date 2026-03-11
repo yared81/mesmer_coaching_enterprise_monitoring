@@ -1,9 +1,17 @@
-// TODO: Register global Riverpod providers for core infrastructure
-// - dioProvider: provides configured Dio instance
-// - secureStorageProvider: provides SecureStorage instance
-// These are injected into all feature-level datasource providers
-
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../network/dio_client.dart';
+import '../storage/secure_storage.dart';
 
-// TODO: final dioProvider = Provider<Dio>((ref) { ... });
-// TODO: final secureStorageProvider = Provider<SecureStorage>((ref) { ... });
+final flutterSecureStorageProvider = Provider<FlutterSecureStorage>((ref) {
+  return const FlutterSecureStorage();
+});
+
+final secureStorageProvider = Provider<SecureStorage>((ref) {
+  return SecureStorage(ref.watch(flutterSecureStorageProvider));
+});
+
+final dioProvider = Provider<Dio>((ref) {
+  return DioClient.createDio(ref.watch(secureStorageProvider));
+});

@@ -1,5 +1,14 @@
-// TODO: AuthTokenModel — stores access_token and refresh_token from login response
-class AuthTokenModel {
-  // TODO: Add fields: accessToken, refreshToken
-  // TODO: Add fromJson / toJson
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'auth_token_model.freezed.dart';
+part 'auth_token_model.g.dart';
+
+@freezed
+class AuthTokenModel with _$AuthTokenModel {
+  const factory AuthTokenModel({
+    required String accessToken,
+    required String refreshToken,
+  }) = _AuthTokenModel;
+
+  factory AuthTokenModel.fromJson(Map<String, dynamic> json) => _$AuthTokenModelFromJson(json);
 }

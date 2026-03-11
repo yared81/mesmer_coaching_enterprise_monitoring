@@ -1,24 +1,31 @@
-// TODO: Implement Dio interceptor for JWT authentication
-// Responsibilities:
-// - Attach Bearer token to every request header
-// - On 401 response: attempt token refresh via /auth/refresh
-// - On refresh success: retry original request with new token
-// - On refresh failure: clear tokens and redirect to login
-
 import 'package:dio/dio.dart';
+import '../storage/secure_storage.dart';
+import '../constants/api_constants.dart';
 
 class ApiInterceptor extends Interceptor {
-  // TODO: Inject SecureStorage to read/write tokens
+  const ApiInterceptor(this._secureStorage);
+  final SecureStorage _secureStorage;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // TODO: Attach Authorization header
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final token = await _secureStorage.getAccessToken();
+    if (token != null) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
     super.onRequest(options, handler);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    // TODO: Handle 401 — refresh token or logout
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response?.statusCode == 401) {
+      // TODO: Handle token refresh logic
+      // This is complex - would typically involve a separate Dio instance to avoid infinite loop
+      // and a lock to handle multiple parallel requests triggering refresh simultaneously.
+      
+      // If refresh fails or not implemented yet:
+      // await _secureStorage.clearTokens();
+      // TODO: Redirect to login (via some global state or event bus)
+    }
     super.onError(err, handler);
   }
 }

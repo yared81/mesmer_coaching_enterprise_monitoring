@@ -1,16 +1,23 @@
-// TODO: Configure Dio HTTP client
-// - Set baseUrl from ApiConstants
-// - Set connection and receive timeouts
-// - Add ApiInterceptor for JWT attach + token refresh logic
-
 import 'package:dio/dio.dart';
+import '../constants/api_constants.dart';
+import 'api_interceptor.dart';
+import '../storage/secure_storage.dart';
 
 class DioClient {
-  // TODO: Implement singleton Dio instance
-  // TODO: Add interceptors (ApiInterceptor)
-  // TODO: Return configured Dio instance
-  
-  static Dio createDio() {
-    throw UnimplementedError('DioClient.createDio() not implemented yet');
+  static Dio createDio(SecureStorage secureStorage) {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: ApiConstants.baseUrl,
+        connectTimeout: ApiConstants.connectTimeout,
+        receiveTimeout: ApiConstants.receiveTimeout,
+      ),
+    );
+
+    dio.interceptors.addAll([
+      ApiInterceptor(secureStorage),
+      LogInterceptor(responseBody: true, requestBody: true), // For dev visibility
+    ]);
+
+    return dio;
   }
 }

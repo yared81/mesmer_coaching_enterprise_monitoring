@@ -109,8 +109,9 @@ Backend: **Node.js + PostgreSQL**
 | id | UUID PK | |
 | session_id | UUID FK → CoachingSessions | |
 | file_type | ENUM | photo, document, video |
-| file_url | TEXT | Cloudflare R2 public/signed URL |
-| file_name | VARCHAR(255) | |
+| file_url | TEXT | Local server path (e.g. `/uploads/session_123_img.jpg`) |
+| file_name | VARCHAR(255) | Original filename |
+| file_size | INT | Bytes |
 | uploaded_at | TIMESTAMP | |
 
 ---

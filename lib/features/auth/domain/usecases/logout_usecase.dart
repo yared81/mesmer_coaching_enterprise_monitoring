@@ -1,5 +1,12 @@
-// TODO: Logout use case — calls AuthRepository.logout()
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../repositories/auth_repository.dart';
+
 class LogoutUseCase {
-  // TODO: Inject AuthRepository
-  // TODO: call() → Future<Either<Failure, void>>
+  LogoutUseCase(this._repository);
+  final AuthRepository _repository;
+
+  Future<Either<Failure, void>> call() {
+    return _repository.logout();
+  }
 }

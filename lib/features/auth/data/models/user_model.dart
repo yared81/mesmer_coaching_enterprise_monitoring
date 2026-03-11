@@ -1,13 +1,28 @@
-// TODO: UserModel — JSON serializable version of UserEntity
-// Fields: id, email, name, role, institutionId, createdAt
-// Use @freezed and @JsonSerializable annotations
-// Generate with: flutter pub run build_runner build
+import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../domain/entities/user_entity.dart';
 
-// import 'package:freezed_annotation/freezed_annotation.dart';
-// part 'user_model.freezed.dart';
-// part 'user_model.g.dart';
+part 'user_model.freezed.dart';
+part 'user_model.g.dart';
 
-class UserModel {
-  // TODO: Add fields and fromJson / toJson
-  // TODO: Add toEntity() method to convert to UserEntity
+@freezed
+class UserModel with _$UserModel {
+  const factory UserModel({
+    required String id,
+    required String email,
+    required String name,
+    required UserRole role,
+    required String institutionId,
+  }) = _UserModel;
+
+  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+
+  const UserModel._();
+
+  UserEntity toEntity() => UserEntity(
+        id: id,
+        email: email,
+        name: name,
+        role: role,
+        institutionId: institutionId,
+      );
 }

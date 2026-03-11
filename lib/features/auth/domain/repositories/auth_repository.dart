@@ -1,11 +1,10 @@
-// TODO: Auth repository interface (contract for the domain layer)
-// Implemented by AuthRepositoryImpl in the data layer
-
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
 import '../entities/user_entity.dart';
 
 abstract class AuthRepository {
-  // TODO: Future<Either<Failure, UserEntity>> login(String email, String password)
-  // TODO: Future<Either<Failure, void>> logout()
-  // TODO: Future<Either<Failure, UserEntity>> getCurrentUser()
-  // TODO: Future<Either<Failure, void>> forgotPassword(String email)
+  Future<Either<Failure, UserEntity>> login(String email, String password);
+  Future<Either<Failure, void>> logout();
+  Future<Either<Failure, UserEntity>> getCurrentUser();
+  Future<Either<Failure, void>> forgotPassword(String email);
 }

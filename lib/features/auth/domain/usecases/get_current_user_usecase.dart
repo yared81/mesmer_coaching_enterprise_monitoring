@@ -1,5 +1,13 @@
-// TODO: Get current authenticated user from backend (GET /auth/me)
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/user_entity.dart';
+import '../repositories/auth_repository.dart';
+
 class GetCurrentUserUseCase {
-  // TODO: Inject AuthRepository
-  // TODO: call() → Future<Either<Failure, UserEntity>>
+  GetCurrentUserUseCase(this._repository);
+  final AuthRepository _repository;
+
+  Future<Either<Failure, UserEntity>> call() {
+    return _repository.getCurrentUser();
+  }
 }

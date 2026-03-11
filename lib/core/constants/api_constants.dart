@@ -7,7 +7,14 @@ abstract class ApiConstants {
     defaultValue: 'http://localhost:3000/api/v1',
   );
 
-  // TODO: Add timeout values
-  // TODO: Add all endpoint path constants per module
-  //   e.g. static const String login = '/auth/login';
+  // Timeouts
+  static const Duration connectTimeout = Duration(seconds: 15);
+  static const Duration receiveTimeout = Duration(seconds: 15);
+
+  // Auth Endpoints
+  static const String login = '/auth/login';
+  static const String logout = '/auth/logout';
+  static const String refresh = '/auth/refresh';
+  static const String me = '/auth/me';
+  static const String forgotPassword = '/auth/forgot-password';
 }

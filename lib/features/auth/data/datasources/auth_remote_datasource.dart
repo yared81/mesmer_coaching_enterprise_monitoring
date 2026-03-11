@@ -1,16 +1,41 @@
-// TODO: Implement auth API calls against Node.js backend
-// Endpoints (see ApiConstants): POST /auth/login, POST /auth/logout,
-// POST /auth/refresh, GET /auth/me, POST /auth/forgot-password
-
 import 'package:dio/dio.dart';
+import '../../../../core/constants/api_constants.dart';
+import '../models/auth_token_model.dart';
+import '../models/user_model.dart';
 
 class AuthRemoteDatasource {
   AuthRemoteDatasource(this._dio);
   final Dio _dio;
 
-  // TODO: Future<Map<String, dynamic>> login(String email, String password)
-  // TODO: Future<void> logout()
-  // TODO: Future<Map<String, dynamic>> refreshToken(String refreshToken)
-  // TODO: Future<Map<String, dynamic>> getMe()
-  // TODO: Future<void> forgotPassword(String email)
+  Future<AuthTokenModel> login(String email, String password) async {
+    final response = await _dio.post(
+      ApiConstants.login,
+      data: {'email': email, 'password': password},
+    );
+    return AuthTokenModel.fromJson(response.data['data']);
+  }
+
+  Future<void> logout() async {
+    await _dio.post(ApiConstants.logout);
+  }
+
+  Future<AuthTokenModel> refreshToken(String refreshToken) async {
+    final response = await _dio.post(
+      ApiConstants.refresh,
+      data: {'refreshToken': refreshToken},
+    );
+    return AuthTokenModel.fromJson(response.data['data']);
+  }
+
+  Future<UserModel> getMe() async {
+    final response = await _dio.get(ApiConstants.me);
+    return UserModel.fromJson(response.data['data']);
+  }
+
+  Future<void> forgotPassword(String email) async {
+    await _dio.post(
+      ApiConstants.forgotPassword,
+      data: {'email': email},
+    );
+  }
 }
