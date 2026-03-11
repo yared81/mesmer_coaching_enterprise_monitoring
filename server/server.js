@@ -12,8 +12,19 @@ const PORT = process.env.PORT || 3000;
 // Connect to Database
 connectDB();
 
-// Basic Middleware
-app.use(cors()); // Standard "allow all" for dev
+// Basic Middleware (Manual CORS for maximum compatibility)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  // Handle Preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
