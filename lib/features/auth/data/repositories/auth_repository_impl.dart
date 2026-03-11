@@ -3,6 +3,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/repositories/auth_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/models/auth_token_model.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/models/user_model.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/data/datasources/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -18,12 +20,20 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserEntity>> login(String email, String password) async {
     try {
-      final tokenModel = await _remoteDatasource.login(email, password);
+      final responseData = await _remoteDatasource.login(email, password);
+      
+      final tokenModel = AuthTokenModel.fromJson(responseData);
       await _secureStorage.saveTokens(
         accessToken: tokenModel.accessToken,
         refreshToken: tokenModel.refreshToken,
       );
-      final userModel = await _remoteDatasource.getMe();
+      
+      final userData = responseData['user'];
+      if (userData == null) {
+        return Left(ServerFailure(message: 'User data missing from response'));
+      }
+
+      final userModel = UserModel.fromJson(userData as Map<String, dynamic>);
       return Right(userModel.toEntity());
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));

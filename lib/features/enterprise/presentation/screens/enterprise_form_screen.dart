@@ -279,7 +279,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: AppColors.primary),
-                  shape: BorderRadius.circular(12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: const Text('Back'),
               ),
@@ -288,7 +288,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           Expanded(
             child: PrimaryButton(
               onPressed: _isLoading ? () {} : _nextStep,
-              text: _currentStep == 1 ? 'Complete Registration' : 'Next Step',
+              label: _currentStep == 1 ? 'Complete Registration' : 'Next Step',
               isLoading: _isLoading,
             ),
           ),

@@ -29,6 +29,7 @@ class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
+        institution_id: user.institution_id,
         institution: user.institution ? user.institution.name : null
       },
       accessToken,
@@ -41,7 +42,12 @@ class AuthService {
    */
   generateTokens(user) {
     const accessToken = jwt.sign(
-      { userId: user.id, role: user.role, tokenVersion: user.token_version },
+      { 
+        userId: user.id, 
+        role: user.role, 
+        institution_id: user.institution_id,
+        tokenVersion: user.token_version 
+      },
       process.env.JWT_ACCESS_SECRET,
       { expiresIn: process.env.JWT_ACCESS_EXPIRE || '15m' }
     );

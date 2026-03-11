@@ -12,23 +12,21 @@ const PORT = process.env.PORT || 3000;
 // Connect to Database
 connectDB();
 
-// 1. Logger (Incoming requests)
+// 1. Mandatory Headers (Nuclear Option)
 app.use((req, res, next) => {
-  console.log(`\n--- Incoming Request ---`);
-  console.log(`Time: ${new Date().toISOString()}`);
-  console.log(`Method: ${req.method}`);
-  console.log(`URL: ${req.url}`);
-  console.log(`Origin: ${req.headers.origin}`);
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    console.log('--- Preflight Request (OPTIONS) Received ---');
+    return res.status(200).send();
+  }
+  
+  console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('Origin:', req.headers.origin);
   next();
 });
-
-// 2. Ultra-Permissive CORS
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200
-}));
 
 app.use(morgan('dev'));
 app.use(express.json());
@@ -36,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health Check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'UP' });
+  res.status(200).json({ status: 'UP', message: 'MESMER API is reaching you!' });
 });
 
 // Routes
@@ -45,13 +43,14 @@ app.use('/api/v1/enterprises', require('./src/routes/enterprise.routes'));
 
 // Error Handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error:', err.message);
   res.status(500).json({
     success: false,
     message: err.message || 'Internal Server Error'
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 MESMER Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 MESMER Server running on http://0.0.0.0:${PORT}`);
+  console.log(`📡 Local check: http://localhost:${PORT}/health`);
 });

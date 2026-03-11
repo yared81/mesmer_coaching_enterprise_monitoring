@@ -7,12 +7,12 @@ class AuthRemoteDatasource {
   AuthRemoteDatasource(this._dio);
   final Dio _dio;
 
-  Future<AuthTokenModel> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     final response = await _dio.post(
       ApiConstants.login,
       data: {'email': email, 'password': password},
     );
-    return AuthTokenModel.fromJson(response.data['data']);
+    return response.data;
   }
 
   Future<void> logout() async {
@@ -24,12 +24,12 @@ class AuthRemoteDatasource {
       ApiConstants.refresh,
       data: {'refreshToken': refreshToken},
     );
-    return AuthTokenModel.fromJson(response.data['data']);
+    return AuthTokenModel.fromJson(response.data);
   }
 
   Future<UserModel> getMe() async {
     final response = await _dio.get(ApiConstants.me);
-    return UserModel.fromJson(response.data['data']);
+    return UserModel.fromJson(response.data['user']);
   }
 
   Future<void> forgotPassword(String email) async {

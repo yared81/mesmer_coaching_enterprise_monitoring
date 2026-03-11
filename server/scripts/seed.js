@@ -1,5 +1,5 @@
 const { sequelize } = require('../src/config/database');
-const { Institution, User } = require('../src/models');
+const { Institution, User, Enterprise } = require('../src/models');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
