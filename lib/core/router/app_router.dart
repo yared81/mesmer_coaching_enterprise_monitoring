@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../constants/api_constants.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -6,6 +8,7 @@ import '../../features/dashboard/presentation/screens/admin_dashboard_screen.dar
 import '../../features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
 import '../../features/dashboard/presentation/screens/coach_dashboard_screen.dart';
 import '../../features/auth/domain/entities/user_entity.dart';
+import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
