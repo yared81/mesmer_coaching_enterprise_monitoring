@@ -6,25 +6,21 @@ require('dotenv').config();
 
 const { connectDB } = require('./src/config/database');
 
-// Initialize app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connect to Database
 connectDB();
 
-// Middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*'
-}));
+// Basic Middleware
+app.use(cors()); // Standard "allow all" for dev
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health Check
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
+  res.status(200).json({ status: 'UP' });
 });
 
 // Routes
