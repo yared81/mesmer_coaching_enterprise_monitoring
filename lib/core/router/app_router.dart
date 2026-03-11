@@ -29,10 +29,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // 2. If authenticated and on login page, redirect to appropriate dashboard
       if (authState.status == AuthStatus.authenticated && isLoggingIn) {
-        final role = authState.user?.role;
-        if (role == UserRole.admin) return AppRoutes.dashboard;
-        if (role == UserRole.supervisor) return AppRoutes.supervisorReports;
-        return AppRoutes.enterpriseList;
+        return AppRoutes.dashboard;
       }
 
       return null;

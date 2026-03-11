@@ -6,6 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../enterprise/presentation/providers/enterprise_provider.dart';
+import '../widgets/stat_card.dart';
 
 class CoachDashboardScreen extends ConsumerWidget {
   const CoachDashboardScreen({super.key});
@@ -16,31 +17,31 @@ class CoachDashboardScreen extends ConsumerWidget {
     final enterpriseList = ref.watch(enterpriseListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         slivers: [
-          _buildAppBar(user?.name ?? 'Coach'),
+          _buildAppBar(context, ref, user?.name ?? 'Coach'),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsRow(enterpriseList),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: 32),
                   const Text(
                     'Quick Actions',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: 16),
                   _buildQuickActions(context),
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'Recent Enterprises',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       TextButton(
                         onPressed: () => context.push(AppRoutes.enterpriseList),
@@ -48,6 +49,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
                   _buildRecentEnterprises(enterpriseList),
                 ],
               ),
@@ -58,9 +60,9 @@ class CoachDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAppBar(String name) {
+  Widget _buildAppBar(BuildContext context, WidgetRef ref, String name) {
     return SliverAppBar(
-      expandedHeight: 200.0,
+      expandedHeight: 180.0,
       floating: false,
       pinned: true,
       elevation: 0,
@@ -75,37 +77,33 @@ class CoachDashboardScreen extends ConsumerWidget {
             fontSize: 20,
           ),
         ),
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.primary, Color(0xFF1976D2)],
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primary, Color(0xFF1976D2)],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -20,
+                bottom: -20,
+                child: Icon(
+                  Icons.auto_graph_rounded,
+                  size: 150,
+                  color: Colors.white.withOpacity(0.1),
                 ),
               ),
-            ),
-            Positioned(
-              right: -50,
-              top: -50,
-              child: CircleAvatar(
-                radius: 100,
-                backgroundColor: Colors.white.withOpacity(0.1),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-          onPressed: () {},
-        ),
-        IconButton(
           icon: const Icon(Icons.logout, color: Colors.white),
-          onPressed: () {}, // TODO: Logout
+          onPressed: () => ref.read(authProvider.notifier).logout(),
         ),
       ],
     );
@@ -114,25 +112,25 @@ class CoachDashboardScreen extends ConsumerWidget {
   Widget _buildStatsRow(AsyncValue enterpriseList) {
     final count = enterpriseList.maybeWhen(
       data: (list) => list.length.toString(),
-      orElse: () => '...',
+      orElse: () => '0',
     );
 
     return Row(
       children: [
         Expanded(
-          child: _StatCard(
-            title: 'Enterprises',
+          child: StatCard(
+            title: 'My Businesses',
             value: count,
-            icon: Icons.business,
+            icon: Icons.business_center_rounded,
             color: Colors.blue,
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: 16),
         const Expanded(
-          child: _StatCard(
+          child: StatCard(
             title: 'Assessments',
             value: '0',
-            icon: Icons.assessment,
+            icon: Icons.assignment_turned_in_rounded,
             color: Colors.orange,
           ),
         ),
@@ -141,25 +139,24 @@ class CoachDashboardScreen extends ConsumerWidget {
   }
 
   Widget _buildQuickActions(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      mainAxisSpacing: AppSpacing.md,
-      crossAxisSpacing: AppSpacing.md,
-      childAspectRatio: 1.5,
+    return Row(
       children: [
-        _QuickActionCard(
-          title: 'Register\nEnterprise',
-          icon: Icons.add_business,
-          color: Colors.green,
-          onTap: () => context.push(AppRoutes.enterpriseForm),
+        Expanded(
+          child: _QuickActionCard(
+            title: 'Register\nEnterprise',
+            icon: Icons.add_business_rounded,
+            color: Colors.green,
+            onTap: () => context.push(AppRoutes.enterpriseForm),
+          ),
         ),
-        _QuickActionCard(
-          title: 'Start\nAssessment',
-          icon: Icons.assignment_outlined,
-          color: Colors.deepPurple,
-          onTap: () {},
+        const SizedBox(width: 16),
+        Expanded(
+          child: _QuickActionCard(
+            title: 'Start\nAssessment',
+            icon: Icons.insights_rounded,
+            color: Colors.deepPurple,
+            onTap: () {},
+          ),
         ),
       ],
     );
@@ -168,73 +165,41 @@ class CoachDashboardScreen extends ConsumerWidget {
   Widget _buildRecentEnterprises(AsyncValue enterpriseList) {
     return enterpriseList.when(
       data: (list) {
-        if (list.isEmpty) return const Center(child: Text('No enterprises yet'));
+        if (list.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(child: Text('No enterprises registered yet.')),
+          );
+        }
         return Column(
           children: list.take(3).map((e) => Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey[200]!),
+            ),
             child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               leading: CircleAvatar(
                 backgroundColor: AppColors.primary.withOpacity(0.1),
-                child: const Icon(Icons.business, color: AppColors.primary),
+                child: const Icon(Icons.store_rounded, color: AppColors.primary),
               ),
-              title: Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold)),
+              title: Text(e.businessName, 
+                style: const TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(e.sector.name),
-              trailing: const Icon(Icons.chevron_right),
+              trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () {},
             ),
           )).toList(),
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, s) => Text('Error: $e'),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
-
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            title,
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
-          ),
-        ],
-      ),
+      error: (e, s) => Center(child: Text('Error loading enterprises')),
     );
   }
 }
@@ -258,24 +223,25 @@ class _QuickActionCard extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withOpacity(0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withOpacity(0.1)),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 32),
-            const SizedBox(height: 8),
+            Icon(icon, color: color, size: 36),
+            const SizedBox(height: 12),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.bold,
-                fontSize: 12,
+                fontSize: 13,
               ),
             ),
           ],

@@ -29,7 +29,18 @@ class EnterpriseController {
    */
   list = async (req, res, next) => {
     try {
-      const result = await enterpriseService.getEnterprises(req.query);
+      const { userId, role, institutionId } = req.user;
+      const filters = { ...req.query };
+
+      // Enforce Role-Based Data Isolation
+      if (role === 'coach') {
+        filters.coach_id = userId;
+      } else if (role === 'supervisor') {
+        filters.institution_id = institutionId;
+      }
+      // Admins see everything (no filter added)
+
+      const result = await enterpriseService.getEnterprises(filters);
       res.status(200).json({
         success: true,
         ...result

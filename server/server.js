@@ -40,6 +40,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/v1/auth', require('./src/routes/auth.routes'));
 app.use('/api/v1/enterprises', require('./src/routes/enterprise.routes'));
+app.use('/api/v1/dashboard', require('./src/routes/dashboard.routes'));
 
 // Error Handler
 app.use((err, req, res, next) => {
