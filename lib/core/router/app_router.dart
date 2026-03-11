@@ -4,11 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/providers/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/login_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/admin_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/coach_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/dashboard_main_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_form_screen.dart';
@@ -41,12 +40,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.dashboard,
-        builder: (context, state) {
-          final role = authState.user?.role;
-          if (role == UserRole.admin) return const AdminDashboardScreen();
-          if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
-          return const CoachDashboardScreen();
-        },
+        builder: (context, state) => const DashboardMainScreen(),
       ),
       GoRoute(
         path: AppRoutes.enterpriseList,
