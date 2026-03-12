@@ -33,9 +33,9 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
     List<Widget> pages = [_getDashboardBody(userRole)];
     List<NavigationDestination> navItems = [
       const NavigationDestination(
-        icon: Icon(Icons.dashboard_outlined),
-        selectedIcon: Icon(Icons.dashboard_rounded, color: Colors.blue),
-        label: 'Dashboard',
+        icon: Icon(Icons.home_outlined),
+        selectedIcon: Icon(Icons.home_rounded, color: Colors.blue),
+        label: 'Home',
       ),
     ];
 
@@ -53,6 +53,14 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
         icon: Icon(Icons.storefront_outlined),
         selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
         label: 'Enterprises',
+      ));
+
+      // Placeholder for Reports
+      pages.add(const Center(child: Text('Reports Coming Soon')));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.bar_chart_outlined),
+        selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
+        label: 'Reports',
       ));
     }
 
