@@ -21,6 +21,18 @@ class SessionService {
       order: [['scheduled_date', 'DESC']]
     });
   }
+
+  async updateSession(sessionId, coachId, updateData) {
+    const session = await CoachingSession.findOne({
+      where: { id: sessionId, coach_id: coachId }
+    });
+
+    if (!session) {
+      throw new Error('Session not found or unauthorized');
+    }
+
+    return await session.update(updateData);
+  }
 }
 
 module.exports = new SessionService();

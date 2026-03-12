@@ -26,4 +26,12 @@ class CoachingRemoteDataSource {
     final list = response.data['data'] as List;
     return list.map((json) => CoachingSessionModel.fromJson(json)).toList();
   }
+
+  Future<CoachingSessionModel> updateSession(CoachingSessionModel session) async {
+    final response = await _dio.put(
+      '${ApiConstants.sessions}/${session.id}',
+      data: session.toJson(),
+    );
+    return CoachingSessionModel.fromJson(response.data['data']);
+  }
 }

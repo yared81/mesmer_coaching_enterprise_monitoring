@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/providers/coaching_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/session_detail_screen.dart';
+import 'package:intl/intl.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -159,7 +162,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               unselectedLabelStyle: const TextStyle(fontSize: 13),
               tabs: const [
                 Tab(text: 'Overview'),
-                Tab(text: 'Timeline'),
+                Tab(text: 'Sessions'),
                 Tab(text: 'Tasks'),
               ],
             ),
@@ -312,68 +315,90 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
-  // ─── TAB 2: Coaching Timeline ──────────────────────────────────────────────
+  // ─── TAB 2: Sessions Timeline ──────────────────────────────────────────────
 
   Widget _buildTimelineTab() {
-    final sessions = [];
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(20),
-      itemCount: sessions.length,
-      itemBuilder: (_, i) {
-        final s = sessions[i];
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
+    final sessionsAsync = ref.watch(enterpriseSessionsProvider(widget.enterpriseId));
+    
+    return sessionsAsync.when(
+      data: (sessions) {
+        if (sessions.isEmpty) {
+          return const Center(
+            child: Text('No sessions recorded for this enterprise.', style: TextStyle(color: Colors.grey)),
+          );
+        }
+        
+        return ListView.builder(
+          padding: const EdgeInsets.all(20),
+          itemCount: sessions.length,
+          itemBuilder: (_, i) {
+            final s = sessions[i];
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 14,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3D5AFE),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
-                  ),
-                ),
-                if (i < sessions.length - 1)
-                  Container(width: 2, height: 70, decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: [Color(0xFF3D5AFE), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                  )),
-              ],
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Column(
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF3D5AFE)),
-                        const SizedBox(width: 4),
-                        Text(s.$1, style: const TextStyle(color: Color(0xFF3D5AFE), fontSize: 11, fontWeight: FontWeight.bold)),
-                        const Spacer(),
-                        Text(s.$2, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                      ],
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3D5AFE),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(s.$3, style: const TextStyle(color: Color(0xFF424242), fontSize: 13)),
+                    if (i < sessions.length - 1)
+                      Container(width: 2, height: 70, decoration: const BoxDecoration(
+                        gradient: LinearGradient(colors: [Color(0xFF3D5AFE), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                      )),
                   ],
                 ),
-              ),
-            ),
-          ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (_) => SessionDetailScreen(session: s),
+                      ));
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF3D5AFE)),
+                              const SizedBox(width: 4),
+                              Text(s.title, style: const TextStyle(color: Color(0xFF3D5AFE), fontSize: 12, fontWeight: FontWeight.bold)),
+                              const Spacer(),
+                              Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
+                            style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
+                            maxLines: 2, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
     );
   }
 

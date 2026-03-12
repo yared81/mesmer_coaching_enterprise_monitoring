@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/coaching_provider.dart';
 import '../../domain/entities/coaching_session_entity.dart';
 import 'add_session_screen.dart';
+import 'session_detail_screen.dart';
 
 class CoachSessionListScreen extends ConsumerWidget {
   const CoachSessionListScreen({super.key});
@@ -79,50 +80,80 @@ class _SessionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(color: Colors.grey[200]!),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  DateFormat('MMM dd, yyyy').format(session.scheduledDate),
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE)),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.green[50],
-                    borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SessionDetailScreen(session: session),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      session.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E3A8A)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  child: const Text('Completed', 
-                    style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            if (session.notes != null && session.notes!.isNotEmpty)
-              Text(
-                session.notes!,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[600]),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text('View/Edit', 
+                      style: TextStyle(color: Colors.blueAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
-            const SizedBox(height: 12),
-            const Divider(),
-            const SizedBox(height: 8),
-            const Row(
-              children: [
-                Icon(Icons.business_rounded, size: 16, color: Colors.grey),
-                SizedBox(width: 8),
-                Text('Session recorded', style: TextStyle(color: Colors.grey, fontSize: 12)),
-              ],
-            ),
-          ],
+              const SizedBox(height: 8),
+              if (session.notes != null && session.notes!.isNotEmpty)
+                Text(
+                  session.notes!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                ),
+              if (session.notes != null && session.notes!.isNotEmpty)
+                const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.business_rounded, size: 14, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text('Enterprise ID: ${session.enterpriseId.substring(0, 8)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      const Icon(Icons.calendar_month, size: 14, color: Colors.grey),
+                      const SizedBox(width: 6),
+                      Text(DateFormat('MMM dd, yyy').format(session.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+

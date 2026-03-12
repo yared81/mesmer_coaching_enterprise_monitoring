@@ -8,5 +8,6 @@ router.use(protect);
 router.post('/', sessionController.createSession);
 router.get('/my-sessions', sessionController.getCoachSessions);
 router.get('/enterprise/:enterpriseId', sessionController.getEnterpriseSessions);
+router.put('/:id', sessionController.updateSession);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../enterprise/presentation/providers/enterprise_provider.dart';
 import '../providers/coaching_provider.dart';
 import '../../domain/entities/coaching_session_entity.dart';
@@ -14,18 +15,13 @@ class AddSessionScreen extends ConsumerStatefulWidget {
 
 class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
   String? _selectedEnterpriseId;
   DateTime _selectedDate = DateTime.now();
-  SessionStatus _status = SessionStatus.completed;
-  final _notesController = TextEditingController();
-  final _problemsController = TextEditingController();
-  final _recommendationsController = TextEditingController();
 
   @override
   void dispose() {
-    _notesController.dispose();
-    _problemsController.dispose();
-    _recommendationsController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -37,17 +33,30 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
 
     final session = CoachingSessionEntity(
       id: '', // Backend generates UUID
+      title: _titleController.text.trim(),
       enterpriseId: _selectedEnterpriseId!,
       coachId: user.id,
       scheduledDate: _selectedDate,
-      status: _status,
-      notes: _notesController.text,
-      problemsIdentified: _problemsController.text,
-      recommendations: _recommendationsController.text,
+      status: SessionStatus.scheduled, // Initially just scheduled/created
+      notes: '',
+      problemsIdentified: '',
+      recommendations: '',
     );
 
     await ref.read(coachingSessionsProvider.notifier).createSession(session);
     if (mounted) Navigator.pop(context);
+  }
+
+  Future<void> _pickDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (date != null) {
+      setState(() => _selectedDate = date);
+    }
   }
 
   @override
@@ -69,7 +78,21 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Enterprise', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text('Session Title', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _titleController,
+                validator: (val) => val == null || val.isEmpty ? 'Please enter a title' : null,
+                decoration: InputDecoration(
+                  hintText: 'e.g. Initial Assessment, Follow-up Review...',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              const Text('Enterprise / Institution', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               enterprisesAsync.when(
                 data: (list) => DropdownButtonFormField<String>(
@@ -92,16 +115,30 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
               ),
               const SizedBox(height: 24),
               
-              const Text('Session Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              const SizedBox(height: 16),
+              const Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: _pickDate,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[400]!),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[50],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(DateFormat('MMM dd, yyyy').format(_selectedDate), 
+                           style: const TextStyle(fontSize: 16)),
+                      const Icon(Icons.calendar_month, color: Colors.grey),
+                    ],
+                  ),
+                ),
+              ),
               
-              _buildTextField('Problems Identified', _problemsController, maxLines: 3),
-              const SizedBox(height: 16),
-              _buildTextField('Recommendations', _recommendationsController, maxLines: 3),
-              const SizedBox(height: 16),
-              _buildTextField('General Notes', _notesController, maxLines: 4),
-              
-              const SizedBox(height: 40),
+              const SizedBox(height: 48),
               
               SizedBox(
                 width: double.infinity,
@@ -122,25 +159,5 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       ),
     );
   }
-
-  Widget _buildTextField(String label, TextEditingController controller, {int maxLines = 1}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: 'Enter $label',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            filled: true,
-            fillColor: Colors.grey[50],
-          ),
-        ),
-      ],
-    );
-  }
 }
+

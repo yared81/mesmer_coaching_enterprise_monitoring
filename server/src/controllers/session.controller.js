@@ -40,6 +40,23 @@ class SessionController {
       next(error);
     }
   };
+
+  updateSession = async (req, res, next) => {
+    try {
+      const session = await sessionService.updateSession(
+        req.params.id,
+        req.user.id,
+        req.body
+      );
+      
+      res.status(200).json({
+        success: true,
+        data: session
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new SessionController();

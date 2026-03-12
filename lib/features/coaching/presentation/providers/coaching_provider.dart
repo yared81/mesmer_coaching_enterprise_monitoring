@@ -42,6 +42,14 @@ class CoachingSessionsNotifier extends StateNotifier<AsyncValue<List<CoachingSes
       (_) => getSessions(), // Refresh list on success
     );
   }
+
+  Future<void> updateSession(CoachingSessionEntity session) async {
+    final result = await _repository.updateSession(session);
+    result.fold(
+      (failure) => null, // Handle error UI if needed
+      (_) => getSessions(), // Refresh list on success
+    );
+  }
 }
 
 final enterpriseSessionsProvider = FutureProvider.family<List<CoachingSessionEntity>, String>((ref, id) async {

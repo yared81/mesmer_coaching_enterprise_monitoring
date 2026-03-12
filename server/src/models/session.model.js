@@ -7,6 +7,10 @@ const CoachingSession = sequelize.define('CoachingSession', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   enterprise_id: {
     type: DataTypes.UUID,
     allowNull: false,

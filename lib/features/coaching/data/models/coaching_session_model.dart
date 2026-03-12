@@ -3,6 +3,7 @@ import '../../domain/entities/coaching_session_entity.dart';
 class CoachingSessionModel extends CoachingSessionEntity {
   const CoachingSessionModel({
     required super.id,
+    required super.title,
     required super.enterpriseId,
     required super.coachId,
     required super.scheduledDate,
@@ -15,6 +16,7 @@ class CoachingSessionModel extends CoachingSessionEntity {
   factory CoachingSessionModel.fromJson(Map<String, dynamic> json) {
     return CoachingSessionModel(
       id: json['id'] as String,
+      title: json['title'] as String,
       enterpriseId: json['enterprise_id'] as String,
       coachId: json['coach_id'] as String,
       scheduledDate: DateTime.parse(json['scheduled_date'] as String),
@@ -28,6 +30,7 @@ class CoachingSessionModel extends CoachingSessionEntity {
   Map<String, dynamic> toJson() {
     return {
       if (id.isNotEmpty) 'id': id,
+      'title': title,
       'enterprise_id': enterpriseId,
       'coach_id': coachId,
       'scheduled_date': scheduledDate.toIso8601String(),

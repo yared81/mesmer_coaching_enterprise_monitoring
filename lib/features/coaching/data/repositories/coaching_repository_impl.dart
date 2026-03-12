@@ -15,6 +15,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
     try {
       final model = CoachingSessionModel(
         id: session.id,
+        title: session.title,
         enterpriseId: session.enterpriseId,
         coachId: session.coachId,
         scheduledDate: session.scheduledDate,
@@ -44,6 +45,27 @@ class CoachingRepositoryImpl implements CoachingRepository {
   Future<Either<Failure, List<CoachingSessionEntity>>> getEnterpriseSessions(String enterpriseId) async {
     try {
       final result = await remoteDataSource.getEnterpriseSessions(enterpriseId);
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CoachingSessionEntity>> updateSession(CoachingSessionEntity session) async {
+    try {
+      final model = CoachingSessionModel(
+        id: session.id,
+        title: session.title,
+        enterpriseId: session.enterpriseId,
+        coachId: session.coachId,
+        scheduledDate: session.scheduledDate,
+        status: session.status,
+        problemsIdentified: session.problemsIdentified,
+        recommendations: session.recommendations,
+        notes: session.notes,
+      );
+      final result = await remoteDataSource.updateSession(model);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));

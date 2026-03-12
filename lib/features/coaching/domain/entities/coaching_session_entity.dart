@@ -6,6 +6,7 @@ enum SessionStatus { scheduled, completed, cancelled }
 class CoachingSessionEntity {
   const CoachingSessionEntity({
     required this.id,
+    required this.title,
     required this.enterpriseId,
     required this.coachId,
     required this.scheduledDate,
@@ -16,6 +17,7 @@ class CoachingSessionEntity {
   });
 
   final String id;
+  final String title;
   final String enterpriseId;
   final String coachId;
   final DateTime scheduledDate;
