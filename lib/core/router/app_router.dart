@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/providers/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/login_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/profile_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/change_password_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/dashboard_main_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
@@ -42,6 +44,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.dashboard,
         builder: (context, state) => const DashboardMainScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.changePassword,
+        builder: (context, state) => const ChangePasswordScreen(),
       ),
       GoRoute(
         path: AppRoutes.enterpriseList,

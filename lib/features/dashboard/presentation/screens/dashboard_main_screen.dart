@@ -5,7 +5,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entit
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/admin_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/coach_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/profile_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/settings_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
 
 class DashboardMainScreen extends ConsumerStatefulWidget {
@@ -56,12 +56,12 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
       ));
     }
 
-    // Everyone gets a profile
-    pages.add(const ProfileScreen());
+    // Everyone gets settings instead of just profile
+    pages.add(const SettingsScreen());
     navItems.add(const NavigationDestination(
-      icon: Icon(Icons.person_outline_rounded),
-      selectedIcon: Icon(Icons.person_rounded, color: Colors.blue),
-      label: 'Profile',
+      icon: Icon(Icons.settings_outlined),
+      selectedIcon: Icon(Icons.settings_rounded, color: Colors.blue),
+      label: 'Settings',
     ));
 
     return Scaffold(
@@ -96,4 +96,5 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
     );
   }
 }
+
 

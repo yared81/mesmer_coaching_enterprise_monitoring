@@ -2,9 +2,11 @@
 // Used by GoRouter and throughout the app for navigation
 
 abstract class AppRoutes {
-  // Auth
+  // Auth & Settings
   static const String login = '/login';
   static const String forgotPassword = '/forgot-password';
+  static const String profile = '/profile';
+  static const String changePassword = '/change-password';
 
   // Dashboard (role-based, same route — screen differs by role)
   static const String dashboard = '/dashboard';
