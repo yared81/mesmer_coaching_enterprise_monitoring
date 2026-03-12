@@ -55,6 +55,30 @@ class DashboardService {
       recentActivity
     };
   }
+
+  /**
+   * Get aggregate stats for Coach
+   */
+  async getCoachStats(coachId) {
+    const [totalEnterprises, recentActivity] = await Promise.all([
+      Enterprise.count({ where: { coach_id: coachId } }),
+      Enterprise.findAll({
+        where: { coach_id: coachId },
+        limit: 5,
+        order: [['registered_at', 'DESC']]
+      })
+    ]);
+
+    return {
+      stats: {
+        totalEnterprises,
+        totalSessions: 0, 
+        pendingTasks: 0,
+        avgAssessmentScore: 0
+      },
+      recentActivity
+    };
+  }
 }
 
 module.exports = new DashboardService();

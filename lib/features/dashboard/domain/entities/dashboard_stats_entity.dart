@@ -36,9 +36,20 @@ class SupervisorStatsEntity {
   final double avgAssessmentScore;
   final List<ActivityEntity> recentActivity;
 
-  SupervisorStatsEntity({
-    required this.totalCoaches,
+  });
+}
+
+class CoachStatsEntity {
+  final int totalEnterprises;
+  final int totalSessions;
+  final int pendingTasks;
+  final double avgAssessmentScore;
+  final List<ActivityEntity> recentActivity;
+
+  CoachStatsEntity({
     required this.totalEnterprises,
+    required this.totalSessions,
+    required this.pendingTasks,
     required this.avgAssessmentScore,
     required this.recentActivity,
   });

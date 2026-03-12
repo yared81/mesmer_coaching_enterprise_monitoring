@@ -33,3 +33,12 @@ final supervisorStatsProvider = FutureProvider<SupervisorStatsEntity>((ref) asyn
     (stats) => stats,
   );
 });
+
+final coachStatsProvider = FutureProvider<CoachStatsEntity>((ref) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
+  final result = await repository.getCoachStats();
+  return result.fold(
+    (failure) => throw failure.message,
+    (stats) => stats,
+  );
+});

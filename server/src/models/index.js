@@ -1,6 +1,7 @@
 const Institution = require('./institution.model');
 const User = require('./user.model');
 const Enterprise = require('./enterprise.model');
+const CoachingSession = require('./session.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -35,10 +36,32 @@ Enterprise.belongsTo(Institution, {
   as: 'institution'
 });
 
+// CoachingSession Associations
+Enterprise.hasMany(CoachingSession, {
+  foreignKey: 'enterprise_id',
+  as: 'sessions'
+});
+
+CoachingSession.belongsTo(Enterprise, {
+  foreignKey: 'enterprise_id',
+  as: 'enterprise'
+});
+
+User.hasMany(CoachingSession, {
+  foreignKey: 'coach_id',
+  as: 'sessions'
+});
+
+CoachingSession.belongsTo(User, {
+  foreignKey: 'coach_id',
+  as: 'coach'
+});
+
 const db = {
   Institution,
   User,
-  Enterprise
+  Enterprise,
+  CoachingSession
 };
 
 module.exports = db;

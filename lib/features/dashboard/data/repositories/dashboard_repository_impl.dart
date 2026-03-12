@@ -28,4 +28,14 @@ class DashboardRepositoryImpl implements DashboardRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, CoachStatsEntity>> getCoachStats() async {
+    try {
+      final stats = await remoteDataSource.getCoachStats();
+      return Right(stats);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

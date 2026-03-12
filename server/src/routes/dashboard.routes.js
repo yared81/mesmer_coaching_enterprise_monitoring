@@ -9,4 +9,7 @@ router.get('/admin', protect, authorize('admin'), dashboardController.getAdminSt
 // Supervisor stats
 router.get('/supervisor', protect, authorize('supervisor'), dashboardController.getSupervisorStats);
 
+// Coach stats
+router.get('/coach', protect, authorize('coach'), dashboardController.getCoachStats);
+
 module.exports = router;

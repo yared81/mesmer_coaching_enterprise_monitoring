@@ -16,4 +16,9 @@ class DashboardRemoteDataSource {
     final response = await _dio.get(ApiConstants.supervisorStats);
     return SupervisorStatsModel.fromJson(response.data['data']);
   }
+
+  Future<CoachStatsModel> getCoachStats() async {
+    final response = await _dio.get(ApiConstants.coachStats);
+    return CoachStatsModel.fromJson(response.data['data']);
+  }
 }

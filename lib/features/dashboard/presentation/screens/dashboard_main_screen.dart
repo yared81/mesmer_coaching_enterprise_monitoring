@@ -8,6 +8,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/settings_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_enterprise_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/coach_session_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
 
 class DashboardMainScreen extends ConsumerWidget {
@@ -51,6 +53,28 @@ class DashboardMainScreen extends ConsumerWidget {
       ));
 
       pages.add(const Center(child: Text('Reports Coming Soon')));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.bar_chart_outlined),
+        selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
+        label: 'Reports',
+      ));
+    } else if (userRole == UserRole.coach) {
+      // Coach Specific Pages
+      pages.add(const CoachEnterpriseListScreen());
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.storefront_outlined),
+        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
+        label: 'Enterprises',
+      ));
+
+      pages.add(const CoachSessionListScreen());
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded, color: Colors.blue),
+        label: 'Sessions',
+      ));
+
+      pages.add(const Center(child: Text('My Reports Screen'))); // Simplified for now
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),

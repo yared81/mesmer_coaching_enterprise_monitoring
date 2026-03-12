@@ -1,7 +1,9 @@
-// TODO: Coaching repository interface
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failure.dart';
+import '../entities/coaching_session_entity.dart';
+
 abstract class CoachingRepository {
-  // TODO: Future<Either<Failure, List<CoachingSessionEntity>>> getSessions(String enterpriseId)
-  // TODO: Future<Either<Failure, CoachingSessionEntity>> createSession(CoachingSessionEntity session)
-  // TODO: Future<Either<Failure, CoachingSessionEntity>> updateSession(CoachingSessionEntity session)
-  // TODO: Future<Either<Failure, String>> uploadEvidence(String sessionId, String filePath) → returns R2 URL
+  Future<Either<Failure, CoachingSessionEntity>> createSession(CoachingSessionEntity session);
+  Future<Either<Failure, List<CoachingSessionEntity>>> getMySessions();
+  Future<Either<Failure, List<CoachingSessionEntity>>> getEnterpriseSessions(String enterpriseId);
 }

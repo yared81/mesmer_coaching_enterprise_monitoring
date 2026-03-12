@@ -47,3 +47,14 @@ class EnterpriseListNotifier extends StateNotifier<AsyncValue<List<EnterpriseEnt
     );
   }
 }
+
+// 5. Filtered Provider for Coach
+final filteredEnterprisesProvider = Provider<AsyncValue<List<EnterpriseEntity>>>((ref) {
+  final enterprisesAsync = ref.watch(enterpriseListProvider);
+  final user = ref.watch(authProvider).user;
+
+  return enterprisesAsync.whenData((list) {
+    if (user == null) return [];
+    return list.where((e) => e.coachId == user.id).toList();
+  });
+});

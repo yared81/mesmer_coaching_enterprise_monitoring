@@ -5,4 +5,5 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/
 abstract class DashboardRepository {
   Future<Either<Failure, AdminStatsEntity>> getAdminStats();
   Future<Either<Failure, SupervisorStatsEntity>> getSupervisorStats();
+  Future<Either<Failure, CoachStatsEntity>> getCoachStats();
 }

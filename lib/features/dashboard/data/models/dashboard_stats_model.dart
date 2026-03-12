@@ -59,9 +59,29 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
         .toList();
 
-    return SupervisorStatsModel(
-      totalCoaches: stats['totalCoaches'] as int,
+    );
+  }
+}
+
+class CoachStatsModel extends CoachStatsEntity {
+  CoachStatsModel({
+    required super.totalEnterprises,
+    required super.totalSessions,
+    required super.pendingTasks,
+    required super.avgAssessmentScore,
+    required super.recentActivity,
+  });
+
+  factory CoachStatsModel.fromJson(Map<String, dynamic> json) {
+    final stats = json['stats'] as Map<String, dynamic>;
+    final recent = (json['recentActivity'] as List)
+        .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    return CoachStatsModel(
       totalEnterprises: stats['totalEnterprises'] as int,
+      totalSessions: stats['totalSessions'] as int,
+      pendingTasks: stats['pendingTasks'] as int,
       avgAssessmentScore: (stats['avgAssessmentScore'] as num).toDouble(),
       recentActivity: recent,
     );
