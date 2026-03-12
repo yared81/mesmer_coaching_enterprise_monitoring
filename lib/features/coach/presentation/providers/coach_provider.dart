@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
-import '../data/datasources/coach_remote_datasource.dart';
-import '../data/repositories/coach_repository_impl.dart';
-import '../domain/repositories/coach_repository.dart';
-import '../domain/entities/coach_entity.dart';
-import '../domain/usecases/coach_usecases.dart';
+import '../../data/datasources/coach_remote_datasource.dart';
+import '../../data/repositories/coach_repository_impl.dart';
+import '../../domain/repositories/coach_repository.dart';
+import '../../domain/entities/coach_entity.dart';
+import '../../domain/usecases/coach_usecases.dart';
 
 // --- Data Layer Providers ---
 final coachRemoteDataSourceProvider = Provider<CoachRemoteDataSource>((ref) {
