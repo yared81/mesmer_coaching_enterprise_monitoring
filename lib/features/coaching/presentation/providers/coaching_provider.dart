@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
-import '../data/datasources/coaching_remote_datasource.dart';
-import '../data/repositories/coaching_repository_impl.dart';
-import '../domain/repositories/coaching_repository.dart';
-import '../domain/entities/coaching_session_entity.dart';
+import '../../data/datasources/coaching_remote_datasource.dart';
+import '../../data/repositories/coaching_repository_impl.dart';
+import '../../domain/repositories/coaching_repository.dart';
+import '../../domain/entities/coaching_session_entity.dart';
 
 final coachingRemoteDataSourceProvider = Provider<CoachingRemoteDataSource>((ref) {
   return CoachingRemoteDataSource(ref.watch(dioProvider));

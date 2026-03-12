@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../providers/coaching_provider.dart';
-import '../domain/entities/coaching_session_entity.dart';
+import '../../domain/entities/coaching_session_entity.dart';
 import 'add_session_screen.dart';
 
 class CoachSessionListScreen extends ConsumerWidget {

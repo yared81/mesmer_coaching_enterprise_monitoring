@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
@@ -167,7 +168,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildOverviewTab(),
+            _buildOverviewTab(enterprise),
             _buildTimelineTab(),
             _buildTasksTab(),
           ],
@@ -178,7 +179,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   // ─── TAB 1: Overview ──────────────────────────────────────────────────────
 
-  Widget _buildOverviewTab() {
+  Widget _buildOverviewTab(EnterpriseEntity enterprise) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
