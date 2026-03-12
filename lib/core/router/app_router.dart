@@ -54,7 +54,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: AppRoutes.dashboard,
-            builder: (context, state) => const Placeholder(), // Managed by redirect or shell logic
+            builder: (context, state) => const _DashboardHome(),
           ),
           GoRoute(
             path: AppRoutes.enterpriseList,
@@ -118,3 +118,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+class _DashboardHome extends ConsumerWidget {
+  const _DashboardHome();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final role = ref.watch(authProvider).user?.role;
+    if (role == UserRole.admin) return const AdminDashboardScreen();
+    if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
+    return const CoachDashboardScreen();
+  }
+}

@@ -281,10 +281,11 @@ class _CoachCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 10),
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
                         children: [
                           _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first),
-                          const SizedBox(width: 8),
                           _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last),
                         ],
                       ),
