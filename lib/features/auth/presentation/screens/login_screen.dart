@@ -1,8 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/app_text_field.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/primary_button.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -39,103 +37,336 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // ─── BACKGROUND VISION AREA ──────────────────────────────────────
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF1E3A8A), // Deep Blue
+                    Color(0xFF3B82F6), // Bright Blue
+                  ],
+                ),
+              ),
+              child: Opacity(
+                opacity: 0.1,
+                child: CustomPaint(
+                  painter: _GridPainter(),
+                ),
+              ),
+            ),
+          ),
+
+          // ─── CONTENT ──────────────────────────────────────────────────────
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                   const Text(
+                  // ─── LOGO & VISION ───────────────────────────────────────
+                  const _LogoWidget(),
+                  const SizedBox(height: 16),
+                  const Text(
                     'MESMER',
-                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 2,
                     ),
                   ),
-                  const SizedBox(height: 8),
                   const Text(
-                    'Business Coaching & Monitoring',
-                    textAlign: TextAlign.center,
+                    'Enterprise Transformation',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textSecondary,
+                      fontSize: 14,
+                      color: Colors.white70,
+                      letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 48),
-                  AppTextField(
-                    label: 'Email',
-                    hint: 'Enter your email',
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter your email';
-                      if (!value.contains('@')) return 'Please enter a valid email';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  AppTextField(
-                    label: 'Password',
-                    hint: 'Enter your password',
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
+
+                  // ─── IMPACT CARD ─────────────────────────────────────────
+                  _buildImpactCard(),
+                  const SizedBox(height: 48),
+
+                  // ─── LOGIN CARD (GLASSMORPHISM) ─────────────────────────
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.85),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Text(
+                                'Welcome back, Coach',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1E3A8A),
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              _buildTextField(
+                                label: 'Email Address',
+                                controller: _emailController,
+                                icon: Icons.email_outlined,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) return 'Enter email';
+                                  if (!val.contains('@')) return 'Invalid email';
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              _buildTextField(
+                                label: 'Password',
+                                controller: _passwordController,
+                                icon: Icons.lock_outline,
+                                obscureText: !_isPasswordVisible,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                                    size: 20,
+                                    color: Colors.blueGrey,
+                                  ),
+                                  onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                                ),
+                                validator: (val) {
+                                  if (val == null || val.isEmpty) return 'Enter password';
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () {},
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.blueAccent,
+                                    textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
+                                  child: const Text('Forgot Password?'),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              if (authState.errorMessage != null) ...[
+                                Text(
+                                  authState.errorMessage!,
+                                  style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                              ElevatedButton(
+                                onPressed: _handleLogin,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1E3A8A),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                  elevation: 0,
+                                ),
+                                child: const Text(
+                                  'LOGIN',
+                                  style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter your password';
-                      if (value.length < 6) return 'Password must be at least 6 characters';
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // TODO: Navigate to Forgot Password
-                      },
-                      child: const Text('Forgot Password?'),
                     ),
                   ),
-                  const SizedBox(height: 32),
-                  if (authState.errorMessage != null) ...[
-                    Text(
-                      authState.errorMessage!,
-                      style: const TextStyle(color: AppColors.error),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  PrimaryButton(
-                    label: 'Login',
-                    onPressed: _handleLogin,
-                    isLoading: authState.status == AuthStatus.initial && 
-                               _emailController.text.isNotEmpty, // Simplified loading check
-                  ),
+                  
+                  const SizedBox(height: 48),
+                  
+                  // ─── PARTNERS ────────────────────────────────────────────
+                  const _PartnersWidget(),
                 ],
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
+
+  Widget _buildImpactCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.auto_graph_rounded, color: Colors.white, size: 20),
+          SizedBox(width: 10),
+          Text(
+            'Transforming 500+ Ethiopia MSEs',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required IconData icon,
+    bool obscureText = false,
+    Widget? suffixIcon,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.blueGrey),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          validator: validator,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 20, color: const Color(0xFF1E3A8A).withOpacity(0.7)),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.withOpacity(0.2)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF1E3A8A)),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.redAccent),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.redAccent),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LogoWidget extends StatelessWidget {
+  const _LogoWidget();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(Icons.hub_rounded, size: 40, color: const Color(0xFF1E3A8A)),
+          Positioned(
+            right: 15,
+            top: 20,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: const BoxDecoration(color: Colors.blueAccent, shape: BoxShape.circle),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PartnersWidget extends StatelessWidget {
+  const _PartnersWidget();
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text(
+          'POWERED BY',
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white54, letterSpacing: 1.5),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildPartner('MONAS'),
+            const SizedBox(width: 24),
+            _buildPartner('MESMER'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPartner(String name) {
+    return Text(
+      name,
+      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1),
+    );
+  }
+}
+
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.1)
+      ..strokeWidth = 1;
+    
+    for (double i = 0; i <= size.width; i += 40) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    for (double i = 0; i <= size.height; i += 40) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
+  }
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
