@@ -149,7 +149,14 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                       const SizedBox(height: 24),
                       const ProgramPerformanceChart(),
                       const SizedBox(height: 32),
-                      ActivityFeedWidget(activities: stats.recentActivity),
+                      ActivityFeedWidget(
+                        activities: stats.recentActivity,
+                        onActivityTap: (activity) {
+                          if (activity.type == 'enterprise') {
+                            ref.read(dashboardIndexProvider.notifier).state = 2;
+                          }
+                        },
+                      ),
                       const SizedBox(height: 40),
                     ],
                   ),
