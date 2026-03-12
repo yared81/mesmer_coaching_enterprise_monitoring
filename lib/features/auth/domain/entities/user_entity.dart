@@ -1,7 +1,14 @@
+import 'package:json_annotation/json_annotation.dart';
+
 // TODO: UserEntity — pure domain object, no JSON or Flutter dependencies
 // Fields: id, email, name, role, institutionId, createdAt
 
-enum UserRole { admin, institutionAdmin, supervisor, coach }
+enum UserRole {
+  @JsonValue('admin') admin,
+  @JsonValue('institution_admin') institutionAdmin,
+  @JsonValue('supervisor') supervisor,
+  @JsonValue('coach') coach
+}
 
 class UserEntity {
   const UserEntity({

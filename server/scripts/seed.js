@@ -23,7 +23,7 @@ const seed = async () => {
     // 3. Create Admin User
     const adminEmail = 'admin@mesmer.com';
     let admin = await User.findOne({ where: { email: adminEmail } });
-    
+
     if (!admin) {
       const hashedPassword = await bcrypt.hash('admin123', 10);
       admin = await User.create({
@@ -37,9 +37,42 @@ const seed = async () => {
       console.log('👤 Admin User Created (admin@mesmer.com / admin123)');
     }
 
-    // 4. Create Coach User
+    // 4. Create Institution Admin User
+    const instAdminEmail = 'inst_admin@mesmer.com';
+    let instAdmin = await User.findOne({ where: { email: instAdminEmail } });
+    if (!instAdmin) {
+      const hashedPassword = await bcrypt.hash('inst123', 10);
+      instAdmin = await User.create({
+        email: instAdminEmail,
+        password_hash: hashedPassword,
+        name: 'Institution Admin',
+        role: 'institution_admin',
+        institution_id: institution.id,
+        is_active: true
+      });
+      console.log('👤 Inst Admin Created (inst_admin@mesmer.com / inst123)');
+    }
+
+    // 5. Create Supervisor User
+    const supervisorEmail = 'supervisor@mesmer.com';
+    let supervisor = await User.findOne({ where: { email: supervisorEmail } });
+    if (!supervisor) {
+      const hashedPassword = await bcrypt.hash('supervisor123', 10);
+      supervisor = await User.create({
+        email: supervisorEmail,
+        password_hash: hashedPassword,
+        name: 'Sara Supervisor',
+        role: 'supervisor',
+        institution_id: institution.id,
+        is_active: true
+      });
+      console.log('👤 Supervisor Created (supervisor@mesmer.com / supervisor123)');
+    }
+
+    // 6. Create Coach User
     const coachEmail = 'coach@mesmer.com';
     let coach = await User.findOne({ where: { email: coachEmail } });
+
     if (!coach) {
       const hashedPassword = await bcrypt.hash('coach123', 10);
       coach = await User.create({
