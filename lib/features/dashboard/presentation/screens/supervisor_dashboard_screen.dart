@@ -285,19 +285,19 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                         ),
                         MetricSwiperItem(
                           icon: Icons.handshake_rounded,
-                          value: '48',
+                          value: '0',
                           label: 'Sessions',
                           subtitle: 'Conducted this month',
-                          trend: '+8%',
+                          trend: '0',
                           trendUp: true,
                           gradient: const [Color(0xFFFF6F00), Color(0xFFFFB300)],
                         ),
                         MetricSwiperItem(
                           icon: Icons.warning_amber_rounded,
-                          value: '4',
+                          value: '0',
                           label: 'Needs Attention',
                           subtitle: 'Low performance score',
-                          trend: '-2',
+                          trend: '0',
                           trendUp: false,
                           gradient: const [Color(0xFFE53935), Color(0xFFEF9A9A)],
                         ),
@@ -326,48 +326,6 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                     ),
 
                     const SizedBox(height: 28),
-
-                    // ── Section: Enterprises Needing Attention ──────────────
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: _SectionHeader(
-                        title: 'Needs Attention',
-                        subtitle: '4 enterprises require review',
-                        actionLabel: 'View All',
-                        onAction: () => ref.read(dashboardIndexProvider.notifier).state = 2,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      height: 130,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        children: const [
-                          _AlertCard(
-                            name: 'Sunrise Bakery',
-                            coach: 'Samuel Bekele',
-                            score: 32,
-                            badge: 'Low Score',
-                            badgeColor: Color(0xFFE53935),
-                          ),
-                          _AlertCard(
-                            name: 'Green Fields',
-                            coach: 'Martha Alemu',
-                            score: 45,
-                            badge: '30 Days No Session',
-                            badgeColor: Color(0xFFFF8F00),
-                          ),
-                          _AlertCard(
-                            name: 'TechHub PLC',
-                            coach: 'Abebe Girma',
-                            score: 38,
-                            badge: 'Assessment Overdue',
-                            badgeColor: Color(0xFF6A1B9A),
-                          ),
-                        ],
-                      ),
-                    ),
 
                     const SizedBox(height: 28),
 

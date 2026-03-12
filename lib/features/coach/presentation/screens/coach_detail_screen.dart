@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/domain/entities/coach_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/providers/coach_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
 
 class CoachDetailScreen extends ConsumerWidget {
   final String coachId;
@@ -15,6 +17,7 @@ class CoachDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coachesAsync = ref.watch(coachListProvider);
+    final enterprisesAsync = ref.watch(enterpriseListProvider);
 
     return coachesAsync.when(
       data: (coaches) {
@@ -22,14 +25,22 @@ class CoachDetailScreen extends ConsumerWidget {
           (c) => c.id == coachId,
           orElse: () => const CoachEntity(id: '', name: 'Unknown', email: '', isActive: false),
         );
-        return _buildBody(context, coach);
+
+        return enterprisesAsync.when(
+          data: (allEnterprises) {
+            final assignedEnterprises = allEnterprises.where((e) => e.coachId == coachId).toList();
+            return _buildBody(context, coach, assignedEnterprises);
+          },
+          loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+          error: (err, _) => Scaffold(body: Center(child: Text('Error loading enterprises: $err'))),
+        );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, _) => Scaffold(body: Center(child: Text('Error: $err'))),
     );
   }
 
-  Widget _buildBody(BuildContext context, CoachEntity coach) {
+  Widget _buildBody(BuildContext context, CoachEntity coach, List<EnterpriseEntity> enterprises) {
     final initials = coach.name
         .trim()
         .split(' ')
@@ -37,26 +48,18 @@ class CoachDetailScreen extends ConsumerWidget {
         .map((w) => w.isNotEmpty ? w[0].toUpperCase() : '')
         .join();
 
-    // Placeholder metrics (would connect to backend)
+    // Calculate real metrics
+    final activeEnterprises = enterprises.length; // Simplified for now
+    
     final metrics = [
-      ('12', 'Enterprises\nAssigned', Icons.storefront_rounded, const Color(0xFF3D5AFE)),
-      ('48', 'Sessions\nThis Month', Icons.handshake_rounded, const Color(0xFF00B09B)),
-      ('74%', 'Avg. Health\nScore', Icons.trending_up_rounded, const Color(0xFFFF6F00)),
-      ('2d', 'Last\nActivity', Icons.schedule_rounded, const Color(0xFF9C27B0)),
+      (activeEnterprises.toString(), 'Enterprises\nAssigned', Icons.storefront_rounded, const Color(0xFF3D5AFE)),
+      ('0', 'Sessions\nThis Month', Icons.handshake_rounded, const Color(0xFF00B09B)),
+      ('N/A', 'Avg. Health\nScore', Icons.trending_up_rounded, const Color(0xFFFF6F00)),
+      ('New', 'Last\nActivity', Icons.schedule_rounded, const Color(0xFF9C27B0)),
     ];
 
-    final enterprises = [
-      ('Sunrise Bakery', 'Food & Bev', 72, true),
-      ('Green Fields', 'Agriculture', 45, false),
-      ('TechHub PLC', 'Technology', 88, true),
-      ('Atlas Trading', 'Trade', 60, true),
-    ];
-
-    final sessions = [
-      ('Mar 10, 2026', 'Recorded session on financial planning and bookkeeping.'),
-      ('Feb 28, 2026', 'Conducted marketing strategy workshop for 3 enterprises.'),
-      ('Feb 15, 2026', 'Assessment review session completed for Sunrise Bakery.'),
-    ];
+    // Sessions are currently not connected to a provider, so we'll show empty for now as requested
+    final sessions = []; 
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
@@ -162,9 +165,11 @@ class CoachDetailScreen extends ConsumerWidget {
                   itemCount: enterprises.length,
                   itemBuilder: (ctx, i) {
                     final e = enterprises[i];
-                    final healthColor = e.$3 >= 70
+                    // Score is mock for now as it's not in the entity yet
+                    final mockScore = 65; 
+                    final healthColor = mockScore >= 70
                         ? Colors.green
-                        : e.$3 >= 50
+                        : mockScore >= 50
                             ? Colors.orange
                             : Colors.red;
                     return Container(
@@ -186,15 +191,15 @@ class CoachDetailScreen extends ConsumerWidget {
                               color: healthColor.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: Center(child: Text(e.$3.toString(), style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 12))),
+                            child: Center(child: Text(mockScore.toString(), style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 12))),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(e.$1, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
-                                Text(e.$2, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
+                                Text(e.sector.name.toUpperCase(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -205,7 +210,7 @@ class CoachDetailScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              e.$3 >= 70 ? 'Healthy' : e.$3 >= 50 ? 'Moderate' : 'Critical',
+                              mockScore >= 70 ? 'Healthy' : mockScore >= 50 ? 'Moderate' : 'Critical',
                               style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 11),
                             ),
                           ),

@@ -1,25 +1,22 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
 
-class EnterpriseDetailScreen extends StatefulWidget {
+class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
   const EnterpriseDetailScreen({super.key, required this.enterpriseId});
 
   @override
-  State<EnterpriseDetailScreen> createState() => _EnterpriseDetailScreenState();
+  ConsumerState<EnterpriseDetailScreen> createState() => _EnterpriseDetailScreenState();
 }
 
-class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
+class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final _tasks = [
-    _Task('Set up bookkeeping system', false),
-    _Task('Create social media accounts', true),
-    _Task('Attend financial literacy workshop', true),
-    _Task('Develop marketing strategy', false),
-    _Task('Register for tax compliance', false),
-  ];
+  // Reduced mock tasks for new entities - in a real app these come from a dedicated provider
+  final List<_Task> _tasks = [];
 
   @override
   void initState() {
@@ -53,6 +50,33 @@ class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final enterprisesAsync = ref.watch(enterpriseListProvider);
+
+    return enterprisesAsync.when(
+      data: (enterprises) {
+        final enterprise = enterprises.firstWhere(
+          (e) => e.id == widget.enterpriseId,
+          orElse: () => EnterpriseEntity(
+            id: '',
+            businessName: 'Unknown',
+            ownerName: 'Unknown',
+            sector: Sector.other,
+            employeeCount: 0,
+            location: '',
+            phone: '',
+            coachId: '',
+            institutionId: '',
+            registeredAt: DateTime.now(),
+          ),
+        );
+        return _buildBody(context, enterprise);
+      },
+      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, _) => Scaffold(body: Center(child: Text('Error: $err'))),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, EnterpriseEntity enterprise) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       body: NestedScrollView(
@@ -95,12 +119,12 @@ class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
-                                    'Sunrise Bakery',
-                                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                                  Text(
+                                    enterprise.businessName,
+                                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    'Food & Beverage · Bahir Dar',
+                                    '${enterprise.sector.name.toUpperCase()} · ${enterprise.location}',
                                     style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13),
                                   ),
                                 ],
@@ -114,7 +138,7 @@ class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
                             _HealthBadge(score: _healthScore, label: _healthLabel),
                             const SizedBox(width: 12),
                             Text(
-                              'Coach: Samuel Bekele',
+                              'Coach ID: ${enterprise.coachId}',
                               style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
                             ),
                           ],
@@ -165,10 +189,10 @@ class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
             title: 'Business Profile',
             icon: Icons.info_outline_rounded,
             children: [
-              _InfoRow(Icons.person_rounded, 'Owner', 'Almaz Tesfaye'),
-              _InfoRow(Icons.phone_rounded, 'Phone', '+251 91 234 5678'),
-              _InfoRow(Icons.people_rounded, 'Employees', '12'),
-              _InfoRow(Icons.location_on_rounded, 'Address', 'Bahir Dar, Amhara'),
+              _InfoRow(Icons.person_rounded, 'Owner', enterprise.ownerName),
+              _InfoRow(Icons.phone_rounded, 'Phone', enterprise.phone),
+              _InfoRow(Icons.people_rounded, 'Employees', enterprise.employeeCount.toString()),
+              _InfoRow(Icons.location_on_rounded, 'Address', enterprise.location),
             ],
           ),
           const SizedBox(height: 20),
@@ -290,12 +314,7 @@ class _EnterpriseDetailScreenState extends State<EnterpriseDetailScreen>
   // ─── TAB 2: Coaching Timeline ──────────────────────────────────────────────
 
   Widget _buildTimelineTab() {
-    final sessions = [
-      ('Mar 10, 2026', 'Samuel Bekele', 'Financial planning and bookkeeping session.'),
-      ('Feb 28, 2026', 'Samuel Bekele', 'Marketing strategy workshop with practical exercises.'),
-      ('Feb 15, 2026', 'Samuel Bekele', 'First assessment review — identified critical areas.'),
-      ('Jan 20, 2026', 'Samuel Bekele', 'Initial onboarding and baseline assessment completed.'),
-    ];
+    final sessions = [];
 
     return ListView.builder(
       padding: const EdgeInsets.all(20),
