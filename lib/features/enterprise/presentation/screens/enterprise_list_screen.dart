@@ -179,8 +179,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
           return EnterpriseCard(
             enterprise: enterprise,
             onTap: () {
-              // TODO: Navigate to detail
-              // context.push('${AppRoutes.enterpriseDetail}/${enterprise.id}');
+              context.push('/enterprises/detail/${enterprise.id}');
             },
           );
         },

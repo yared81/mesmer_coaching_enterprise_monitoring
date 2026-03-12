@@ -29,6 +29,7 @@ abstract class AppRoutes {
   static const String coachList = '/coaches';
   static const String addCoach = '/coaches/new';
   static const String coachProfile = '/coaches/:id';
+  static const String coachDetail = '/coaches';
 
   // Progress
   static const String progressDashboard = '/enterprises/:id/progress';

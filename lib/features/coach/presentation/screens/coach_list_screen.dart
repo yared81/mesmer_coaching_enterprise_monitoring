@@ -3,170 +3,349 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/providers/coach_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/domain/entities/coach_entity.dart';
 
-class CoachListScreen extends ConsumerWidget {
+class CoachListScreen extends ConsumerStatefulWidget {
   const CoachListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CoachListScreen> createState() => _CoachListScreenState();
+}
+
+class _CoachListScreenState extends ConsumerState<CoachListScreen> {
+  String _searchQuery = '';
+  String _activeFilter = 'All'; // All, Active, Inactive
+  bool _showFilters = false;
+
+  static const List<String> _filterOptions = ['All', 'Active', 'Inactive'];
+
+  @override
+  Widget build(BuildContext context) {
     final coachesAsync = ref.watch(coachListProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Manage Coaches',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              // TODO: Implement coach search
-            },
-          ),
-        ],
-      ),
-      body: coachesAsync.when(
-        data: (coaches) {
-          if (coaches.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.group_off_rounded, size: 80, color: Colors.grey[300]),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No Coaches Found',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54,
-                    ),
+      backgroundColor: const Color(0xFFF4F6FB),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, _) => [
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: const Color(0xFF3D5AFE),
+            foregroundColor: Colors.white,
+            title: const Text('Coaches', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            actions: [
+              IconButton(
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    _showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
+                    key: ValueKey(_showFilters),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap the + button to register your first coach.',
-                    style: TextStyle(color: Colors.grey[500]),
-                  ),
-                ],
+                ),
+                onPressed: () => setState(() => _showFilters = !_showFilters),
               ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              // Invalidate to force a re-fetch
-              ref.invalidate(coachListProvider);
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              itemCount: coaches.length,
-              itemBuilder: (context, index) {
-                final coach = coaches[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+            ],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(_showFilters ? 108 : 56),
+              child: Column(
+                children: [
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        // TODO: Navigate to Coach Profile
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
-                              child: Text(
-                                coach.name.substring(0, 1).toUpperCase(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    coach.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    coach.email,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: coach.isActive 
-                                    ? Colors.green.withOpacity(0.1) 
-                                    : Colors.red.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                coach.isActive ? 'Active' : 'Inactive',
-                                style: TextStyle(
-                                  color: coach.isActive ? Colors.green[700] : Colors.red[700],
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(Icons.chevron_right_rounded, color: Colors.grey[400]),
-                          ],
+                      child: TextField(
+                        onChanged: (q) => setState(() => _searchQuery = q.toLowerCase()),
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        decoration: const InputDecoration(
+                          hintText: 'Search coaches…',
+                          hintStyle: TextStyle(color: Colors.white60),
+                          prefixIcon: Icon(Icons.search_rounded, color: Colors.white60, size: 20),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
                   ),
-                );
-              },
+                  // Filter chips
+                  if (_showFilters)
+                    SizedBox(
+                      height: 44,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        children: _filterOptions.map((f) {
+                          final selected = _activeFilter == f;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(f),
+                              selected: selected,
+                              onSelected: (_) => setState(() => _activeFilter = f),
+                              selectedColor: Colors.white,
+                              backgroundColor: Colors.white.withValues(alpha: 0.15),
+                              labelStyle: TextStyle(
+                                color: selected ? const Color(0xFF3D5AFE) : Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+          ),
+        ],
+        body: coachesAsync.when(
+          data: (all) {
+            // Apply filters
+            final coaches = all.where((c) {
+              final matchesSearch = _searchQuery.isEmpty ||
+                  c.name.toLowerCase().contains(_searchQuery) ||
+                  c.email.toLowerCase().contains(_searchQuery);
+              final matchesFilter = _activeFilter == 'All' ||
+                  (_activeFilter == 'Active' && c.isActive) ||
+                  (_activeFilter == 'Inactive' && !c.isActive);
+              return matchesSearch && matchesFilter;
+            }).toList();
+
+            if (coaches.isEmpty) {
+              return _EmptyState(
+                icon: Icons.group_off_rounded,
+                title: 'No Coaches Found',
+                subtitle: 'Try adjusting your search or filters.',
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async => ref.invalidate(coachListProvider),
+              child: ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+                itemCount: coaches.length,
+                itemBuilder: (context, i) => _CoachCard(
+                  coach: coaches[i],
+                  index: i,
+                  onTap: () => context.push('${AppRoutes.coachDetail}/${coaches[i].id}'),
+                ),
+              ),
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(child: Text('Error: $err')),
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          context.push(AppRoutes.addCoach);
-        },
-        backgroundColor: AppColors.primary,
+        onPressed: () => context.push(AppRoutes.addCoach),
+        backgroundColor: const Color(0xFF3D5AFE),
+        elevation: 4,
         icon: const Icon(Icons.person_add_rounded, color: Colors.white),
-        label: const Text('New Coach', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text('Add Coach', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+}
+
+// ─── Coach Card ────────────────────────────────────────────────────────────────
+
+class _CoachCard extends StatelessWidget {
+  final CoachEntity coach;
+  final int index;
+  final VoidCallback onTap;
+
+  const _CoachCard({required this.coach, required this.index, required this.onTap});
+
+  static const _gradients = [
+    [Color(0xFF3D5AFE), Color(0xFF7B9EFF)],
+    [Color(0xFF00B09B), Color(0xFF96C93D)],
+    [Color(0xFFFF6F00), Color(0xFFFFB300)],
+    [Color(0xFF9C27B0), Color(0xFFCE93D8)],
+    [Color(0xFFE53935), Color(0xFFEF9A9A)],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final gradient = _gradients[index % _gradients.length];
+    final initials = coach.name
+        .trim()
+        .split(' ')
+        .take(2)
+        .map((w) => w.isNotEmpty ? w[0].toUpperCase() : '')
+        .join();
+
+    // Placeholder stats (would come from backend)
+    final enterprises = 8 + (index * 3) % 12;
+    final sessions = 4 + (index * 5) % 15;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                // Gradient Avatar
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: gradient,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: gradient.first.withValues(alpha: 0.35),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      initials,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              coach.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFF1A1A1A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: coach.isActive
+                                  ? Colors.green.withValues(alpha: 0.1)
+                                  : Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              coach.isActive ? 'Active' : 'Inactive',
+                              style: TextStyle(
+                                color: coach.isActive ? Colors.green[700] : Colors.red[700],
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        coach.email,
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first),
+                          const SizedBox(width: 8),
+                          _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right_rounded, color: Colors.grey[300], size: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  const _StatPill(this.icon, this.label, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  const _EmptyState({required this.icon, required this.title, required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 80, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54)),
+          const SizedBox(height: 6),
+          Text(subtitle, style: TextStyle(color: Colors.grey[500])),
+        ],
       ),
     );
   }
