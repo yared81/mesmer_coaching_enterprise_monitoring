@@ -1,27 +1,69 @@
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/entities/dashboard_stats_entity.dart';
-import 'package:json_annotation/json_annotation.dart';
 
-part 'dashboard_stats_model.g.dart';
-
-@JsonSerializable()
-class AdminStatsModel extends AdminStatsEntity {
-  AdminStatsModel({
-    @JsonKey(name: 'totalInstitutions') required super.totalInstitutions,
-    @JsonKey(name: 'totalCoaches') required super.totalCoaches,
-    @JsonKey(name: 'totalEnterprises') required super.totalEnterprises,
-    @JsonKey(name: 'activePrograms') required super.activePrograms,
+class ActivityModel extends ActivityEntity {
+  ActivityModel({
+    required super.id,
+    required super.title,
+    required super.description,
+    required super.timestamp,
+    super.type,
   });
 
-  factory AdminStatsModel.fromJson(Map<String, dynamic> json) => _$AdminStatsModelFromJson(json);
+  factory ActivityModel.fromJson(Map<String, dynamic> json) {
+    return ActivityModel(
+      id: json['id'] as String,
+      title: json['name'] as String,
+      description: 'Coach: ${json['coach']?['name'] ?? 'N/A'}',
+      timestamp: DateTime.parse(json['registered_at'] as String),
+      type: 'enterprise',
+    );
+  }
 }
 
-@JsonSerializable()
-class SupervisorStatsModel extends SupervisorStatsEntity {
-  SupervisorStatsModel({
-    @JsonKey(name: 'totalCoaches') required super.totalCoaches,
-    @JsonKey(name: 'totalEnterprises') required super.totalEnterprises,
-    @JsonKey(name: 'avgAssessmentScore') required super.avgAssessmentScore,
+class AdminStatsModel extends AdminStatsEntity {
+  AdminStatsModel({
+    required super.totalInstitutions,
+    required super.totalCoaches,
+    required super.totalEnterprises,
+    required super.activePrograms,
+    required super.recentEnterprises,
   });
 
-  factory SupervisorStatsModel.fromJson(Map<String, dynamic> json) => _$SupervisorStatsModelFromJson(json);
+  factory AdminStatsModel.fromJson(Map<String, dynamic> json) {
+    final stats = json['stats'] as Map<String, dynamic>;
+    final recent = (json['recentEnterprises'] as List)
+        .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+    
+    return AdminStatsModel(
+      totalInstitutions: stats['totalInstitutions'] as int,
+      totalCoaches: stats['totalCoaches'] as int,
+      totalEnterprises: stats['totalEnterprises'] as int,
+      activePrograms: stats['activePrograms'] as int,
+      recentEnterprises: recent,
+    );
+  }
+}
+
+class SupervisorStatsModel extends SupervisorStatsEntity {
+  SupervisorStatsModel({
+    required super.totalCoaches,
+    required super.totalEnterprises,
+    required super.avgAssessmentScore,
+    required super.recentActivity,
+  });
+
+  factory SupervisorStatsModel.fromJson(Map<String, dynamic> json) {
+    final stats = json['stats'] as Map<String, dynamic>;
+    final recent = (json['recentActivity'] as List)
+        .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    return SupervisorStatsModel(
+      totalCoaches: stats['totalCoaches'] as int,
+      totalEnterprises: stats['totalEnterprises'] as int,
+      avgAssessmentScore: (stats['avgAssessmentScore'] as num).toDouble(),
+      recentActivity: recent,
+    );
+  }
 }

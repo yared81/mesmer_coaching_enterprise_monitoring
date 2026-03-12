@@ -9,11 +9,11 @@ class DashboardRemoteDataSource {
 
   Future<AdminStatsModel> getAdminStats() async {
     final response = await _dio.get(ApiConstants.adminStats);
-    return AdminStatsModel.fromJson(response.data['data']['stats']);
+    return AdminStatsModel.fromJson(response.data['data']);
   }
 
   Future<SupervisorStatsModel> getSupervisorStats() async {
     final response = await _dio.get(ApiConstants.supervisorStats);
-    return SupervisorStatsModel.fromJson(response.data['data']['stats']);
+    return SupervisorStatsModel.fromJson(response.data['data']);
   }
 }

@@ -4,6 +4,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/stat_card.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
+
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
 
@@ -12,7 +14,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(adminStatsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFFBFBFD),
       body: statsAsync.when(
         data: (stats) => RefreshIndicator(
           onRefresh: () => ref.refresh(adminStatsProvider.future),
@@ -20,57 +22,43 @@ class AdminDashboardScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverAppBar(
-                expandedHeight: 180.0,
-                floating: false,
+                floating: true,
                 pinned: true,
                 elevation: 0,
                 backgroundColor: AppColors.primary,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-                  title: const Text(
-                    'Program Administration',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppColors.primary, Color(0xFF1976D2)],
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          right: -30,
-                          bottom: -30,
-                          child: Icon(
-                            Icons.admin_panel_settings_rounded,
-                            size: 160,
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                      ],
-                    ),
+                foregroundColor: Colors.white,
+                centerTitle: true,
+                title: const Text(
+                  'Admin Dashboard',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search_rounded),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none_rounded),
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'System Overview',
+                        'System Statistics',
                         style: TextStyle(
                           fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF1A1A1A),
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -81,10 +69,10 @@ class AdminDashboardScreen extends ConsumerWidget {
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
-                        childAspectRatio: 0.95, // Adjusted to fit the taller premium StatCards
+                        childAspectRatio: 1.1,
                         children: [
                           StatCard(
-                            title: 'Active Programs',
+                            title: 'Programs',
                             value: stats.activePrograms.toString(),
                             icon: Icons.assignment_rounded,
                             color: Colors.green,
@@ -96,7 +84,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                             color: Colors.blue,
                           ),
                           StatCard(
-                            title: 'Total Coaches',
+                            title: 'Coaches',
                             value: stats.totalCoaches.toString(),
                             icon: Icons.people_rounded,
                             color: Colors.purple,
@@ -110,50 +98,8 @@ class AdminDashboardScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 32),
-                      const Text(
-                        'Recent Registrations',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey[200]!),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.02),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.feed_rounded, size: 48, color: Colors.grey[300]),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Live Feed Upcoming',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Real-time enterprise registrations will appear here in the next software iteration.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey[500], fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ActivityFeedWidget(activities: stats.recentEnterprises),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
