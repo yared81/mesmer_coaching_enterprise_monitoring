@@ -65,7 +65,8 @@ class DashboardService {
       Enterprise.findAll({
         where: { coach_id: coachId },
         limit: 5,
-        order: [['registered_at', 'DESC']]
+        order: [['registered_at', 'DESC']],
+        include: [{ model: User, as: 'coach', attributes: ['name'] }]
       })
     ]);
 

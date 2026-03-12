@@ -43,6 +43,7 @@ class AuthService {
   generateTokens(user) {
     const accessToken = jwt.sign(
       { 
+        id: user.id,
         userId: user.id, 
         role: user.role, 
         institution_id: user.institution_id,

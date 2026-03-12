@@ -12,10 +12,12 @@ class ActivityModel extends ActivityEntity {
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
     return ActivityModel(
       id: json['id'] as String,
-      title: json['name'] as String,
-      description: 'Coach: ${json['coach']?['name'] ?? 'N/A'}',
-      timestamp: DateTime.parse(json['registered_at'] as String),
-      type: 'enterprise',
+      title: (json['business_name'] ?? json['name'] ?? 'Unknown') as String,
+      description: json['coach'] != null 
+          ? 'Coach: ${json['coach']['name']}' 
+          : 'Enterprise activity',
+      timestamp: DateTime.parse((json['registered_at'] ?? json['timestamp'] ?? DateTime.now().toIso8601String()) as String),
+      type: json['type'] as String? ?? 'enterprise',
     );
   }
 }
