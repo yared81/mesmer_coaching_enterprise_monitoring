@@ -33,7 +33,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     final router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
-      title: 'MESMER Coaching',
+      title: 'GrowthTrack Coaching',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: ThemeData(

@@ -73,7 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const _LogoWidget(),
                   const SizedBox(height: 16),
                   const Text(
-                    'MESMER',
+                    'GrowthTrack',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w900,
@@ -338,7 +338,7 @@ class _PartnersWidget extends StatelessWidget {
           children: [
             _buildPartner('MONAS'),
             const SizedBox(width: 24),
-            _buildPartner('MESMER'),
+            _buildPartner('GrowthTrack'),
           ],
         ),
       ],

@@ -1,4 +1,4 @@
-// TODO: Define ThemeData for MESMER app
+// TODO: Define ThemeData for GrowthTrack app
 // - Use AppColors for colorScheme
 // - Use Inter font family
 // - Define AppBar, Card, ElevatedButton, InputDecoration themes
