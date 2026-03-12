@@ -70,7 +70,7 @@ class _MetricSwiperState extends State<MetricSwiper> {
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: item.gradient.first.withValues(alpha: 0.4),
+                          color: item.gradient.first.withOpacity(0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -88,7 +88,7 @@ class _MetricSwiperState extends State<MetricSwiper> {
                                   Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.2),
+                                      color: Colors.white.withOpacity(0.2),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Icon(item.icon, color: Colors.white, size: 20),
@@ -98,35 +98,30 @@ class _MetricSwiperState extends State<MetricSwiper> {
                                     item.label,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.bold,
                                       fontSize: 14,
-                                      letterSpacing: 0.2,
                                     ),
                                   ),
                                 ],
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    item.value,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 42,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -1.5,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    item.subtitle,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.75),
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 12),
+                              Text(
+                                item.value,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 42,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -1.5,
+                                  height: 1,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                item.subtitle,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.75),
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),
@@ -135,8 +130,8 @@ class _MetricSwiperState extends State<MetricSwiper> {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: item.trendUp
-                                ? Colors.white.withValues(alpha: 0.25)
-                                : Colors.red.withValues(alpha: 0.3),
+                                ? Colors.white.withOpacity(0.25)
+                                : Colors.red.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(

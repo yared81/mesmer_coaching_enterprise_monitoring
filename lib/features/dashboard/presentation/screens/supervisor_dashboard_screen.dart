@@ -181,7 +181,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                             Container(
                               padding: const EdgeInsets.all(6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: Colors.white.withOpacity(0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 20),
@@ -504,10 +504,10 @@ class _AlertCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: badgeColor.withValues(alpha: 0.25)),
+        border: Border.all(color: badgeColor.withOpacity(0.25)),
         boxShadow: [
           BoxShadow(
-            color: badgeColor.withValues(alpha: 0.08),
+            color: badgeColor.withOpacity(0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -530,7 +530,7 @@ class _AlertCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.1),
+                  color: badgeColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(Icons.warning_rounded, color: badgeColor, size: 16),
@@ -548,7 +548,7 @@ class _AlertCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.12),
+                  color: badgeColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -585,9 +585,9 @@ class _QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
+          color: color.withOpacity(0.08),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withValues(alpha: 0.15)),
+          border: Border.all(color: color.withOpacity(0.15)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -627,13 +627,13 @@ class _ProfileMenuTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: c.withValues(alpha: 0.08),
+          color: c.withOpacity(0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: c, size: 20),
       ),
       title: Text(label, style: TextStyle(color: c, fontWeight: FontWeight.w600)),
-      trailing: Icon(Icons.chevron_right_rounded, color: c.withValues(alpha: 0.4), size: 20),
+      trailing: Icon(Icons.chevron_right_rounded, color: c.withOpacity(0.4), size: 20),
     );
   }
 }
@@ -658,7 +658,7 @@ class _NotificationTile extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
-        backgroundColor: iconColor.withValues(alpha: 0.1),
+        backgroundColor: iconColor.withOpacity(0.1),
         child: Icon(icon, color: iconColor, size: 20),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),

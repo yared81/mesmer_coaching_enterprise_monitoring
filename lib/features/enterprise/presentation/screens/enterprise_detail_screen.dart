@@ -92,7 +92,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [_healthColor, _healthColor.withValues(alpha: 0.7)],
+                    colors: [_healthColor, _healthColor.withOpacity(0.7)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -109,7 +109,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
+                                color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 28),
@@ -125,7 +125,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                   ),
                                   Text(
                                     '${enterprise.sector.name.toUpperCase()} · ${enterprise.location}',
-                                    style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13),
+                                    style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
                                   ),
                                 ],
                               ),
@@ -139,7 +139,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                             const SizedBox(width: 12),
                             Text(
                               'Coach ID: ${enterprise.coachId}',
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
+                              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13),
                             ),
                           ],
                         ),
@@ -225,7 +225,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       radarBorderData: const BorderSide(color: Color(0xFFBDBDBD), width: 1.5),
                       dataSets: [
                         RadarDataSet(
-                          fillColor: _healthColor.withValues(alpha: 0.2),
+                          fillColor: _healthColor.withOpacity(0.2),
                           borderColor: _healthColor,
                           borderWidth: 2.5,
                           entryRadius: 5,
@@ -289,13 +289,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   LineChartBarData(
                     spots: const [FlSpot(0, 25), FlSpot(1, 30), FlSpot(2, 28), FlSpot(3, 35), FlSpot(4, 40), FlSpot(5, 45)],
                     isCurved: true,
-                    gradient: LinearGradient(colors: [_healthColor.withValues(alpha: 0.5), _healthColor]),
+                    gradient: LinearGradient(colors: [_healthColor.withOpacity(0.5), _healthColor]),
                     barWidth: 3,
                     dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
-                        colors: [_healthColor.withValues(alpha: 0.2), Colors.transparent],
+                        colors: [_healthColor.withOpacity(0.2), Colors.transparent],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -333,7 +333,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     color: const Color(0xFF3D5AFE),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withValues(alpha: 0.4), blurRadius: 6)],
+                    boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
                   ),
                 ),
                 if (i < sessions.length - 1)
@@ -350,7 +350,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +435,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
               ),
               child: ListTile(
                 leading: GestureDetector(
@@ -466,7 +466,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: (_tasks[i].done ? Colors.green : Colors.orange).withValues(alpha: 0.1),
+                    color: (_tasks[i].done ? Colors.green : Colors.orange).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -499,7 +499,7 @@ class _Task {
 BoxDecoration _cardDecor() => BoxDecoration(
   color: Colors.white,
   borderRadius: BorderRadius.circular(20),
-  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 20, offset: const Offset(0, 8))],
+  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 8))],
 );
 
 class _HealthBadge extends StatelessWidget {
@@ -512,9 +512,9 @@ class _HealthBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
+        color: Colors.white.withOpacity(0.25),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        border: Border.all(color: Colors.white.withOpacity(0.4)),
       ),
       child: Text('$score% · $label', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
     );

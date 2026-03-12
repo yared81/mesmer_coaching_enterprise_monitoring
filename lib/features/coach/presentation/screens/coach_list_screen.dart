@@ -56,7 +56,7 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
                     child: Container(
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: Colors.white.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: TextField(
@@ -88,7 +88,7 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
                               selected: selected,
                               onSelected: (_) => setState(() => _activeFilter = f),
                               selectedColor: Colors.white,
-                              backgroundColor: Colors.white.withValues(alpha: 0.15),
+                              backgroundColor: Colors.white.withOpacity(0.15),
                               labelStyle: TextStyle(
                                 color: selected ? const Color(0xFF3D5AFE) : Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -191,7 +191,7 @@ class _CoachCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -219,7 +219,7 @@ class _CoachCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: gradient.first.withValues(alpha: 0.35),
+                        color: gradient.first.withOpacity(0.35),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -259,8 +259,8 @@ class _CoachCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: coach.isActive
-                                  ? Colors.green.withValues(alpha: 0.1)
-                                  : Colors.red.withValues(alpha: 0.1),
+                                  ? Colors.green.withOpacity(0.1)
+                                  : Colors.red.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -313,7 +313,7 @@ class _StatPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

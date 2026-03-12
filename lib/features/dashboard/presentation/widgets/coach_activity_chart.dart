@@ -33,7 +33,7 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
         border: Border.all(color: Colors.grey.shade100),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -67,7 +67,7 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3D5AFE).withValues(alpha: 0.08),
+                  color: const Color(0xFF3D5AFE).withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(

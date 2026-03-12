@@ -90,9 +90,9 @@ class CoachDetailScreen extends ConsumerWidget {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white.withOpacity(0.2),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 2.5),
+                          border: Border.all(color: Colors.white.withOpacity(0.6), width: 2.5),
                         ),
                         child: Center(
                           child: Text(
@@ -107,16 +107,16 @@ class CoachDetailScreen extends ConsumerWidget {
                         style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(coach.email, style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 13)),
+                      Text(coach.email, style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 13)),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         decoration: BoxDecoration(
                           color: coach.isActive
-                              ? Colors.green.withValues(alpha: 0.25)
-                              : Colors.red.withValues(alpha: 0.25),
+                              ? Colors.green.withOpacity(0.25)
+                              : Colors.red.withOpacity(0.25),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
+                          border: Border.all(color: Colors.white.withOpacity(0.3)),
                         ),
                         child: Text(
                           coach.isActive ? '● Active' : '● Inactive',
@@ -179,7 +179,7 @@ class CoachDetailScreen extends ConsumerWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 16, offset: const Offset(0, 6)),
+                          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 16, offset: const Offset(0, 6)),
                         ],
                       ),
                       child: Row(
@@ -188,7 +188,7 @@ class CoachDetailScreen extends ConsumerWidget {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: healthColor.withValues(alpha: 0.1),
+                              color: healthColor.withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Center(child: Text(mockScore.toString(), style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 12))),
@@ -206,7 +206,7 @@ class CoachDetailScreen extends ConsumerWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: healthColor.withValues(alpha: 0.1),
+                              color: healthColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -241,7 +241,7 @@ class CoachDetailScreen extends ConsumerWidget {
                                 decoration: const BoxDecoration(color: Color(0xFF3D5AFE), shape: BoxShape.circle),
                               ),
                               if (i < sessions.length - 1)
-                                Container(width: 2, height: 56, color: const Color(0xFF3D5AFE).withValues(alpha: 0.15)),
+                                Container(width: 2, height: 56, color: const Color(0xFF3D5AFE).withOpacity(0.15)),
                             ],
                           ),
                           const SizedBox(width: 16),
@@ -253,7 +253,7 @@ class CoachDetailScreen extends ConsumerWidget {
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(14),
                                 boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0, 4)),
+                                  BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4)),
                                 ],
                               ),
                               child: Column(
@@ -296,7 +296,7 @@ class _MiniMetricCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 6)),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6)),
         ],
       ),
       child: Column(
@@ -304,7 +304,7 @@ class _MiniMetricCard extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
             child: Icon(icon, color: color, size: 18),
           ),
           const SizedBox(height: 6),
