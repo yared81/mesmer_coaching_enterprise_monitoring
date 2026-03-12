@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/enterprise/presentation/providers/enterprise_provider.dart';
-import '../../features/enterprise/domain/entities/enterprise_entity.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 
 class CoachEnterpriseListScreen extends ConsumerWidget {
   const CoachEnterpriseListScreen({super.key});

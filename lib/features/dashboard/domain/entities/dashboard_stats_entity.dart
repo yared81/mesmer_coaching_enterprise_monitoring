@@ -36,6 +36,11 @@ class SupervisorStatsEntity {
   final double avgAssessmentScore;
   final List<ActivityEntity> recentActivity;
 
+  SupervisorStatsEntity({
+    required this.totalCoaches,
+    required this.totalEnterprises,
+    required this.avgAssessmentScore,
+    required this.recentActivity,
   });
 }
 

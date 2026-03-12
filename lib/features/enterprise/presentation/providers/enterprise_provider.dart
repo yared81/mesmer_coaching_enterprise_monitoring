@@ -6,6 +6,7 @@ import '../../domain/repositories/enterprise_repository.dart';
 import '../../domain/usecases/get_enterprises_usecase.dart';
 import '../../domain/usecases/register_enterprise_usecase.dart';
 import '../../domain/entities/enterprise_entity.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 // 1. Datasource Provider
 final enterpriseRemoteDataSourceProvider = Provider<EnterpriseRemoteDatasource>((ref) {

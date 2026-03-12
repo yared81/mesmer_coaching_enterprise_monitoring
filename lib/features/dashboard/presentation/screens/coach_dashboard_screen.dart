@@ -13,6 +13,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/performance_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/add_session_screen.dart';
 
 class CoachDashboardScreen extends ConsumerWidget {
   const CoachDashboardScreen({super.key});

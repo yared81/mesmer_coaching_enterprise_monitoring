@@ -59,6 +59,11 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
         .toList();
 
+    return SupervisorStatsModel(
+      totalCoaches: stats['totalCoaches'] as int,
+      totalEnterprises: stats['totalEnterprises'] as int,
+      avgAssessmentScore: (stats['avgAssessmentScore'] as num).toDouble(),
+      recentActivity: recent,
     );
   }
 }
