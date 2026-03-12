@@ -8,15 +8,10 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/settings_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
 
-class DashboardMainScreen extends ConsumerStatefulWidget {
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
+
+class DashboardMainScreen extends ConsumerWidget {
   const DashboardMainScreen({super.key});
-
-  @override
-  ConsumerState<DashboardMainScreen> createState() => _DashboardMainScreenState();
-}
-
-class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
-  int _currentIndex = 0;
 
   Widget _getDashboardBody(UserRole? role) {
     if (role == UserRole.admin) return const AdminDashboardScreen();
@@ -25,9 +20,10 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final userRole = authState.user?.role;
+    final currentIndex = ref.watch(dashboardIndexProvider);
 
     // Dynamically build the screens and navigation items based on role
     List<Widget> pages = [_getDashboardBody(userRole)];
@@ -47,7 +43,6 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
         label: 'Coaches',
       ));
       
-      // Placeholder for Enterprise master list
       pages.add(const Center(child: Text('Enterprise List Coming Soon')));
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.storefront_outlined),
@@ -55,7 +50,6 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
         label: 'Enterprises',
       ));
 
-      // Placeholder for Reports
       pages.add(const Center(child: Text('Reports Coming Soon')));
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
@@ -64,7 +58,6 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
       ));
     }
 
-    // Everyone gets settings instead of just profile
     pages.add(const SettingsScreen());
     navItems.add(const NavigationDestination(
       icon: Icon(Icons.settings_outlined),
@@ -74,7 +67,7 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
 
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
+        index: currentIndex,
         children: pages,
       ),
       bottomNavigationBar: Container(
@@ -88,11 +81,9 @@ class _DashboardMainScreenState extends ConsumerState<DashboardMainScreen> {
           ],
         ),
         child: NavigationBar(
-          selectedIndex: _currentIndex,
+          selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            ref.read(dashboardIndexProvider.notifier).state = index;
           },
           backgroundColor: Colors.white,
           elevation: 0,

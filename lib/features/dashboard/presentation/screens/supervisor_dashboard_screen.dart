@@ -7,6 +7,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/performance_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
+
 class SupervisorDashboardScreen extends ConsumerWidget {
   const SupervisorDashboardScreen({super.key});
 
@@ -93,12 +95,14 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                             value: stats.totalCoaches.toString(),
                             icon: Icons.people_alt_rounded,
                             color: Colors.indigo,
+                            onTap: () => ref.read(dashboardIndexProvider.notifier).state = 1,
                           ),
                           StatCard(
                             title: 'Enterprises',
                             value: stats.totalEnterprises.toString(),
                             icon: Icons.storefront_rounded,
                             color: Colors.amber[800]!,
+                            onTap: () => ref.read(dashboardIndexProvider.notifier).state = 2,
                           ),
                         ],
                       ),
