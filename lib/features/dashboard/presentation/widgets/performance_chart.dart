@@ -99,6 +99,7 @@ class ProgramPerformanceChart extends StatelessWidget {
                           case 10: text = 'NOV'; break;
                         }
                         return SideTitleWidget(
+                          meta: meta,
                           child: Text(text, style: style),
                         );
                       },
