@@ -20,44 +20,50 @@ class SupervisorDashboardScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverAppBar(
-                expandedHeight: 180.0,
-                floating: false,
+                floating: true,
                 pinned: true,
                 elevation: 0,
                 backgroundColor: Colors.indigo,
-                flexibleSpace: FlexibleSpaceBar(
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-                  title: const Text(
-                    'Institution Oversight',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ),
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.indigo, Color(0xFF3949AB)], // Slightly lighter indigo
+                foregroundColor: Colors.white,
+                centerTitle: true,
+                leadingWidth: 120, // Give enough space for institution name
+                leading: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 16.0),
+                    child: Text(
+                      'MESMER HQ', // Extracted from context
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          right: -20,
-                          bottom: -20,
-                          child: Icon(
-                            Icons.domain_rounded,
-                            size: 160,
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                      ],
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
+                title: const Text(
+                  'Supervisor Dashboard',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.search_rounded),
+                    onPressed: () {
+                      // TODO: Implement search
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none_rounded),
+                    onPressed: () {
+                      // TODO: Implement notifications
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
               ),
               SliverToBoxAdapter(
                 child: Padding(
