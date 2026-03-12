@@ -1,0 +1,58 @@
+Analyzing mesmer_coaching_enterprise_monitoring...              
+
+warning • Unused import: 'package:flutter/material.dart' • lib/core/constants/app_text_styles.dart:2:8 • unused_import
+warning • Unused import: '../constants/api_constants.dart' • lib/core/network/api_interceptor.dart:3:8 • unused_import
+warning • Unused import: 'package:flutter/material.dart' • lib/core/router/app_router.dart:1:8 • unused_import
+warning • Unused import: 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart' • lib/core/router/app_router.dart:4:8 • unused_import
+warning • Unused import: 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart' • lib/core/router/app_router.dart:10:8 • unused_import
+warning • The annotation 'JsonKey.new' can only be used on fields or getters • lib/features/auth/data/models/user_model.dart:14:6 • invalid_annotation_target
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/auth/presentation/screens/profile_screen.dart:31:63 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/auth/presentation/screens/profile_screen.dart:54:55 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/auth/presentation/screens/profile_screen.dart:123:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/auth/presentation/screens/settings_screen.dart:37:69 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/auth/presentation/screens/settings_screen.dart:179:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/coach/presentation/screens/add_coach_screen.dart:82:42 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/coach/presentation/screens/coach_list_screen.dart:78:45 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/coach/presentation/screens/coach_list_screen.dart:97:66 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/coach/presentation/screens/coach_list_screen.dart:135:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/coach/presentation/screens/coach_list_screen.dart:136:50 • deprecated_member_use
+warning • Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' • lib/features/coaching/presentation/providers/coaching_provider.dart:2:8 • unused_import
+warning • Unused import: 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart' • lib/features/dashboard/presentation/providers/dashboard_provider.dart:7:8 • unused_import
+warning • Unused import: '../../../../core/constants/app_spacing.dart' • lib/features/dashboard/presentation/screens/coach_dashboard_screen.dart:6:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/coach_dashboard_screen.dart:96:39 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/coach_dashboard_screen.dart:189:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/coach_dashboard_screen.dart:228:24 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/coach_dashboard_screen.dart:230:43 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/dashboard_main_screen.dart:77:35 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/screens/dashboard_main_screen.dart:90:58 • deprecated_member_use
+  error • Undefined name 'dashboardIndexProvider' • lib/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart:138:51 • undefined_identifier
+  error • Undefined name 'dashboardIndexProvider' • lib/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart:145:51 • undefined_identifier
+  error • Undefined name 'dashboardIndexProvider' • lib/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart:156:38 • undefined_identifier
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/activity_feed_widget.dart:41:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/performance_chart.dart:17:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/performance_chart.dart:139:39 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/performance_chart.dart:140:39 • deprecated_member_use
+  error • The getter 'name' isn't defined for the type 'EnterpriseEntity' • lib/features/dashboard/presentation/widgets/premium_search_bar.dart:57:31 • undefined_getter
+  error • The getter 'name' isn't defined for the type 'EnterpriseEntity' • lib/features/dashboard/presentation/widgets/premium_search_bar.dart:121:30 • undefined_getter
+  error • The getter 'name' isn't defined for the type 'EnterpriseEntity' • lib/features/dashboard/presentation/widgets/premium_search_bar.dart:124:42 • undefined_getter
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/stat_card.dart:30:45 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/stat_card.dart:33:30 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/stat_card.dart:38:37 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/stat_card.dart:54:36 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/dashboard/presentation/widgets/stat_card.dart:59:64 • deprecated_member_use
+  error • The name 'AssessmentCategory' isn't a type, so it can't be used as a type argument • lib/features/diagnosis/domain/entities/diagnosis_result_entity.dart:15:13 • non_type_as_type_argument
+warning • Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' • lib/features/diagnosis/presentation/providers/diagnosis_provider.dart:2:8 • unused_import
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/features/enterprise/data/datasources/enterprise_remote_datasource.dart:15:9 • use_null_aware_elements
+   info • Use the null-aware marker '?' rather than a null check via an 'if' • lib/features/enterprise/data/datasources/enterprise_remote_datasource.dart:16:9 • use_null_aware_elements
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/screens/enterprise_form_screen.dart:157:71 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/screens/enterprise_form_screen.dart:271:51 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/screens/enterprise_list_screen.dart:91:39 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/screens/enterprise_list_screen.dart:164:91 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/widgets/enterprise_card.dart:25:33 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/widgets/enterprise_card.dart:107:22 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/features/enterprise/presentation/widgets/enterprise_card.dart:109:41 • deprecated_member_use
+warning • Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' • lib/features/progress/presentation/providers/progress_provider.dart:2:8 • unused_import
+warning • Unused import: 'package:flutter_riverpod/flutter_riverpod.dart' • lib/features/reports/presentation/providers/reports_provider.dart:2:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/shared/widgets/primary_button.dart:29:52 • deprecated_member_use
+
+54 issues found. (ran in 2.5s)

@@ -54,7 +54,7 @@ class _PremiumSearchBarState extends ConsumerState<PremiumSearchBar> {
         // Enterprises Section
         enterprisesAsync.whenData((enterprises) {
           final filteredEnterprises = enterprises
-              .where((e) => e.name.toLowerCase().contains(query))
+              .where((e) => e.businessName.toLowerCase().contains(query))
               .take(3)
               .toList();
 
@@ -118,10 +118,10 @@ class _PremiumSearchBarState extends ConsumerState<PremiumSearchBar> {
         ),
         child: Icon(Icons.storefront_rounded, color: Colors.amber[800], size: 20),
       ),
-      title: Text(enterprise.name),
+      title: Text(enterprise.businessName),
       subtitle: Text(enterprise.sector.name),
       onTap: () {
-        _controller.closeView(enterprise.name);
+        _controller.closeView(enterprise.businessName);
         // TODO: Navigate to enterprise details
       },
     );
