@@ -13,7 +13,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presenta
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
 
 class DashboardMainScreen extends ConsumerWidget {
-  const DashboardMainScreen({super.key});
+  final Widget child;
+  const DashboardMainScreen({super.key, required this.child});
 
   Widget _getDashboardBody(UserRole? role) {
     if (role == UserRole.admin) return const AdminDashboardScreen();
@@ -25,7 +26,35 @@ class DashboardMainScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final userRole = authState.user?.role;
-    final currentIndex = ref.watch(dashboardIndexProvider);
+    final location = GoRouterState.of(context).matchedLocation;
+    
+    // Determine current index based on location
+    int currentIndex = 0;
+    if (location.startsWith('/enterprises')) {
+      currentIndex = 1;
+    } else if (location.startsWith('/coaches')) {
+      currentIndex = 1;
+    } else if (location.startsWith('/sessions')) {
+      currentIndex = 2;
+    } else if (location.startsWith('/reports') || location.contains('reports')) {
+      currentIndex = 3;
+    } else if (location.startsWith('/settings')) {
+      currentIndex = (userRole == UserRole.supervisor) ? 4 : 4; // Settings is always last
+    }
+
+    if (userRole == UserRole.coach) {
+       if (location.startsWith('/enterprises')) currentIndex = 1;
+       else if (location.startsWith('/sessions')) currentIndex = 2;
+       else if (location.contains('reports')) currentIndex = 3;
+       else if (location.startsWith('/settings')) currentIndex = 4;
+       else currentIndex = 0;
+    } else if (userRole == UserRole.supervisor) {
+       if (location.startsWith('/coaches')) currentIndex = 1;
+       else if (location.startsWith('/enterprises')) currentIndex = 2;
+       else if (location.startsWith('/reports')) currentIndex = 3;
+       else if (location.startsWith('/settings')) currentIndex = 4;
+       else currentIndex = 0;
+    }
 
     // Dynamically build the screens and navigation items based on role
     List<Widget> pages = [_getDashboardBody(userRole)];
@@ -90,10 +119,7 @@ class DashboardMainScreen extends ConsumerWidget {
     ));
 
     return Scaffold(
-      body: IndexedStack(
-        index: currentIndex,
-        children: pages,
-      ),
+      body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -107,7 +133,19 @@ class DashboardMainScreen extends ConsumerWidget {
         child: NavigationBar(
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
-            ref.read(dashboardIndexProvider.notifier).state = index;
+            String targetPath = AppRoutes.dashboard;
+            if (userRole == UserRole.supervisor) {
+              if (index == 1) targetPath = '/coaches';
+              else if (index == 2) targetPath = AppRoutes.enterpriseList;
+              else if (index == 3) targetPath = AppRoutes.supervisorReports;
+              else if (index == 4) targetPath = '/settings';
+            } else if (userRole == UserRole.coach) {
+              if (index == 1) targetPath = AppRoutes.enterpriseList;
+              else if (index == 2) targetPath = '/sessions';
+              else if (index == 3) targetPath = '/reports'; // Coach reports fallback
+              else if (index == 4) targetPath = '/settings';
+            }
+            context.go(targetPath);
           },
           backgroundColor: Colors.white,
           elevation: 0,

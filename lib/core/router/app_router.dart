@@ -10,6 +10,12 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/coach_session_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/add_session_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/screens/settings_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/session_detail_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/domain/entities/coaching_session_entity.dart';
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_form_screen.dart';
@@ -43,47 +49,71 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardMainScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.profile,
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.changePassword,
-        builder: (context, state) => const ChangePasswordScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.enterpriseList,
-        builder: (context, state) => const EnterpriseListScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.enterpriseForm,
-        builder: (context, state) => const EnterpriseFormScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.supervisorReports,
-        builder: (context, state) => const SupervisorDashboardScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.addCoach,
-        builder: (context, state) => const AddCoachScreen(),
-      ),
-      GoRoute(
-        path: '/coaches/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return CoachDetailScreen(coachId: id);
-        },
-      ),
-      GoRoute(
-        path: '/enterprises/detail/:id',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return EnterpriseDetailScreen(enterpriseId: id);
-        },
+      ShellRoute(
+        builder: (context, state, child) => DashboardMainScreen(child: child),
+        routes: [
+          GoRoute(
+            path: AppRoutes.dashboard,
+            builder: (context, state) => const Placeholder(), // Managed by redirect or shell logic
+          ),
+          GoRoute(
+            path: AppRoutes.enterpriseList,
+            builder: (context, state) => const EnterpriseListScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.supervisorReports,
+            builder: (context, state) => const SupervisorDashboardScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.profile,
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.changePassword,
+            builder: (context, state) => const ChangePasswordScreen(),
+          ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
+          ),
+          GoRoute(
+            path: '/sessions',
+            builder: (context, state) => const CoachSessionListScreen(),
+          ),
+          GoRoute(
+            path: '/sessions/new',
+            builder: (context, state) => const AddSessionScreen(),
+          ),
+          GoRoute(
+            path: '/sessions/detail',
+            builder: (context, state) {
+              final session = state.extra as CoachingSessionEntity;
+              return SessionDetailScreen(session: session);
+            },
+          ),
+          GoRoute(
+            path: '/coaches',
+            builder: (context, state) => const CoachListScreen(),
+          ),
+          GoRoute(
+            path: '/coaches/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return CoachDetailScreen(coachId: id);
+            },
+          ),
+          GoRoute(
+            path: '/enterprises/detail/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return EnterpriseDetailScreen(enterpriseId: id);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.enterpriseForm,
+            builder: (context, state) => const EnterpriseFormScreen(),
+          ),
+        ],
       ),
     ],
   );

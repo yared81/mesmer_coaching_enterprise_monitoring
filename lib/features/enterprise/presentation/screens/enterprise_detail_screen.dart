@@ -358,9 +358,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (_) => SessionDetailScreen(session: s),
-                      ));
+                      context.push('/sessions/detail', extra: s);
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Container(

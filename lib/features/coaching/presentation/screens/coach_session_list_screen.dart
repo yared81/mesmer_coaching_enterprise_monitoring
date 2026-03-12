@@ -39,10 +39,7 @@ class CoachSessionListScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.push(
-          context, 
-          MaterialPageRoute(builder: (context) => const AddSessionScreen())
-        ),
+        onPressed: () => context.push('/sessions/new'),
         label: const Text('New Session'),
         icon: const Icon(Icons.add),
         backgroundColor: const Color(0xFF3D5AFE),
@@ -83,12 +80,7 @@ class _SessionCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SessionDetailScreen(session: session),
-            ),
-          );
+          context.push('/sessions/detail', extra: session);
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

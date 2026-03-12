@@ -159,7 +159,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 floating: false,
                 pinned: true,
                 snap: false,
-                expandedHeight: 100,
+                expandedHeight: 70,
                 elevation: 0,
                 backgroundColor: const Color(0xFF3D5AFE),
                 surfaceTintColor: Colors.transparent,
@@ -174,7 +174,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                     ),
                     child: SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                         child: Row(
                           children: [
                             // Institution logo + name
@@ -271,7 +271,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                           trend: '+12%',
                           trendUp: true,
                           gradient: const [Color(0xFF3D5AFE), Color(0xFF6979F8)],
-                          onTap: () => ref.read(dashboardIndexProvider.notifier).state = 2,
+                          onTap: () => context.go(AppRoutes.enterpriseList),
                         ),
                         MetricSwiperItem(
                           icon: Icons.people_alt_rounded,
@@ -281,7 +281,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                           trend: '+2',
                           trendUp: true,
                           gradient: const [Color(0xFF00B09B), Color(0xFF96C93D)],
-                          onTap: () => ref.read(dashboardIndexProvider.notifier).state = 1,
+                          onTap: () => context.go('/coaches'),
                         ),
                         MetricSwiperItem(
                           icon: Icons.handshake_rounded,
@@ -344,7 +344,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                         activities: stats.recentActivity,
                         onActivityTap: (activity) {
                           if (activity.type == 'enterprise') {
-                            ref.read(dashboardIndexProvider.notifier).state = 2;
+                            context.go(AppRoutes.enterpriseList);
                           }
                         },
                       ),
@@ -367,7 +367,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                               icon: Icons.bar_chart_rounded,
                               label: 'Reports',
                               color: const Color(0xFF3D5AFE),
-                              onTap: () => ref.read(dashboardIndexProvider.notifier).state = 3,
+                              onTap: () => context.go(AppRoutes.supervisorReports),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -376,7 +376,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                               icon: Icons.people_outline_rounded,
                               label: 'All Coaches',
                               color: const Color(0xFF00B09B),
-                              onTap: () => ref.read(dashboardIndexProvider.notifier).state = 1,
+                              onTap: () => context.go('/coaches'),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -385,7 +385,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                               icon: Icons.domain_rounded,
                               label: 'Enterprises',
                               color: const Color(0xFFFF6F00),
-                              onTap: () => ref.read(dashboardIndexProvider.notifier).state = 2,
+                              onTap: () => context.go(AppRoutes.enterpriseList),
                             ),
                           ),
                         ],

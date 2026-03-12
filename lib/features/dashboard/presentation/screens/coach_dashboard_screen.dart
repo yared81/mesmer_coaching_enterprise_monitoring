@@ -47,7 +47,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                           trend: '+${stats.totalEnterprises}',
                           trendUp: true,
                           gradient: const [Color(0xFF3D5AFE), Color(0xFF8C9EFF)],
-                          onTap: () => ref.read(dashboardIndexProvider.notifier).state = 1,
+                          onTap: () => context.go(AppRoutes.enterpriseList),
                         ),
                         MetricSwiperItem(
                           icon: Icons.calendar_month_rounded,
@@ -57,7 +57,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                           trend: '0',
                           trendUp: true,
                           gradient: const [Color(0xFF00B09B), Color(0xFF96C93D)],
-                          onTap: () => ref.read(dashboardIndexProvider.notifier).state = 2,
+                          onTap: () => context.go('/sessions'),
                         ),
                         MetricSwiperItem(
                           icon: Icons.task_alt_rounded,
@@ -104,10 +104,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                                   title: 'Add Session',
                                   icon: Icons.add_circle_outline_rounded,
                                   color: const Color(0xFF3D5AFE),
-                                  onTap: () => Navigator.push(
-                                    context, 
-                                    MaterialPageRoute(builder: (context) => const AddSessionScreen())
-                                  ),
+                                  onTap: () => context.push('/sessions/new'),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -151,19 +148,19 @@ class CoachDashboardScreen extends ConsumerWidget {
 
   Widget _buildAppBar(BuildContext context, WidgetRef ref, String name) {
     return SliverAppBar(
-      expandedHeight: 140.0,
+      expandedHeight: 80.0,
       floating: false,
       pinned: true,
       elevation: 0,
       backgroundColor: const Color(0xFF3D5AFE),
       flexibleSpace: FlexibleSpaceBar(
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
-        title: Text(
+        titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
+        title: const Text(
           'Coach Dashboard',
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
             letterSpacing: -0.5,
           ),
         ),
