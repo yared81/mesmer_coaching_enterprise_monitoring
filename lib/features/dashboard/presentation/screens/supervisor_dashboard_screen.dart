@@ -7,7 +7,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/performance_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
 
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/premium_search_bar.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/app_search_bar.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
 
 class SupervisorDashboardScreen extends ConsumerWidget {
@@ -99,7 +99,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  const PremiumSearchBar(),
+                  const AppSearchBar(),
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded),
                     onPressed: () => _showNotificationsSheet(context),

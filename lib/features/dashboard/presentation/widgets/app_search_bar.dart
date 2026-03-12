@@ -5,14 +5,14 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presen
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/domain/entities/coach_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
 
-class PremiumSearchBar extends ConsumerStatefulWidget {
-  const PremiumSearchBar({super.key});
+class AppSearchBar extends ConsumerStatefulWidget {
+  const AppSearchBar({super.key});
 
   @override
-  ConsumerState<PremiumSearchBar> createState() => _PremiumSearchBarState();
+  ConsumerState<AppSearchBar> createState() => _AppSearchBarState();
 }
 
-class _PremiumSearchBarState extends ConsumerState<PremiumSearchBar> {
+class _AppSearchBarState extends ConsumerState<AppSearchBar> {
   final SearchController _controller = SearchController();
 
   @override
