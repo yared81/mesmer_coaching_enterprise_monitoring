@@ -7,10 +7,53 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/performance_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
 
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_navigation_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/premium_search_bar.dart';
 
 class SupervisorDashboardScreen extends ConsumerWidget {
   const SupervisorDashboardScreen({super.key});
+
+  void _showNotificationsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Notifications',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                TextButton(onPressed: () {}, child: const Text('Mark all as read')),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const CircleAvatar(backgroundColor: Colors.blueAccent, child: Icon(Icons.info_outline, color: Colors.white)),
+              title: const Text('System Update'),
+              subtitle: const Text('Service maintenance scheduled for tonight at 2 AM.'),
+              trailing: const Text('2h ago', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ),
+            ListTile(
+              leading: const CircleAvatar(backgroundColor: Colors.green, child: Icon(Icons.check_circle_outline, color: Colors.white)),
+              title: const Text('New Enterprise Registered'),
+              subtitle: const Text('Global Tech Solutions has joined the program.'),
+              trailing: const Text('5h ago', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,13 +98,10 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.search_rounded),
-                    onPressed: () {},
-                  ),
+                  const PremiumSearchBar(),
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded),
-                    onPressed: () {},
+                    onPressed: () => _showNotificationsSheet(context),
                   ),
                   const SizedBox(width: 8),
                 ],

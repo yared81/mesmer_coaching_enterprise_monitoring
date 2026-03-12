@@ -3,11 +3,54 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/stat_card.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/activity_feed_widget.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/widgets/premium_search_bar.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
+
+  void _showNotificationsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'System Alerts',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                TextButton(onPressed: () {}, child: const Text('Clear All')),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const ListTile(
+              leading: CircleAvatar(backgroundColor: Colors.orange, child: Icon(Icons.warning_amber_rounded, color: Colors.white)),
+              title: Text('Low Performance Alert'),
+              subtitle: Text('Institution "FastTrack" showing 15% drop in activity.'),
+              trailing: Text('1h ago', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ),
+            const ListTile(
+              leading: CircleAvatar(backgroundColor: Colors.blueAccent, child: Icon(Icons.person_add_outlined, color: Colors.white)),
+              title: Text('New Admin Multi-factor request'),
+              subtitle: Text('Supervisor "John Doe" requested 2FA reset.'),
+              trailing: Text('3h ago', style: TextStyle(fontSize: 12, color: Colors.grey)),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,13 +79,10 @@ class AdminDashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.search_rounded),
-                    onPressed: () {},
-                  ),
+                  const PremiumSearchBar(),
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded),
-                    onPressed: () {},
+                    onPressed: () => _showNotificationsSheet(context),
                   ),
                   const SizedBox(width: 8),
                 ],

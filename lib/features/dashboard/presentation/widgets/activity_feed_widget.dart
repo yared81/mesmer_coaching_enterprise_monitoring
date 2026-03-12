@@ -4,8 +4,13 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/
 
 class ActivityFeedWidget extends StatelessWidget {
   final List<ActivityEntity> activities;
+  final Function(ActivityEntity)? onActivityTap;
 
-  const ActivityFeedWidget({super.key, required this.activities});
+  const ActivityFeedWidget({
+    super.key, 
+    required this.activities,
+    this.onActivityTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,57 +70,63 @@ class ActivityFeedWidget extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final activity = activities[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        activity.type == 'enterprise' 
-                          ? Icons.storefront_rounded 
-                          : Icons.assessment_rounded,
-                        color: Colors.blue[700],
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            activity.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Color(0xFF1A1A1A),
-                            ),
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onActivityTap != null ? () => onActivityTap!(activity) : null,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            activity.description,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 13,
-                            ),
+                          child: Icon(
+                            activity.type == 'enterprise' 
+                              ? Icons.storefront_rounded 
+                              : Icons.assessment_rounded,
+                            color: Colors.blue[700],
+                            size: 20,
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                activity.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Color(0xFF1A1A1A),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                activity.description,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          DateFormat('MMM d').format(activity.timestamp),
+                          style: TextStyle(
+                            color: Colors.grey[400],
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      DateFormat('MMM d').format(activity.timestamp),
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               );
             },
