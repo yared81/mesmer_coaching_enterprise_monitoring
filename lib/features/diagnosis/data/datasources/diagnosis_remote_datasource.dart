@@ -18,9 +18,9 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
 
   @override
   Future<DiagnosisTemplateModel> getLatestTemplate() async {
-    final response = await dio.get('/api/v1/diagnosis/template/latest');
+    final response = await dio.get('diagnosis/template/latest');
     
-    if (response.data['success']) {
+    if (response.data['success'] == true) {
       return DiagnosisTemplateModel.fromJson(response.data['data']);
     } else {
       throw Exception(response.data['message'] ?? 'Failed to fetch latest template');
@@ -29,11 +29,16 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId) async {
-    final response = await dio.get('/api/v1/diagnosis/reports/session/$sessionId');
-    if (response.data['success']) {
-      return response.data['data'];
+    try {
+      final response = await dio.get('diagnosis/reports/session/$sessionId');
+      if (response.data['success'] == true) {
+        return response.data['data'];
+      }
+      return null;
+    } catch (e) {
+      // A 404 means no report exists yet — that's fine, not an error
+      return null;
     }
-    return null;
   }
 
   @override
@@ -42,13 +47,13 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
     required String templateId,
     required Map<String, String> responses,
   }) async {
-    final response = await dio.post('/api/v1/diagnosis/reports', data: {
+    final response = await dio.post('diagnosis/reports', data: {
       'session_id': sessionId,
       'template_id': templateId,
       'responses': responses,
     });
 
-    if (response.data['success']) {
+    if (response.data['success'] == true) {
       return response.data['data'];
     } else {
       throw Exception(response.data['message'] ?? 'Failed to submit diagnosis');

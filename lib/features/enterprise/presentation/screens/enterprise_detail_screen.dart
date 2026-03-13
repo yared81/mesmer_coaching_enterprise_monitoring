@@ -165,13 +165,23 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
                           children: [
                             _HealthBadge(score: _healthScore, label: _healthLabel),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Coach ID: ${enterprise.coachId}',
-                              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 13),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                const Icon(Icons.people_outline, size: 13, color: Colors.white70),
+                                const SizedBox(width: 4),
+                                Text('${enterprise.employeeCount} employees',
+                                    style: const TextStyle(color: Colors.white, fontSize: 12)),
+                              ]),
                             ),
                           ],
                         ),
@@ -186,8 +196,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               controller: _tabController,
               indicatorColor: Colors.white,
               indicatorWeight: 3,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white60,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              unselectedLabelStyle: const TextStyle(fontSize: 13),
+              unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               tabs: const [
                 Tab(text: 'Overview'),
                 Tab(text: 'Sessions'),
