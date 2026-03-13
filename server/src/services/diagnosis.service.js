@@ -1,4 +1,4 @@
-const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice } = require('../models');
+const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, DiagnosisReport, DiagnosisResponse } = require('../models');
 
 class DiagnosisService {
   /**
@@ -102,6 +102,70 @@ class DiagnosisService {
     }
 
     return template;
+  }
+
+  /**
+   * Submit a diagnosis report
+   * @param {Object} data - { session_id, template_id, responses: { questionId: choiceId } }
+   */
+  async submitReport(data) {
+    const { session_id, template_id, responses } = data;
+
+    // 1. Calculate scores
+    let totalScore = 0;
+    let maxPossibleScore = 0;
+
+    // Get all choices in the template to calculate points
+    const template = await DiagnosisTemplate.findByPk(template_id, {
+      include: [
+        {
+          model: DiagnosisCategory,
+          as: 'categories',
+          include: [{ model: DiagnosisQuestion, as: 'questions', include: [{ model: DiagnosisChoice, as: 'choices' }] }]
+        }
+      ]
+    });
+
+    if (!template) throw new Error('Template not found');
+
+    // Calculate max possible score
+    for (const category of template.categories) {
+      for (const question of category.questions) {
+        const maxChoicePoints = Math.max(...question.choices.map(c => c.points));
+        maxPossibleScore += maxChoicePoints;
+
+        // Calculate actual score from responses
+        const choiceId = responses[question.id];
+        if (choiceId) {
+          const choice = question.choices.find(c => c.id === choiceId);
+          if (choice) {
+            totalScore += choice.points;
+          }
+        }
+      }
+    }
+
+    const healthPercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+
+    // 2. Create the Report
+    const report = await DiagnosisReport.create({
+      session_id,
+      template_id,
+      total_score: totalScore,
+      max_score: maxPossibleScore,
+      health_percentage: healthPercentage
+    });
+
+    // 3. Create individual responses
+    for (const [questionId, choiceId] of Object.entries(responses)) {
+      await DiagnosisResponse.create({
+        report_id: report.id,
+        question_id: questionId,
+        choice_id: choiceId
+      });
+    }
+
+    return report;
   }
 }
 

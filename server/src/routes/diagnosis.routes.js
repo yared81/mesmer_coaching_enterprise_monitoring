@@ -12,5 +12,6 @@ router.get('/template/latest', diagnosisController.getLatestTemplate);
 // Supervisor/Admin Only Routes
 router.get('/templates', authorize('supervisor', 'admin'), diagnosisController.listTemplates);
 router.post('/templates', authorize('supervisor', 'admin'), diagnosisController.createTemplate);
+router.post('/reports', diagnosisController.submitReport);
 
 module.exports = router;

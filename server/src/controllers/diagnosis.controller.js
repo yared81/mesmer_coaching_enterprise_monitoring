@@ -61,6 +61,23 @@ class DiagnosisController {
       next(error);
     }
   };
+
+  /**
+   * @route POST /api/v1/diagnosis/reports
+   * @access Coach, Supervisor, Admin
+   */
+  submitReport = async (req, res, next) => {
+    try {
+      const report = await diagnosisService.submitReport(req.body);
+      
+      res.status(201).json({
+        success: true,
+        data: report
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new DiagnosisController();
