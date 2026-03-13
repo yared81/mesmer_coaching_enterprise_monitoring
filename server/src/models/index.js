@@ -2,6 +2,10 @@ const Institution = require('./institution.model');
 const User = require('./user.model');
 const Enterprise = require('./enterprise.model');
 const CoachingSession = require('./session.model');
+const DiagnosisTemplate = require('./diagnosis_template.model');
+const DiagnosisCategory = require('./diagnosis_category.model');
+const DiagnosisQuestion = require('./diagnosis_question.model');
+const DiagnosisChoice = require('./diagnosis_choice.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -57,11 +61,28 @@ CoachingSession.belongsTo(User, {
   as: 'coach'
 });
 
+// Diagnosis Template Associations (1:N Hierarchy)
+Institution.hasMany(DiagnosisTemplate, { foreignKey: 'institution_id', as: 'diagnosisTemplates' });
+DiagnosisTemplate.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });
+
+DiagnosisTemplate.hasMany(DiagnosisCategory, { foreignKey: 'template_id', as: 'categories' });
+DiagnosisCategory.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
+
+DiagnosisCategory.hasMany(DiagnosisQuestion, { foreignKey: 'category_id', as: 'questions' });
+DiagnosisQuestion.belongsTo(DiagnosisCategory, { foreignKey: 'category_id' });
+
+DiagnosisQuestion.hasMany(DiagnosisChoice, { foreignKey: 'question_id', as: 'choices' });
+DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
+
 const db = {
   Institution,
   User,
   Enterprise,
-  CoachingSession
+  CoachingSession,
+  DiagnosisTemplate,
+  DiagnosisCategory,
+  DiagnosisQuestion,
+  DiagnosisChoice
 };
 
 module.exports = db;
