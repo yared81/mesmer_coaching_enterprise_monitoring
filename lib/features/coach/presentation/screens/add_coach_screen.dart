@@ -68,8 +68,8 @@ class _AddCoachScreenState extends ConsumerState<AddCoachScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Add New Coach', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -78,8 +78,12 @@ class _AddCoachScreenState extends ConsumerState<AddCoachScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.05),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
               child: const Column(
                 children: [
@@ -88,20 +92,20 @@ class _AddCoachScreenState extends ConsumerState<AddCoachScreen> {
                     backgroundColor: AppColors.primary,
                     child: Icon(Icons.person_add_rounded, size: 40, color: Colors.white),
                   ),
-                  SizedBox(height: 16),
-                  Text(
+                  const SizedBox(height: 16),
+                  const Text(
                     'Invite a Coach',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
+                      color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     'They will be assigned to your institution and receive default login credentials.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black54),
+                    style: TextStyle(color: Colors.white.withOpacity(0.9)),
                   ),
                 ],
               ),

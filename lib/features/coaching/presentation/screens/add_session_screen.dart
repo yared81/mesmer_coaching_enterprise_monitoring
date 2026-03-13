@@ -88,8 +88,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       appBar: AppBar(
         title: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

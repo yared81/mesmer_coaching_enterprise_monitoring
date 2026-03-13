@@ -91,7 +91,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             expandedHeight: 200,
             pinned: true,
             elevation: 0,
-            backgroundColor: _healthColor,
+            backgroundColor: const Color(0xFF3D5AFE),
             foregroundColor: Colors.white,
             actions: [
               PopupMenuButton<String>(
@@ -118,8 +118,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [_healthColor, _healthColor.withOpacity(0.7)],
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

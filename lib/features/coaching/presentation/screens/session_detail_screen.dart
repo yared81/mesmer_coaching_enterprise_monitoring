@@ -79,9 +79,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Session Details', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0.5,
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -91,7 +91,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             // Header Info
             Text(
               widget.session.title,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE)),
             ),
             const SizedBox(height: 8),
             Row(
@@ -142,7 +142,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.blueGrey)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF3D5AFE))),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
