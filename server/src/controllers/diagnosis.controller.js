@@ -7,7 +7,7 @@ class DiagnosisController {
    */
   getLatestTemplate = async (req, res, next) => {
     try {
-      const { institutionId } = req.user;
+      const institutionId = req.user.institution_id || req.user.institutionId;
       const template = await diagnosisService.getLatestTemplate(institutionId);
       
       if (!template) {
@@ -32,7 +32,7 @@ class DiagnosisController {
    */
   listTemplates = async (req, res, next) => {
     try {
-      const { institutionId } = req.user;
+      const institutionId = req.user.institution_id || req.user.institutionId;
       const templates = await diagnosisService.listTemplates(institutionId);
       
       res.status(200).json({
@@ -50,7 +50,7 @@ class DiagnosisController {
    */
   createTemplate = async (req, res, next) => {
     try {
-      const { institutionId } = req.user;
+      const institutionId = req.user.institution_id || req.user.institutionId;
       const template = await diagnosisService.createTemplate(req.body, institutionId);
       
       res.status(201).json({
