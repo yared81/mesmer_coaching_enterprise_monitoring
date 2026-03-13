@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../coaching/domain/entities/coaching_session_entity.dart';
-import '../../coaching/presentation/providers/coaching_provider.dart';
-import '../models/diagnosis_report_model.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/domain/entities/coaching_session_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/providers/coaching_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/data/models/diagnosis_report_model.dart';
 import '../providers/diagnosis_provider.dart';
 import '../widgets/question_card.dart';
 import 'diagnosis_summary_screen.dart';
@@ -283,7 +284,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     if (mounted) Navigator.pop(context); // Pop loading
 
     result.fold(
-      (failure) {
+      (Failure failure) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to submit: ${failure.message}'), backgroundColor: AppColors.error),
         );

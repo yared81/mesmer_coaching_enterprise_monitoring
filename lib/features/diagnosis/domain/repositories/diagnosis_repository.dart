@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failures.dart';
+import '../../../../core/errors/failure.dart';
 import '../entities/diagnosis_template_entity.dart';
 
 abstract class DiagnosisRepository {

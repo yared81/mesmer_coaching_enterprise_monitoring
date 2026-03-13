@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../models/diagnosis_report_model.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/data/models/diagnosis_report_model.dart';
 
 class DiagnosisSummaryScreen extends StatelessWidget {
   final DiagnosisReportModel report;

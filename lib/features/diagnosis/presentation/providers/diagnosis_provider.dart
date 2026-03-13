@@ -1,6 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/providers/core_providers.dart';
-import '../../../../core/storage/hive_storage.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
 import '../../data/datasources/diagnosis_remote_datasource.dart';
 import '../../data/repositories/diagnosis_repository_impl.dart';
 import '../../domain/entities/diagnosis_template_entity.dart';
@@ -22,7 +22,7 @@ final latestDiagnosisTemplateProvider = FutureProvider<DiagnosisTemplateEntity>(
   final repository = ref.watch(diagnosisRepositoryProvider);
   final result = await repository.getLatestTemplate();
   return result.fold(
-    (failure) => throw failure.message,
+    (Failure failure) => throw failure.message,
     (template) => template,
   );
 });
