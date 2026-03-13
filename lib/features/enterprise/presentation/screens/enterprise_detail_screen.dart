@@ -93,7 +93,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         headerSliverBuilder: (ctx, _) => [
           // ── Hero Header ─────────────────────────────────────────────────
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 280, // Increased height to prevent overlap
             pinned: true,
             elevation: 0,
             backgroundColor: const Color(0xFF3D5AFE),
@@ -122,8 +122,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
                     colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -131,7 +131,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 52, 24, 16),
+                    padding: const EdgeInsets.fromLTRB(24, 52, 24, 60), // Add bottom padding for TabBar
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -240,61 +240,106 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             ],
           ),
           const SizedBox(height: 20),
-          // Radar Chart for Category Scores
-          const _SectionLabel('Assessment Scores'),
+          // Bar Chart for Category Scores (Premium Design)
+          const _SectionLabel('Assessment Performance'),
           const SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
             decoration: _cardDecor(),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text(
+                  'Core Areas (Out of 5.0)',
+                  style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 24),
                 SizedBox(
                   height: 220,
-                  child: RadarChart(
-                    RadarChartData(
-                      radarTouchData: RadarTouchData(enabled: false),
-                      getTitle: (index, angle) {
-                        const titles = ['Finance', 'Marketing', 'Operations', 'HR', 'Strategy'];
-                        return RadarChartTitle(
-                          text: titles[index],
-                          angle: angle,
-                          positionPercentageOffset: 0.1,
-                        );
-                      },
-                      titleTextStyle: const TextStyle(fontSize: 11, color: Color(0xFF424242), fontWeight: FontWeight.w600),
-                      titlePositionPercentageOffset: 0.15,
-                      tickCount: 4,
-                      tickBorderData: const BorderSide(color: Color(0xFFE0E0E0), width: 1),
-                      gridBorderData: const BorderSide(color: Color(0xFFEEEEEE), width: 1),
-                      radarBorderData: const BorderSide(color: Color(0xFFBDBDBD), width: 1.5),
-                      dataSets: [
-                        RadarDataSet(
-                          fillColor: _healthColor.withOpacity(0.2),
-                          borderColor: _healthColor,
-                          borderWidth: 2.5,
-                          entryRadius: 5,
-                          dataEntries: [
-                            const RadarEntry(value: 3.2),
-                            const RadarEntry(value: 2.8),
-                            const RadarEntry(value: 3.8),
-                            const RadarEntry(value: 2.4),
-                            const RadarEntry(value: 3.0),
-                          ],
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: 5,
+                      minY: 0,
+                      barTouchData: BarTouchData(
+                        enabled: true,
+                        touchTooltipData: BarTouchTooltipData(
+                          tooltipPadding: const EdgeInsets.all(8),
+                          tooltipMargin: 8,
+                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                            return BarTooltipItem(
+                              rod.toY.toStringAsFixed(1),
+                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            );
+                          },
                         ),
+                      ),
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 32,
+                            getTitlesWidget: (value, meta) {
+                              const titles = ['FIN', 'MKT', 'OPS', 'HR', 'STR'];
+                              final index = value.toInt();
+                              if (index < 0 || index >= titles.length) return const SizedBox.shrink();
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  titles[index],
+                                  style: const TextStyle(color: Color(0xFF616161), fontSize: 11, fontWeight: FontWeight.bold),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            interval: 1,
+                            reservedSize: 28,
+                            getTitlesWidget: (value, meta) {
+                              if (value == 0) return const SizedBox.shrink();
+                              return Text(
+                                value.toInt().toString(),
+                                style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                              );
+                            },
+                          ),
+                        ),
+                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      ),
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: false,
+                        horizontalInterval: 1,
+                        getDrawingHorizontalLine: (value) {
+                          return FlLine(color: Colors.grey[200]!, strokeWidth: 1);
+                        },
+                      ),
+                      borderData: FlBorderData(show: false),
+                      barGroups: [
+                        _makeBarData(0, 3.2),
+                        _makeBarData(1, 2.8),
+                        _makeBarData(2, 3.8),
+                        _makeBarData(3, 2.4),
+                        _makeBarData(4, 3.0),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 12,
-                  runSpacing: 6,
+                  runSpacing: 8,
                   children: [
-                    _LegendDot('Finance', 32, _healthColor),
-                    _LegendDot('Marketing', 28, _healthColor),
-                    _LegendDot('Operations', 38, _healthColor),
-                    _LegendDot('HR', 24, _healthColor),
-                    _LegendDot('Strategy', 30, _healthColor),
+                    _LegendBadge('FIN', 'Finance', 3.2),
+                    _LegendBadge('MKT', 'Marketing', 2.8),
+                    _LegendBadge('OPS', 'Operations', 3.8),
+                    _LegendBadge('HR', 'Human Res.', 2.4),
+                    _LegendBadge('STR', 'Strategy', 3.0),
                   ],
                 ),
               ],
@@ -721,18 +766,57 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _LegendDot extends StatelessWidget {
-  final String label;
-  final int score;
-  final Color color;
-  const _LegendDot(this.label, this.score, this.color);
+BarChartGroupData _makeBarData(int x, double y) {
+  return BarChartGroupData(
+    x: x,
+    barRods: [
+      BarChartRodData(
+        toY: y,
+        width: 18,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF3D5AFE), Color(0xFF536DFE)],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        ),
+        backDrawRodData: BackgroundBarChartRodData(
+          show: true,
+          toY: 5,
+          color: Colors.grey[100],
+        ),
+      ),
+    ],
+  );
+}
+
+class _LegendBadge extends StatelessWidget {
+  final String short;
+  final String full;
+  final double score;
+  const _LegendBadge(this.short, this.full, this.score);
 
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-      const SizedBox(width: 4),
-      Text('$label ($score%)', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-    ]);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border.all(color: Colors.grey[200]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(color: const Color(0xFF3D5AFE).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+            child: Text(short, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE))),
+          ),
+          const SizedBox(width: 6),
+          Text(full, style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500)),
+          const SizedBox(width: 4),
+          Text(score.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
   }
 }
