@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../coaching/domain/entities/coaching_session_entity.dart';
 import '../../coaching/presentation/providers/coaching_provider.dart';
+import '../models/diagnosis_report_model.dart';
 import '../providers/diagnosis_provider.dart';
 import '../widgets/question_card.dart';
+import 'diagnosis_summary_screen.dart';
 
 class AssessmentScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -286,14 +288,22 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
           SnackBar(content: Text('Failed to submit: ${failure.message}'), backgroundColor: AppColors.error),
         );
       },
-      (success) {
-        if (success) {
-          ref.read(diagnosisStateProvider(widget.sessionId).notifier).reset();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Diagnosis submitted successfully!'), backgroundColor: AppColors.success),
-          );
-          Navigator.pop(context); // Go back to enterprise detail
-        }
+      (reportData) {
+        ref.read(diagnosisStateProvider(widget.sessionId).notifier).reset();
+        
+        final report = DiagnosisReportModel.fromJson(reportData);
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Diagnosis submitted successfully!'), backgroundColor: AppColors.success),
+        );
+        
+        // Navigate to Summary Screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DiagnosisSummaryScreen(report: report),
+          ),
+        );
       },
     );
   }

@@ -4,7 +4,7 @@ import '../models/diagnosis_template_model.dart';
 abstract class DiagnosisRemoteDataSource {
   Future<DiagnosisTemplateModel> getLatestTemplate();
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
-  Future<bool> submitDiagnosis({
+  Future<Map<String, dynamic>> submitDiagnosis({
     required String sessionId,
     required String templateId,
     required Map<String, String> responses,
@@ -37,7 +37,7 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
   }
 
   @override
-  Future<bool> submitDiagnosis({
+  Future<Map<String, dynamic>> submitDiagnosis({
     required String sessionId,
     required String templateId,
     required Map<String, String> responses,
@@ -48,6 +48,10 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
       'responses': responses,
     });
 
-    return response.data['success'] == true;
+    if (response.data['success']) {
+      return response.data['data'];
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to submit diagnosis');
+    }
   }
 }
