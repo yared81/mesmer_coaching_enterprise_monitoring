@@ -50,14 +50,26 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       notes: _notesController.text,
     );
 
-    await ref.read(coachingSessionsProvider.notifier).updateSession(updatedSession);
-    
-    if (mounted) {
-      setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Session notes saved successfully')),
-      );
-      Navigator.pop(context); // Go back after saving
+    try {
+      await ref.read(coachingSessionsProvider.notifier).updateSession(updatedSession);
+      
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Session notes saved successfully')),
+        );
+        Navigator.pop(context); // Go back after saving
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Failed to save session. Please try again.'),
+            backgroundColor: Colors.red[700],
+          ),
+        );
+      }
     }
   }
 

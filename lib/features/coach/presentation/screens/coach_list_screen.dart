@@ -84,7 +84,14 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: ChoiceChip(
-                              label: Text(f),
+                              label: Text(
+                                f,
+                                style: TextStyle(
+                                  color: selected ? const Color(0xFF3D5AFE) : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
                               selected: selected,
                               onSelected: (_) => setState(() => _activeFilter = f),
                               selectedColor: Colors.white,

@@ -137,6 +137,11 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
       child: ChoiceChip(
         label: Text(
           label[0].toUpperCase() + label.substring(1),
+          style: TextStyle(
+            color: isSelected ? const Color(0xFF3D5AFE) : Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
         ),
         selected: isSelected,
         onSelected: (selected) {
