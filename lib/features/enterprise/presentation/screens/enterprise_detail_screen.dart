@@ -250,7 +250,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Core Areas (Out of 5.0)',
+                  'Core Areas (Out of 10.0)',
                   style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 24),
@@ -259,7 +259,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   child: BarChart(
                     BarChartData(
                       alignment: BarChartAlignment.spaceAround,
-                      maxY: 5,
+                      maxY: 10,
                       minY: 0,
                       barTouchData: BarTouchData(
                         enabled: true,
@@ -780,7 +780,7 @@ BarChartGroupData _makeBarData(int x, double y) {
         ),
         backDrawRodData: BackgroundBarChartRodData(
           show: true,
-          toY: 5,
+          toY: 10,
           color: Colors.grey[100],
         ),
       ),
