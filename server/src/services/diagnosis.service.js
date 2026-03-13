@@ -110,6 +110,8 @@ class DiagnosisService {
    */
   async submitReport(data) {
     const { session_id, template_id, responses } = data;
+    const categoryScores = {};
+    const primaryChallenges = [];
 
     // 1. Calculate scores
     let totalScore = 0;
@@ -128,21 +130,46 @@ class DiagnosisService {
 
     if (!template) throw new Error('Template not found');
 
-    // Calculate max possible score
+    // Calculate max possible score and category scores
     for (const category of template.categories) {
+      let catScore = 0;
+      let catMax = 0;
+
       for (const question of category.questions) {
         const maxChoicePoints = Math.max(...question.choices.map(c => c.points));
-        maxPossibleScore += maxChoicePoints;
+        catMax += maxChoicePoints;
 
         // Calculate actual score from responses
         const choiceId = responses[question.id];
         if (choiceId) {
           const choice = question.choices.find(c => c.id === choiceId);
           if (choice) {
-            totalScore += choice.points;
+            catScore += choice.points;
+            
+            // Challenge Detection Logic: 
+            // points <= 1 OR < 30% of max
+            if (choice.points <= 1 || (maxChoicePoints > 0 && choice.points < maxChoicePoints * 0.3)) {
+              primaryChallenges.push({
+                question_id: question.id,
+                category_name: category.name,
+                question_text: question.text,
+                selected_choice: choice.text,
+                points: choice.points,
+                max_points: maxChoicePoints
+              });
+            }
           }
         }
       }
+
+      categoryScores[category.name] = {
+        score: catScore,
+        max: catMax,
+        percentage: catMax > 0 ? (catScore / catMax) * 100 : 0
+      };
+
+      totalScore += catScore;
+      maxPossibleScore += catMax;
     }
 
     const healthPercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
@@ -153,7 +180,9 @@ class DiagnosisService {
       template_id,
       total_score: totalScore,
       max_score: maxPossibleScore,
-      health_percentage: healthPercentage
+      health_percentage: healthPercentage,
+      category_scores: categoryScores,
+      primary_challenges: primaryChallenges
     });
 
     // 3. Create individual responses

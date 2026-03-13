@@ -35,6 +35,16 @@ const DiagnosisReport = sequelize.define('DiagnosisReport', {
     type: DataTypes.FLOAT,
     defaultValue: 0,
   },
+  category_scores: {
+    type: DataTypes.JSONB,
+    defaultValue: {},
+    comment: '{ categoryName: { score, max, percentage } }'
+  },
+  primary_challenges: {
+    type: DataTypes.JSONB,
+    defaultValue: [],
+    comment: 'List of { questionId, text, choiceText, points } for critical issues'
+  },
 }, {
   tableName: 'diagnosis_reports',
   underscored: true,
