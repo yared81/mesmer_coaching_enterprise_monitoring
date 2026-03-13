@@ -1,6 +1,7 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const { sequelize } = require('../src/config/database');
 const { Institution, DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice } = require('../src/models');
-require('dotenv').config();
 
 const questions = {
   "Finance": [
@@ -45,6 +46,13 @@ const choices = [
 // but for this seed we follow the provided standard.
 
 const seedDiagnosis = async () => {
+  console.log('Database Config:', {
+    name: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    password_length: process.env.DB_PASSWORD ? process.env.DB_PASSWORD.length : 0
+  });
   try {
     await sequelize.sync({ force: false });
     console.log('🌱 Database Synced');
