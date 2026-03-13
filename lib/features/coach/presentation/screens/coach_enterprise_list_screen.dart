@@ -5,12 +5,20 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presen
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 
-class CoachEnterpriseListScreen extends ConsumerWidget {
+class CoachEnterpriseListScreen extends ConsumerStatefulWidget {
   const CoachEnterpriseListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CoachEnterpriseListScreen> createState() => _CoachEnterpriseListScreenState();
+}
+
+class _CoachEnterpriseListScreenState extends ConsumerState<CoachEnterpriseListScreen> {
+  bool _showFilters = false;
+
+  @override
+  Widget build(BuildContext context) {
     final filteredEnterprises = ref.watch(filteredEnterprisesProvider);
+    final selectedSector = ref.watch(coachEnterpriseSectorFilterProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -22,14 +30,27 @@ class CoachEnterpriseListScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () {},
+            icon: Icon(_showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded),
+            onPressed: () => setState(() => _showFilters = !_showFilters),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(_showFilters ? 52 : 0),
+          child: _showFilters 
+            ? Container(
+                height: 52,
+                padding: const EdgeInsets.only(bottom: 8),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    _buildFilterChip(null, 'All', selectedSector),
+                    ...Sector.values.map((s) => _buildFilterChip(s, s.name, selectedSector)),
+                  ],
+                ),
+              )
+            : const SizedBox.shrink(),
+        ),
       ),
       body: filteredEnterprises.when(
         data: (enterprises) {
@@ -51,6 +72,27 @@ class CoachEnterpriseListScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildFilterChip(Sector? sector, String label, Sector? selectedSector) {
+    final isSelected = selectedSector == sector;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ChoiceChip(
+        label: Text(label[0].toUpperCase() + label.substring(1)),
+        selected: isSelected,
+        onSelected: (selected) {
+          ref.read(coachEnterpriseSectorFilterProvider.notifier).state = selected ? sector : null;
+        },
+        backgroundColor: Colors.white.withOpacity(0.1),
+        selectedColor: Colors.white,
+        labelStyle: TextStyle(
+          color: isSelected ? const Color(0xFF3D5AFE) : Colors.white.withOpacity(0.9),
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -59,7 +101,7 @@ class CoachEnterpriseListScreen extends ConsumerWidget {
           Icon(Icons.store_outlined, size: 80, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
-            'No enterprises assigned yet',
+            'No enterprises found',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -68,7 +110,7 @@ class CoachEnterpriseListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Your assigned businesses will appear here',
+            'Try adjusting your filters',
             style: TextStyle(color: Colors.grey[400]),
           ),
         ],

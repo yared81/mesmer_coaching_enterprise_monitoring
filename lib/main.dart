@@ -38,7 +38,19 @@ class _MyAppState extends ConsumerState<MyApp> {
       routerConfig: router,
       theme: ThemeData(
         useMaterial3: true,
-        primarySwatch: Colors.teal,
+        primaryColor: const Color(0xFF3D5AFE),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF3D5AFE),
+          primary: const Color(0xFF3D5AFE),
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: Colors.white.withOpacity(0.15),
+          selectedColor: Colors.white,
+          secondarySelectedColor: Colors.white,
+          labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+          secondaryLabelStyle: const TextStyle(color: Color(0xFF3D5AFE), fontWeight: FontWeight.bold, fontSize: 12),
+          brightness: Brightness.dark,
+        ),
       ),
     );
   }

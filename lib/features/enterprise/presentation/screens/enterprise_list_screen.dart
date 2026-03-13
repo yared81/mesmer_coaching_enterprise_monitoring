@@ -135,14 +135,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ChoiceChip(
-        label: Text(
-          label[0].toUpperCase() + label.substring(1),
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF3D5AFE) : Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-        ),
+        label: Text(label[0].toUpperCase() + label.substring(1)),
         selected: isSelected,
         onSelected: (selected) {
           setState(() {
@@ -150,10 +143,10 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
           });
           _onSearch();
         },
+        backgroundColor: Colors.white.withOpacity(0.1),
         selectedColor: Colors.white,
-        backgroundColor: Colors.white.withOpacity(0.15),
         labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF3D5AFE) : Colors.white,
+          color: isSelected ? const Color(0xFF3D5AFE) : Colors.white.withOpacity(0.9),
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),
