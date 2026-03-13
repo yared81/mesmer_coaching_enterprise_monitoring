@@ -56,7 +56,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                           subtitle: 'Scheduled sessions',
                           trend: '0',
                           trendUp: true,
-                          gradient: const [Color(0xFF00B09B), Color(0xFF96C93D)],
+                          gradient: const [Color(0xFF0EA5E9), Color(0xFF38BDF8)],
                           onTap: () => context.go('/sessions'),
                         ),
                         MetricSwiperItem(

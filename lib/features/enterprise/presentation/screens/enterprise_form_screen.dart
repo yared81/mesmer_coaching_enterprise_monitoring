@@ -103,10 +103,10 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Register Enterprise'),
+        title: const Text('Register Enterprise', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
       ),
       body: Form(
         key: _formKey,

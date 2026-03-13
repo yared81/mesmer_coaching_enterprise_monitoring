@@ -228,7 +228,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                           subtitle: 'Currently coaching',
                           trend: '+2',
                           trendUp: true,
-                          gradient: const [Color(0xFF00B09B), Color(0xFF96C93D)],
+                          gradient: const [Color(0xFF6366F1), Color(0xFF818CF8)],
                           onTap: () => context.go('/coaches'),
                         ),
                         MetricSwiperItem(
