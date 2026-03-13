@@ -17,8 +17,9 @@ class CoachEnterpriseListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('My Enterprises', 
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF3D5AFE),
         elevation: 0,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),

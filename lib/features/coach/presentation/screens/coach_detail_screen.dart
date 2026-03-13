@@ -217,16 +217,24 @@ class CoachDetailScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: healthColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              mockScore >= 70 ? 'Healthy' : mockScore >= 50 ? 'Moderate' : 'Critical',
-                              style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 11),
-                            ),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+                            onSelected: (value) async {
+                              if (value == 'unassign') {
+                                final success = await ref.read(enterpriseListProvider.notifier).assignEnterprise(e.id, null);
+                                if (success && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('${e.businessName} unassigned.'), backgroundColor: Colors.orange),
+                                  );
+                                }
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'unassign',
+                                child: Text('Unassign Coach'),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -419,12 +427,14 @@ class _SectionTitle extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-              const SizedBox(width: 8),
-              Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            ],
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)), overflow: TextOverflow.ellipsis)),
+                const SizedBox(width: 8),
+                Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+              ],
+            ),
           ),
           if (action != null) action!,
         ],

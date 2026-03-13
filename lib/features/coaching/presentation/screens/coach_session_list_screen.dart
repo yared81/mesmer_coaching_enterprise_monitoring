@@ -19,8 +19,9 @@ class CoachSessionListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('My Coaching Sessions', 
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF3D5AFE),
         elevation: 0,
+        foregroundColor: Colors.white,
       ),
       body: sessionsAsync.when(
         data: (sessions) {

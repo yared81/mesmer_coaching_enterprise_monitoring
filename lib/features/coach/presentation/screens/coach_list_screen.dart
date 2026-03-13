@@ -288,8 +288,8 @@ class _CoachCard extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first),
-                          _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last),
+                          Flexible(child: _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first)),
+                          Flexible(child: _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last)),
                         ],
                       ),
                     ],
@@ -325,7 +325,7 @@ class _StatPill extends StatelessWidget {
         children: [
           Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+          Flexible(child: Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
         ],
       ),
     );

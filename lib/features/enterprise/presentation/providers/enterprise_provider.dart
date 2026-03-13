@@ -57,7 +57,7 @@ class EnterpriseListNotifier extends StateNotifier<AsyncValue<List<EnterpriseEnt
     );
   }
 
-  Future<bool> assignEnterprise(String enterpriseId, String coachId) async {
+  Future<bool> assignEnterprise(String enterpriseId, String? coachId) async {
     final result = await _updateEnterprise(enterpriseId, {'coach_id': coachId});
     return result.fold(
       (failure) => false,
