@@ -98,9 +98,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) {
                   if (value == 'edit') {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit coming soon')));
+                    // Logic for edit
                   } else if (value == 'delete') {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Delete coming soon')));
+                    // Logic for delete
                   }
                 },
                 itemBuilder: (context) => [

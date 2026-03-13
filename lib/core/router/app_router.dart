@@ -65,7 +65,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.supervisorReports,
             builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Reports Dashboard (Coming Soon)')),
+              body: SizedBox.shrink(),
             ),
           ),
           GoRoute(

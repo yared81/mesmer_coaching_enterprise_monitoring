@@ -76,14 +76,14 @@ class DashboardMainScreen extends ConsumerWidget {
         label: 'Coaches',
       ));
       
-      pages.add(const Center(child: Text('Enterprise List Coming Soon')));
+      pages.add(const SizedBox.shrink());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.storefront_outlined),
         selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
         label: 'Enterprises',
       ));
 
-      pages.add(const Center(child: Text('Reports Coming Soon')));
+      pages.add(const SizedBox.shrink());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
