@@ -1,6 +1,15 @@
-// TODO: Diagnosis repository interface
+import 'package:dartz/dartz.dart';
+import '../../../../core/errors/failures.dart';
+import '../entities/diagnosis_template_entity.dart';
+
 abstract class DiagnosisRepository {
-  // TODO: Future<Either<Failure, List<Map>>> getAssessmentQuestions()
-  // TODO: Future<Either<Failure, AssessmentEntity>> submitAssessment(AssessmentEntity data)
-  // TODO: Future<Either<Failure, DiagnosisResultEntity>> getDiagnosisResult(String assessmentId)
+  /// Fetches the latest active diagnosis template for the institution
+  Future<Either<Failure, DiagnosisTemplateEntity>> getLatestTemplate();
+
+  /// Submits a completed diagnosis for a specific session
+  Future<Either<Failure, bool>> submitDiagnosis({
+    required String sessionId,
+    required String templateId,
+    required Map<String, String> responses, // questionId -> choiceId
+  });
 }

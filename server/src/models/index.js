@@ -6,6 +6,8 @@ const DiagnosisTemplate = require('./diagnosis_template.model');
 const DiagnosisCategory = require('./diagnosis_category.model');
 const DiagnosisQuestion = require('./diagnosis_question.model');
 const DiagnosisChoice = require('./diagnosis_choice.model');
+const DiagnosisReport = require('./diagnosis_report.model');
+const DiagnosisResponse = require('./diagnosis_response.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -74,6 +76,22 @@ DiagnosisQuestion.belongsTo(DiagnosisCategory, { foreignKey: 'category_id' });
 DiagnosisQuestion.hasMany(DiagnosisChoice, { foreignKey: 'question_id', as: 'choices' });
 DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
 
+// Diagnosis Report Associations
+CoachingSession.hasOne(DiagnosisReport, { foreignKey: 'session_id', as: 'diagnosisReport' });
+DiagnosisReport.belongsTo(CoachingSession, { foreignKey: 'session_id' });
+
+DiagnosisTemplate.hasMany(DiagnosisReport, { foreignKey: 'template_id', as: 'reports' });
+DiagnosisReport.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
+
+DiagnosisReport.hasMany(DiagnosisResponse, { foreignKey: 'report_id', as: 'responses' });
+DiagnosisResponse.belongsTo(DiagnosisReport, { foreignKey: 'report_id' });
+
+DiagnosisQuestion.hasMany(DiagnosisResponse, { foreignKey: 'question_id', as: 'responses' });
+DiagnosisResponse.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
+
+DiagnosisChoice.hasMany(DiagnosisResponse, { foreignKey: 'choice_id', as: 'responses' });
+DiagnosisResponse.belongsTo(DiagnosisChoice, { foreignKey: 'choice_id' });
+
 const db = {
   Institution,
   User,
@@ -82,7 +100,9 @@ const db = {
   DiagnosisTemplate,
   DiagnosisCategory,
   DiagnosisQuestion,
-  DiagnosisChoice
+  DiagnosisChoice,
+  DiagnosisReport,
+  DiagnosisResponse
 };
 
 module.exports = db;

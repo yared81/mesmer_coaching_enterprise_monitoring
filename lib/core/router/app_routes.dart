@@ -36,5 +36,6 @@ abstract class AppRoutes {
 
   // Reports
   static const String supervisorReports = '/reports';
+  static const String diagnosis = '/diagnosis';
 }
 

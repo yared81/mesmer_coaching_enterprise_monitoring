@@ -408,6 +408,24 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
                             style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
                             maxLines: 2, overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  context.push(AppRoutes.diagnosis, extra: s.id);
+                                },
+                                icon: const Icon(Icons.assessment_outlined, size: 16),
+                                label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.primary,
+                                  side: const BorderSide(color: AppColors.primary),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
