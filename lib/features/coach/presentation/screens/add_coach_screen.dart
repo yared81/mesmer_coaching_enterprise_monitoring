@@ -85,9 +85,9 @@ class _AddCoachScreenState extends ConsumerState<AddCoachScreen> {
                   end: Alignment.bottomRight,
                 ),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 40,
                     backgroundColor: AppColors.primary,
                     child: Icon(Icons.person_add_rounded, size: 40, color: Colors.white),
