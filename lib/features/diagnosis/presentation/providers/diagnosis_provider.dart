@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/storage/hive_storage.dart';
 import '../../data/datasources/diagnosis_remote_datasource.dart';
 import '../../data/repositories/diagnosis_repository_impl.dart';
 import '../../domain/entities/diagnosis_template_entity.dart';
@@ -26,15 +27,32 @@ final latestDiagnosisTemplateProvider = FutureProvider<DiagnosisTemplateEntity>(
   );
 });
 
+final existingDiagnosisReportProvider = FutureProvider.family<Map<String, dynamic>?, String>((ref, sessionId) async {
+  final repository = ref.watch(diagnosisRepositoryProvider);
+  final result = await repository.getReportBySessionId(sessionId);
+  return result.fold(
+    (failure) => throw failure.message,
+    (report) => report,
+  );
+});
+
 /// State Management for the active Diagnosis session
 class DiagnosisResponseState {
   final Map<String, String> responses; // questionId -> choiceId
+  final bool isLoading;
 
-  DiagnosisResponseState({this.responses = const {}});
+  DiagnosisResponseState({
+    this.responses = const {},
+    this.isLoading = false,
+  });
 
-  DiagnosisResponseState copyWith({Map<String, String>? responses}) {
+  DiagnosisResponseState copyWith({
+    Map<String, String>? responses,
+    bool? isLoading,
+  }) {
     return DiagnosisResponseState(
       responses: responses ?? this.responses,
+      isLoading: isLoading ?? this.isLoading,
     );
   }
 
@@ -61,19 +79,50 @@ class DiagnosisResponseState {
 }
 
 class DiagnosisNotifier extends StateNotifier<DiagnosisResponseState> {
-  DiagnosisNotifier() : super(DiagnosisResponseState());
+  final String sessionId;
+
+  DiagnosisNotifier(this.sessionId) : super(DiagnosisResponseState()) {
+    _loadInitialState();
+  }
+
+  void _loadInitialState() {
+    // 1. Load from Hive first (most recent draft)
+    final draft = HiveStorage.getDraft(sessionId);
+    if (draft != null) {
+      state = state.copyWith(responses: draft);
+    }
+  }
+
+  /// Merges responses from an existing server report if local draft is empty
+  void mergeServerResponses(List<dynamic> serverResponses) {
+    if (state.responses.isNotEmpty) return; // Keep draft if it exists
+
+    final Map<String, String> merged = {};
+    for (var resp in serverResponses) {
+      merged[resp['question_id']] = resp['choice_id'];
+    }
+    
+    if (merged.isNotEmpty) {
+      state = state.copyWith(responses: merged);
+      HiveStorage.saveDraft(sessionId, merged);
+    }
+  }
 
   void setResponse(String questionId, String choiceId) {
     final newResponses = Map<String, String>.from(state.responses);
     newResponses[questionId] = choiceId;
     state = state.copyWith(responses: newResponses);
+    
+    // Autosave to Hive
+    HiveStorage.saveDraft(sessionId, newResponses);
   }
 
   void reset() {
     state = DiagnosisResponseState();
+    HiveStorage.clearDraft(sessionId);
   }
 }
 
-final diagnosisStateProvider = StateNotifierProvider<DiagnosisNotifier, DiagnosisResponseState>((ref) {
-  return DiagnosisNotifier();
+final diagnosisStateProvider = StateNotifierProvider.family<DiagnosisNotifier, DiagnosisResponseState, String>((ref, sessionId) {
+  return DiagnosisNotifier(sessionId);
 });
