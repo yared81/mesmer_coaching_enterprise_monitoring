@@ -60,3 +60,17 @@ final enterpriseSessionsProvider = FutureProvider.family<List<CoachingSessionEnt
     (sessions) => sessions,
   );
 });
+
+final coachingSessionProvider = FutureProvider.family<CoachingSessionEntity?, String>((ref, sessionId) async {
+  // Simple search in the list for now, or fetch from repo if needed
+  // Since we usually have the list loaded, we can try matching. 
+  // But for direct links (deep links), we should fetch.
+  final repository = ref.watch(coachingRepositoryProvider);
+  // Assuming the repository has a getSessionById or similar. 
+  // If not, we'll use getMySessions and find.
+  final result = await repository.getMySessions();
+  return result.fold(
+    (failure) => null,
+    (sessions) => sessions.firstWhere((s) => s.id == sessionId),
+  );
+});

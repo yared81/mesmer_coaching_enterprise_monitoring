@@ -5,13 +5,20 @@ import '../../domain/entities/diagnosis_template_entity.dart';
 import '../providers/diagnosis_provider.dart';
 
 class QuestionCard extends ConsumerWidget {
+  final String sessionId;
   final DiagnosisQuestionEntity question;
+  final bool readOnly;
 
-  const QuestionCard({super.key, required this.question});
+  const QuestionCard({
+    super.key,
+    required this.sessionId,
+    required this.question,
+    this.readOnly = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final responseState = ref.watch(diagnosisStateProvider);
+    final responseState = ref.watch(diagnosisStateProvider(sessionId));
     final selectedChoiceId = responseState.responses[question.id];
 
     return Card(
@@ -37,9 +44,11 @@ class QuestionCard extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: InkWell(
-                  onTap: () => ref
-                      .read(diagnosisStateProvider.notifier)
-                      .setResponse(question.id, choice.id),
+                  onTap: readOnly
+                      ? null
+                      : () => ref
+                          .read(diagnosisStateProvider(sessionId).notifier)
+                          .setResponse(question.id, choice.id),
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
