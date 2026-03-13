@@ -7,6 +7,8 @@ import '../../domain/entities/enterprise_entity.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/providers/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 
 class EnterpriseListScreen extends ConsumerStatefulWidget {
   const EnterpriseListScreen({super.key});
@@ -120,13 +122,18 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
           error: (err, stack) => _buildError(err.toString()),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.enterpriseForm),
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 4,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('New Enterprise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
+      floatingActionButton: Builder(builder: (context) {
+        final role = ref.watch(authProvider).user?.role;
+        // Only supervisors and admins can register new enterprises
+        if (role == UserRole.coach) return const SizedBox.shrink();
+        return FloatingActionButton.extended(
+          onPressed: () => context.push(AppRoutes.enterpriseForm),
+          backgroundColor: const Color(0xFF3D5AFE),
+          elevation: 4,
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text('New Enterprise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        );
+      }),
     );
   }
 

@@ -6,6 +6,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/providers/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/session_detail_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/add_session_from_enterprise_sheet.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/providers/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_routes.dart';
@@ -344,98 +347,157 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   Widget _buildTimelineTab() {
     final sessionsAsync = ref.watch(enterpriseSessionsProvider(widget.enterpriseId));
+    final currentUser = ref.watch(authProvider).user;
     
     return sessionsAsync.when(
       data: (sessions) {
-        if (sessions.isEmpty) {
-          return const Center(
-            child: Text('No sessions recorded for this enterprise.', style: TextStyle(color: Colors.grey)),
-          );
-        }
-        
-        return ListView.builder(
-          padding: const EdgeInsets.all(20),
-          itemCount: sessions.length,
-          itemBuilder: (_, i) {
-            final s = sessions[i];
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3D5AFE),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
+        // Sort newest first
+        final sorted = [...sessions]
+          ..sort((a, b) => b.scheduledDate.compareTo(a.scheduledDate));
+
+        return Column(
+          children: [
+            // ── New Session button bar (always visible at top) ──
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () async {
+                    await showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                       ),
-                    ),
-                    if (i < sessions.length - 1)
-                      Container(width: 2, height: 70, decoration: const BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0xFF3D5AFE), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                      )),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      context.push('/sessions/detail', extra: s);
-                    },
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                      builder: (_) => AddSessionFromEnterpriseSheet(
+                        enterpriseId: widget.enterpriseId,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF3D5AFE)),
-                              const SizedBox(width: 4),
-                              Text(s.title, style: const TextStyle(color: Color(0xFF3D5AFE), fontSize: 12, fontWeight: FontWeight.bold)),
-                              const Spacer(),
-                              Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
-                            style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
-                            maxLines: 2, overflow: TextOverflow.ellipsis),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              OutlinedButton.icon(
-                                onPressed: () {
-                                  context.push(AppRoutes.diagnosis, extra: s.id);
-                                },
-                                icon: const Icon(Icons.assessment_outlined, size: 16),
-                                label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.primary,
-                                  side: const BorderSide(color: AppColors.primary),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+            const Divider(height: 1),
+            // ── Session list ──
+            Expanded(
+              child: sorted.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.calendar_today_outlined, size: 64, color: Colors.grey[300]),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'No sessions yet',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tap "New Session" above to record the first coaching session.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(20),
+                    itemCount: sorted.length,
+                    itemBuilder: (_, i) {
+                      final s = sorted[i];
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3D5AFE),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
+                                  boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
+                                ),
+                              ),
+                              if (i < sorted.length - 1)
+                                Container(width: 2, height: 70, decoration: const BoxDecoration(
+                                  gradient: LinearGradient(colors: [Color(0xFF3D5AFE), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                                )),
+                            ],
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {
+                                context.push('/sessions/detail', extra: s);
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF3D5AFE)),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(s.title, style: const TextStyle(color: Color(0xFF3D5AFE), fontSize: 12, fontWeight: FontWeight.bold),
+                                            overflow: TextOverflow.ellipsis),
+                                        ),
+                                        Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
+                                      style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
+                                      maxLines: 2, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        OutlinedButton.icon(
+                                          onPressed: () {
+                                            context.push(AppRoutes.diagnosis, extra: s.id);
+                                          },
+                                          icon: const Icon(Icons.assessment_outlined, size: 16),
+                                          label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor: AppColors.primary,
+                                            side: const BorderSide(color: AppColors.primary),
+                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+            ),
+          ],
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),

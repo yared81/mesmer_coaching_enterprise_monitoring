@@ -8,7 +8,7 @@ router.use(protect);
 
 router.post(
   '/', 
-  authorize('admin', 'institution_admin', 'coach'), 
+  authorize('admin', 'institution_admin', 'supervisor'), 
   enterpriseController.register
 );
 

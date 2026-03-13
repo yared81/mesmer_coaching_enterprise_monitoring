@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const { sequelize } = require('../src/config/database');
 
 async function fixSchema() {
@@ -13,6 +15,11 @@ async function fixSchema() {
 
     console.log('Adding updated_at to institutions...');
     await sequelize.query('ALTER TABLE institutions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;');
+
+    console.log('Adding missing columns to coaching_sessions...');
+    await sequelize.query('ALTER TABLE coaching_sessions ADD COLUMN IF NOT EXISTS title VARCHAR(255);');
+    await sequelize.query('ALTER TABLE coaching_sessions ADD COLUMN IF NOT EXISTS session_type VARCHAR(50) DEFAULT \'coaching\';');
+    await sequelize.query('ALTER TABLE coaching_sessions ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;');
 
     console.log('✅ Schema Fix Applied');
     process.exit(0);
