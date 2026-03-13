@@ -158,101 +158,47 @@ class SupervisorDashboardScreen extends ConsumerWidget {
 
               // ── App Bar ────────────────────────────────────────────────────
               SliverAppBar(
+                expandedHeight: 80.0,
                 floating: false,
                 pinned: true,
-                snap: false,
-                expandedHeight: 70,
                 elevation: 0,
                 backgroundColor: const Color(0xFF3D5AFE),
-                surfaceTintColor: Colors.transparent,
                 flexibleSpace: FlexibleSpaceBar(
+                  titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
+                  title: const Text(
+                    'Supervisor Dashboard',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                   background: Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF3D5AFE), Color(0xFF1A237E)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                        child: Row(
-                          children: [
-                            // Institution logo + name
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.account_balance_rounded, color: Colors.white, size: 20),
-                            ),
-                            const SizedBox(width: 10),
-                            const Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Bahir Dar Labour Bureau',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    'Supervisor Dashboard',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const AppSearchBar(),
-                            Stack(
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                                  onPressed: () => _showNotificationsSheet(context),
-                                ),
-                                Positioned(
-                                  right: 10,
-                                  top: 10,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            GestureDetector(
-                              onTap: () => _showProfileMenu(context, ref),
-                              child: const CircleAvatar(
-                                radius: 18,
-                                backgroundColor: Colors.white,
-                                child: Text(
-                                  'SV',
-                                  style: TextStyle(
-                                    color: Color(0xFF3D5AFE),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
                       ),
                     ),
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                    onPressed: () => _showNotificationsSheet(context),
+                  ),
+                  GestureDetector(
+                    onTap: () => _showProfileMenu(context, ref),
+                    child: const CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.white24,
+                      child: Icon(Icons.person_outline_rounded, size: 20, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                ],
               ),
 
               // ── Body Content ───────────────────────────────────────────────

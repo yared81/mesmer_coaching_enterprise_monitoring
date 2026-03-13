@@ -22,4 +22,10 @@ router.get(
   enterpriseController.getById
 );
 
+router.put(
+  '/:id',
+  authorize('admin', 'institution_admin', 'supervisor'),
+  enterpriseController.update
+);
+
 module.exports = router;

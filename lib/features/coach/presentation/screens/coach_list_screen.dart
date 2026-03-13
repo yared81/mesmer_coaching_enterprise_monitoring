@@ -164,10 +164,6 @@ class _CoachCard extends StatelessWidget {
 
   static const _gradients = [
     [Color(0xFF3D5AFE), Color(0xFF7B9EFF)],
-    [Color(0xFF00B09B), Color(0xFF96C93D)],
-    [Color(0xFFFF6F00), Color(0xFFFFB300)],
-    [Color(0xFF9C27B0), Color(0xFFCE93D8)],
-    [Color(0xFFE53935), Color(0xFFEF9A9A)],
   ];
 
   @override

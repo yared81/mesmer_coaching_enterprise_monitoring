@@ -207,7 +207,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 48),
                   
                   // ─── PARTNERS ────────────────────────────────────────────
-                  const _PartnersWidget(),
+                  // Removed Partners widget per request
                 ],
               ),
             ),
@@ -322,36 +322,6 @@ class _LogoWidget extends StatelessWidget {
   }
 }
 
-class _PartnersWidget extends StatelessWidget {
-  const _PartnersWidget();
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text(
-          'POWERED BY',
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white54, letterSpacing: 1.5),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildPartner('MONAS'),
-            const SizedBox(width: 24),
-            _buildPartner('GrowthTrack'),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPartner(String name) {
-    return Text(
-      name,
-      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1),
-    );
-  }
-}
 
 class _GridPainter extends CustomPainter {
   @override

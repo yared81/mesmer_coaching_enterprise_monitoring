@@ -10,6 +10,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/supervisor_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/admin_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/coach_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/coach_session_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/screens/add_session_screen.dart';
@@ -62,7 +64,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.supervisorReports,
-            builder: (context, state) => const SupervisorDashboardScreen(),
+            builder: (context, state) => const Scaffold(
+              body: Center(child: Text('Reports Dashboard (Coming Soon)')),
+            ),
           ),
           GoRoute(
             path: AppRoutes.profile,
@@ -96,6 +100,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CoachListScreen(),
           ),
           GoRoute(
+            path: AppRoutes.addCoach,
+            builder: (context, state) => const AddCoachScreen(),
+          ),
+          GoRoute(
             path: '/coaches/:id',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
@@ -125,8 +133,8 @@ class _DashboardHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(authProvider).user?.role;
-    if (role == UserRole.admin) return const AdminDashboardScreen();
+    if (role == UserRole.admin) return AdminDashboardScreen();
     if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
-    return const CoachDashboardScreen();
+    return CoachDashboardScreen();
   }
 }

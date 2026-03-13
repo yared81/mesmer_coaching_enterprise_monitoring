@@ -18,6 +18,7 @@ class EnterpriseListScreen extends ConsumerStatefulWidget {
 class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
   final TextEditingController _searchController = TextEditingController();
   Sector? _selectedSector;
+  bool _showFilters = false;
 
   @override
   void dispose() {
@@ -37,93 +38,94 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     final enterpriseList = ref.watch(enterpriseListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'My Enterprises',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () {
-              // TODO: Implement sorting
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildSearchAndFilters(),
-          Expanded(
-            child: enterpriseList.when(
-              data: (enterprises) => _buildList(enterprises),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => _buildError(err.toString()),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.enterpriseForm),
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add),
-        label: const Text('New Enterprise'),
-      ),
-    );
-  }
-
-  Widget _buildSearchAndFilters() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
+      backgroundColor: const Color(0xFFF4F6FB),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, _) => [
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: const Color(0xFF3D5AFE),
+            foregroundColor: Colors.white,
+            title: const Text('Enterprises', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+            actions: [
+              IconButton(
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    _showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
+                    key: ValueKey(_showFilters),
+                  ),
                 ),
-              ],
-            ),
-            child: TextField(
-              controller: _searchController,
-              onSubmitted: (_) => _onSearch(),
-              decoration: InputDecoration(
-                hintText: 'Search enterprises...',
-                border: InputBorder.none,
-                icon: const Icon(Icons.search, color: AppColors.textSecondary),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _onSearch();
-                        },
-                      )
-                    : null,
+                onPressed: () => setState(() => _showFilters = !_showFilters),
+              ),
+            ],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(_showFilters ? 108 : 56),
+              child: Column(
+                children: [
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        onSubmitted: (_) => _onSearch(),
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        decoration: InputDecoration(
+                          hintText: 'Search enterprises…',
+                          hintStyle: const TextStyle(color: Colors.white60),
+                          prefixIcon: const Icon(Icons.search_rounded, color: Colors.white60, size: 20),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, color: Colors.white70, size: 20),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _onSearch();
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Filter chips
+                  if (_showFilters)
+                    SizedBox(
+                      height: 44,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                        children: [
+                          _buildFilterChip(null, 'All'),
+                          ...Sector.values.map((s) => _buildFilterChip(s, s.name)),
+                        ],
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _buildFilterChip(null, 'All'),
-                ...Sector.values.map((s) => _buildFilterChip(s, s.name)),
-              ],
-            ),
-          ),
         ],
+        body: enterpriseList.when(
+          data: (enterprises) => _buildList(enterprises),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => _buildError(err.toString()),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(AppRoutes.enterpriseForm),
+        backgroundColor: const Color(0xFF3D5AFE),
+        elevation: 4,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('New Enterprise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -132,25 +134,24 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     final isSelected = _selectedSector == sector;
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
-      child: FilterChip(
-        selected: isSelected,
+      child: ChoiceChip(
         label: Text(
           label[0].toUpperCase() + label.substring(1),
-          style: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
         ),
-        backgroundColor: Colors.white,
-        selectedColor: AppColors.primary,
-        checkmarkColor: Colors.white,
+        selected: isSelected,
         onSelected: (selected) {
           setState(() {
             _selectedSector = selected ? sector : null;
           });
           _onSearch();
         },
+        selectedColor: Colors.white,
+        backgroundColor: Colors.white.withOpacity(0.15),
+        labelStyle: TextStyle(
+          color: isSelected ? const Color(0xFF3D5AFE) : Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
       ),
     );
   }

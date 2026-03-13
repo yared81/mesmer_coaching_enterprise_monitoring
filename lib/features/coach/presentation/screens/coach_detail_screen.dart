@@ -29,7 +29,7 @@ class CoachDetailScreen extends ConsumerWidget {
         return enterprisesAsync.when(
           data: (allEnterprises) {
             final assignedEnterprises = allEnterprises.where((e) => e.coachId == coachId).toList();
-            return _buildBody(context, coach, assignedEnterprises);
+            return _buildBody(context, ref, coach, assignedEnterprises);
           },
           loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (err, _) => Scaffold(body: Center(child: Text('Error loading enterprises: $err'))),
@@ -40,7 +40,7 @@ class CoachDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, CoachEntity coach, List<EnterpriseEntity> enterprises) {
+  Widget _buildBody(BuildContext context, WidgetRef ref, CoachEntity coach, List<EnterpriseEntity> enterprises) {
     final initials = coach.name
         .trim()
         .split(' ')
@@ -156,7 +156,21 @@ class CoachDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 28),
 
                 // ── Assigned Enterprises ───────────────────────────────────
-                _SectionTitle('Assigned Enterprises', '${enterprises.length} total'),
+                _SectionTitle(
+                  'Assigned Enterprises', 
+                  '${enterprises.length} total',
+                  action: TextButton.icon(
+                    onPressed: () => _showAssignBottomSheet(context, ref, coachId),
+                    icon: const Icon(Icons.add, size: 16),
+                    label: const Text('Assign'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF3D5AFE),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 12),
                 ListView.builder(
                   shrinkWrap: true,
@@ -279,6 +293,81 @@ class CoachDetailScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showAssignBottomSheet(BuildContext context, WidgetRef ref, String coachId) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final asyncEnterprises = ref.watch(enterpriseListProvider);
+            return asyncEnterprises.when(
+              data: (all) {
+                final unassigned = all.where((e) => e.coachId == null || e.coachId != coachId).toList();
+                if (unassigned.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: Text('No unassigned enterprises available.')),
+                  );
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('Assign Enterprise', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: unassigned.length,
+                        itemBuilder: (context, index) {
+                          final e = unassigned[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: const Color(0xFF3D5AFE).withOpacity(0.1),
+                              child: const Icon(Icons.storefront, color: Color(0xFF3D5AFE), size: 18),
+                            ),
+                            title: Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(e.sector.name.toUpperCase(), style: const TextStyle(fontSize: 12)),
+                            trailing: TextButton(
+                              onPressed: () async {
+                                final success = await ref.read(enterpriseListProvider.notifier).assignEnterprise(e.id, coachId);
+                                if (success && context.mounted) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('${e.businessName} assigned to coach.'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } else if (!success && context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Failed to assign enterprise.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: const Text('Assign'),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text('Error: $err')),
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 class _MiniMetricCard extends StatelessWidget {
@@ -320,7 +409,8 @@ class _MiniMetricCard extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String title;
   final String subtitle;
-  const _SectionTitle(this.title, this.subtitle);
+  final Widget? action;
+  const _SectionTitle(this.title, this.subtitle, {this.action});
 
   @override
   Widget build(BuildContext context) {
@@ -329,8 +419,14 @@ class _SectionTitle extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
-          Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Row(
+            children: [
+              Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A))),
+              const SizedBox(width: 8),
+              Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            ],
+          ),
+          if (action != null) action!,
         ],
       ),
     );

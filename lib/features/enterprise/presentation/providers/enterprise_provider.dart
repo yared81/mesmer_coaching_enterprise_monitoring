@@ -5,6 +5,7 @@ import '../../data/repositories/enterprise_repository_impl.dart';
 import '../../domain/repositories/enterprise_repository.dart';
 import '../../domain/usecases/get_enterprises_usecase.dart';
 import '../../domain/usecases/register_enterprise_usecase.dart';
+import '../../domain/usecases/update_enterprise_usecase.dart';
 import '../../domain/entities/enterprise_entity.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
@@ -27,17 +28,25 @@ final registerEnterpriseUseCaseProvider = Provider<RegisterEnterpriseUseCase>((r
   return RegisterEnterpriseUseCase(ref.watch(enterpriseRepositoryProvider));
 });
 
+final updateEnterpriseUseCaseProvider = Provider<UpdateEnterpriseUseCase>((ref) {
+  return UpdateEnterpriseUseCase(ref.watch(enterpriseRepositoryProvider));
+});
+
 // 4. State Management (Notifier)
 final enterpriseListProvider = StateNotifierProvider<EnterpriseListNotifier, AsyncValue<List<EnterpriseEntity>>>((ref) {
-  return EnterpriseListNotifier(ref.watch(getEnterprisesUseCaseProvider));
+  return EnterpriseListNotifier(
+    ref.watch(getEnterprisesUseCaseProvider),
+    ref.watch(updateEnterpriseUseCaseProvider),
+  );
 });
 
 class EnterpriseListNotifier extends StateNotifier<AsyncValue<List<EnterpriseEntity>>> {
-  EnterpriseListNotifier(this._getEnterprises) : super(const AsyncValue.loading()) {
+  EnterpriseListNotifier(this._getEnterprises, this._updateEnterprise) : super(const AsyncValue.loading()) {
     getEnterprises();
   }
 
   final GetEnterprisesUseCase _getEnterprises;
+  final UpdateEnterpriseUseCase _updateEnterprise;
 
   Future<void> getEnterprises({String? search, Sector? sector}) async {
     state = const AsyncValue.loading();
@@ -45,6 +54,21 @@ class EnterpriseListNotifier extends StateNotifier<AsyncValue<List<EnterpriseEnt
     result.fold(
       (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
       (enterprises) => state = AsyncValue.data(enterprises),
+    );
+  }
+
+  Future<bool> assignEnterprise(String enterpriseId, String coachId) async {
+    final result = await _updateEnterprise(enterpriseId, {'coach_id': coachId});
+    return result.fold(
+      (failure) => false,
+      (updatedEnterprise) {
+        // Optimistically update the list
+        if (state is AsyncData) {
+          final currentList = state.value!;
+          state = AsyncValue.data(currentList.map((e) => e.id == enterpriseId ? updatedEnterprise : e).toList());
+        }
+        return true;
+      },
     );
   }
 }

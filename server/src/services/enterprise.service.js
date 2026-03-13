@@ -85,6 +85,19 @@ class EnterpriseService {
 
     return enterprise;
   }
+
+  /**
+   * Update an enterprise
+   */
+  async updateEnterprise(id, data) {
+    const enterprise = await Enterprise.findByPk(id);
+    if (!enterprise) {
+      throw new Error('Enterprise not found');
+    }
+
+    await enterprise.update(data);
+    return this.getEnterpriseById(id);
+  }
 }
 
 module.exports = new EnterpriseService();

@@ -64,6 +64,21 @@ class EnterpriseController {
       next(error);
     }
   };
+
+  /**
+   * @route PUT /api/v1/enterprises/:id
+   */
+  update = async (req, res, next) => {
+    try {
+      const enterprise = await enterpriseService.updateEnterprise(req.params.id, req.body);
+      res.status(200).json({
+        success: true,
+        data: enterprise
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new EnterpriseController();

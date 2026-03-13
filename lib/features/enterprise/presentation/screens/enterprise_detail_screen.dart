@@ -93,6 +93,28 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             elevation: 0,
             backgroundColor: _healthColor,
             foregroundColor: Colors.white,
+            actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert, color: Colors.white),
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit coming soon')));
+                  } else if (value == 'delete') {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Delete coming soon')));
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
+                  ),
+                ],
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: BoxDecoration(
@@ -423,14 +445,14 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     fit: StackFit.expand,
                     children: [
                       CircularProgressIndicator(
-                        value: completed / _tasks.length,
+                        value: _tasks.isEmpty ? 0 : completed / _tasks.length,
                         strokeWidth: 6,
                         backgroundColor: Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation(_healthColor),
                       ),
                       Center(
                         child: Text(
-                          '${((completed / _tasks.length) * 100).toInt()}%',
+                          '${_tasks.isEmpty ? 0 : ((completed / _tasks.length) * 100).toInt()}%',
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ),
