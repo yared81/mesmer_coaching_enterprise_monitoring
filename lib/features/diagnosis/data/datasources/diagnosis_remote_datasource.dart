@@ -3,6 +3,7 @@ import '../models/diagnosis_template_model.dart';
 
 abstract class DiagnosisRemoteDataSource {
   Future<DiagnosisTemplateModel> getLatestTemplate();
+  Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
   Future<bool> submitDiagnosis({
     required String sessionId,
     required String templateId,
@@ -24,6 +25,15 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
     } else {
       throw Exception(response.data['message'] ?? 'Failed to fetch latest template');
     }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getReportBySessionId(String sessionId) async {
+    final response = await dio.get('/api/v1/diagnosis/reports/session/$sessionId');
+    if (response.data['success']) {
+      return response.data['data'];
+    }
+    return null;
   }
 
   @override

@@ -6,6 +6,9 @@ abstract class DiagnosisRepository {
   /// Fetches the latest active diagnosis template for the institution
   Future<Either<Failure, DiagnosisTemplateEntity>> getLatestTemplate();
 
+  /// Fetches an existing diagnosis report for a session
+  Future<Either<Failure, Map<String, dynamic>?>> getReportBySessionId(String sessionId);
+
   /// Submits a completed diagnosis for a specific session
   Future<Either<Failure, bool>> submitDiagnosis({
     required String sessionId,

@@ -167,6 +167,21 @@ class DiagnosisService {
 
     return report;
   }
+
+  /**
+   * Get a diagnosis report by session ID
+   */
+  async getReportBySessionId(sessionId) {
+    return await DiagnosisReport.findOne({
+      where: { session_id: sessionId },
+      include: [
+        {
+          model: DiagnosisResponse,
+          as: 'responses'
+        }
+      ]
+    });
+  }
 }
 
 module.exports = new DiagnosisService();

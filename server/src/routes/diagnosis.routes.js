@@ -13,5 +13,6 @@ router.get('/template/latest', diagnosisController.getLatestTemplate);
 router.get('/templates', authorize('supervisor', 'admin'), diagnosisController.listTemplates);
 router.post('/templates', authorize('supervisor', 'admin'), diagnosisController.createTemplate);
 router.post('/reports', diagnosisController.submitReport);
+router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
 
 module.exports = router;

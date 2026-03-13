@@ -78,6 +78,24 @@ class DiagnosisController {
       next(error);
     }
   };
+
+  /**
+   * @route GET /api/v1/diagnosis/reports/session/:sessionId
+   * @access Coach, Supervisor, Admin
+   */
+  getReportBySession = async (req, res, next) => {
+    try {
+      const { sessionId } = req.params;
+      const report = await diagnosisService.getReportBySessionId(sessionId);
+      
+      res.status(200).json({
+        success: true,
+        data: report
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new DiagnosisController();
