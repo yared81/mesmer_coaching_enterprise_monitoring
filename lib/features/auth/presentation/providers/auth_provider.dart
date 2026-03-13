@@ -33,6 +33,10 @@ final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
   return GetCurrentUserUseCase(ref.watch(authRepositoryProvider));
 });
 
+final lastUserRoleProvider = FutureProvider<String?>((ref) async {
+  return ref.watch(secureStorageProvider).getLastUserRole();
+});
+
 // --- Auth Presentation State ---
 
 enum AuthStatus { authenticated, unauthenticated, initial }
@@ -61,13 +65,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> login(String email, String password) async {
     state = const AuthState(status: AuthStatus.initial); // or loading
     final result = await _ref.read(loginUseCaseProvider)(email, password);
-    state = result.fold(
-      (failure) => AuthState.unauthenticated(error: failure.message),
-      (user) => AuthState.authenticated(user),
+    state = await result.fold(
+      (failure) async => AuthState.unauthenticated(error: failure.message),
+      (user) async {
+        await _ref.read(secureStorageProvider).saveLastUserRole(user.role.name);
+        return AuthState.authenticated(user);
+      },
     );
   }
 
   Future<void> logout() async {
+    final currentUser = state.user;
+    if (currentUser != null) {
+      await _ref.read(secureStorageProvider).saveLastUserRole(currentUser.role.name);
+    }
     await _ref.read(logoutUseCaseProvider)();
     state = AuthState.unauthenticated();
   }

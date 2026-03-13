@@ -77,9 +77,30 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 icon: Icons.logout_rounded,
                 label: 'Logout',
                 color: Colors.red,
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(ctx);
-                  ref.read(authProvider.notifier).logout();
+                  final double check = await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content: const Text('Are you sure you want to log out of your account?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 0.0),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 1.0),
+                          style: TextButton.styleFrom(foregroundColor: Colors.red),
+                          child: const Text('Logout'),
+                        ),
+                      ],
+                    ),
+                  ) ?? 0.0;
+                  
+                  if (check == 1.0) {
+                    ref.read(authProvider.notifier).logout();
+                  }
                 },
               ),
             ],

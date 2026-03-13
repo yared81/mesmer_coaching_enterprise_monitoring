@@ -122,14 +122,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Text(
-                                'Welcome back, Coach',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E3A8A),
-                                ),
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final lastRoleAsync = ref.watch(lastUserRoleProvider);
+                                  return lastRoleAsync.when(
+                                    data: (role) {
+                                      final welcomeText = role != null 
+                                          ? 'Welcome back, ${role[0].toUpperCase()}${role.substring(1)}'
+                                          : 'Welcome to GrowthTrack';
+                                      return Text(
+                                        welcomeText,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF1E3A8A),
+                                        ),
+                                      );
+                                    },
+                                    loading: () => const SizedBox(height: 24),
+                                    error: (_, __) => const Text(
+                                      'Welcome to GrowthTrack',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1E3A8A),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 32),
                               _buildTextField(

@@ -144,8 +144,29 @@ class SettingsScreen extends ConsumerWidget {
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        ref.read(authProvider.notifier).logout();
+                      onPressed: () async {
+                        final bool? confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirm Logout'),
+                            content: const Text('Are you sure you want to log out of your account?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                                child: const Text('Logout'),
+                              ),
+                            ],
+                          ),
+                        );
+                        
+                        if (confirm == true) {
+                          ref.read(authProvider.notifier).logout();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[50],
