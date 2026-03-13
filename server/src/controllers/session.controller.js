@@ -5,7 +5,7 @@ class SessionController {
     try {
       const session = await sessionService.createSession({
         ...req.body,
-        coach_id: req.user.id
+        coach_id: req.user.userId
       });
 
       res.status(201).json({
@@ -19,7 +19,7 @@ class SessionController {
 
   getCoachSessions = async (req, res, next) => {
     try {
-      const sessions = await sessionService.getCoachSessions(req.user.id);
+      const sessions = await sessionService.getCoachSessions(req.user.userId);
       res.status(200).json({
         success: true,
         data: sessions
@@ -45,7 +45,7 @@ class SessionController {
     try {
       const session = await sessionService.updateSession(
         req.params.id,
-        req.user.id,
+        req.user.userId,
         req.body
       );
       

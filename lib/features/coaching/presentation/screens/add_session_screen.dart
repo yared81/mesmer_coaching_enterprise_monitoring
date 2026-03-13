@@ -43,8 +43,28 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       recommendations: '',
     );
 
-    await ref.read(coachingSessionsProvider.notifier).createSession(session);
-    if (mounted) Navigator.pop(context);
+    try {
+      await ref.read(coachingSessionsProvider.notifier).createSession(session);
+      
+      // Force the enterprise's session list to refresh its cache
+      ref.invalidate(enterpriseSessionsProvider(_selectedEnterpriseId!));
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Session created successfully'), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create session: $e'), 
+            backgroundColor: Colors.red[700],
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _pickDate() async {

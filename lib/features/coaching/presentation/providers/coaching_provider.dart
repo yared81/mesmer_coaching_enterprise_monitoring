@@ -37,8 +37,8 @@ class CoachingSessionsNotifier extends StateNotifier<AsyncValue<List<CoachingSes
 
   Future<void> createSession(CoachingSessionEntity session) async {
     final result = await _repository.createSession(session);
-    result.fold(
-      (failure) => null, // Handle error UI if needed
+    return result.fold(
+      (failure) => throw Exception(failure.message),
       (_) => getSessions(), // Refresh list on success
     );
   }
