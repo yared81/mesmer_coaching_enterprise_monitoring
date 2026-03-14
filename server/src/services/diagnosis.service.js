@@ -1,4 +1,4 @@
-const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, DiagnosisReport, DiagnosisResponse } = require('../models');
+const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, DiagnosisReport, DiagnosisResponse, sequelize } = require('../models');
 
 class DiagnosisService {
   /**

@@ -57,6 +57,16 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
   late final TextEditingController _titleController;
   final List<_CategoryDraft> _categories = [];
   bool _isSaving = false;
+  
+  final List<String> _standardCategories = [
+    'Financial Management',
+    'Marketing & Sales',
+    'Operations Management',
+    'Human Resources',
+    'Strategy & Leadership',
+    'Governance & Compliance',
+    'General Management',
+  ];
 
   @override
   void initState() {
@@ -213,14 +223,20 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
           ? await repository.updateTemplate(widget.existingProfile!.id, payload)
           : await repository.createTemplate(payload);
 
+      if (!mounted) return;
+
       result.fold(
         (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.message)));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.message)));
+          }
         },
         (template) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Assessment Profile Published Successfully!')));
-          ref.refresh(allTemplatesProvider.future);
-          context.pop();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Assessment Profile Published Successfully!')));
+            ref.refresh(allTemplatesProvider.future);
+            context.pop();
+          }
         },
       );
     } finally {
@@ -309,21 +325,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                         Icon(Icons.folder_open_rounded, color: isFocused ? const Color(0xFF3D5AFE) : Colors.grey, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: TextFormField(
-                            controller: category.nameController,
-                            focusNode: category.focusNode,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
-                            ),
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Category Name (e.g., Marketing)',
-                              enabledBorder: isFocused ? const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)) : null,
-                              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
-                            ),
-                          ),
+                          child: _buildCategoryNameField(category, isFocused),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -455,6 +457,79 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
           const SizedBox(height: 48),
         ],
       ),
+    );
+  }
+
+  Widget _buildCategoryNameField(_CategoryDraft category, bool isFocused) {
+    bool isStandard = _standardCategories.contains(category.name);
+    
+    if (isStandard || (category.name.isEmpty && !category.focusNode.hasFocus)) {
+      return DropdownButton<String>(
+        value: category.name.isEmpty ? null : category.name,
+        hint: const Text('Select Category', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        isExpanded: true,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
+        ),
+        underline: const SizedBox.shrink(),
+        onChanged: (val) {
+          setState(() {
+            if (val == 'CUSTOM') {
+              category.nameController.text = '';
+              // We'll trigger a redraw so it shows as a text field
+              Future.delayed(Duration.zero, () => category.focusNode.requestFocus());
+            } else {
+              category.nameController.text = val!;
+            }
+          });
+        },
+        items: [
+          ..._standardCategories.map((cat) => DropdownMenuItem(
+                value: cat,
+                child: Text(cat),
+              )),
+          const DropdownMenuItem(
+            value: 'CUSTOM',
+            child: Text('Custom...', style: TextStyle(color: Colors.blue, fontStyle: FontStyle.italic)),
+          ),
+        ],
+      );
+    }
+
+    // Custom Mode
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: category.nameController,
+            focusNode: category.focusNode,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
+            ),
+            onChanged: (v) => setState(() {}),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'Type custom category name...',
+              isDense: true,
+              enabledBorder: isFocused ? const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)) : null,
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.list_alt_rounded, size: 20, color: Colors.blue),
+          onPressed: () {
+            setState(() {
+              category.nameController.text = _standardCategories.first;
+            });
+          },
+          tooltip: 'Back to standard categories',
+        ),
+      ],
     );
   }
 }

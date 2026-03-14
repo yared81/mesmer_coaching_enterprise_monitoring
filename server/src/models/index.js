@@ -80,16 +80,16 @@ DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
 CoachingSession.hasOne(DiagnosisReport, { foreignKey: 'session_id', as: 'diagnosisReport' });
 DiagnosisReport.belongsTo(CoachingSession, { foreignKey: 'session_id' });
 
-DiagnosisTemplate.hasMany(DiagnosisReport, { foreignKey: 'template_id', as: 'reports' });
+DiagnosisTemplate.hasMany(DiagnosisReport, { foreignKey: 'template_id', as: 'reports', onDelete: 'CASCADE' });
 DiagnosisReport.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
 
-DiagnosisReport.hasMany(DiagnosisResponse, { foreignKey: 'report_id', as: 'responses' });
+DiagnosisReport.hasMany(DiagnosisResponse, { foreignKey: 'report_id', as: 'responses', onDelete: 'CASCADE' });
 DiagnosisResponse.belongsTo(DiagnosisReport, { foreignKey: 'report_id' });
 
-DiagnosisQuestion.hasMany(DiagnosisResponse, { foreignKey: 'question_id', as: 'responses' });
+DiagnosisQuestion.hasMany(DiagnosisResponse, { foreignKey: 'question_id', as: 'responses', onDelete: 'CASCADE' });
 DiagnosisResponse.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
 
-DiagnosisChoice.hasMany(DiagnosisResponse, { foreignKey: 'choice_id', as: 'responses' });
+DiagnosisChoice.hasMany(DiagnosisResponse, { foreignKey: 'choice_id', as: 'responses', onDelete: 'CASCADE' });
 DiagnosisResponse.belongsTo(DiagnosisChoice, { foreignKey: 'choice_id' });
 
 const db = {

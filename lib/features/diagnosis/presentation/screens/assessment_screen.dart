@@ -267,9 +267,9 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     );
 
     final result = await repository.submitDiagnosis(
-      sessionId: widget.sessionId,
-      templateId: templateId,
-      responses: responseState.responses,
+      widget.sessionId,
+      templateId,
+      responseState.responses,
     );
 
     if (mounted) Navigator.pop(context); // Pop loading
