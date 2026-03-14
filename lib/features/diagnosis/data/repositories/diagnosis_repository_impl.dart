@@ -40,6 +40,16 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
   }
 
   @override
+  Future<Either<Failure, DiagnosisTemplateEntity>> updateTemplate(String id, Map<String, dynamic> data) async {
+    try {
+      final result = await remoteDataSource.updateTemplate(id, data);
+      return Right(result.toEntity());
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Map<String, dynamic>?>> getReportBySessionId(String sessionId) async {
     try {
       final result = await remoteDataSource.getReportBySessionId(sessionId);

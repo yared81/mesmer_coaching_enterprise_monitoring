@@ -12,6 +12,9 @@ abstract class DiagnosisRepository {
   /// Creates a new template version
   Future<Either<Failure, DiagnosisTemplateEntity>> createTemplate(Map<String, dynamic> data);
 
+  /// Updates an existing template directly
+  Future<Either<Failure, DiagnosisTemplateEntity>> updateTemplate(String id, Map<String, dynamic> data);
+
   /// Fetches an existing diagnosis report for a session
   Future<Either<Failure, Map<String, dynamic>?>> getReportBySessionId(String sessionId);
 

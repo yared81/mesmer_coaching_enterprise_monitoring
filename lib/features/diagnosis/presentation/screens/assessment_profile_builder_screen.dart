@@ -99,11 +99,13 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
               return {
                 'text': q.text,
                 'sort_order': qIndex + 1,
-                // Automatically populate Yes/No/N.A as requested
+                // Automatically populate 1-5 scoring as requested
                 'choices': [
-                  {'text': 'Yes', 'points': 2, 'sort_order': 1},
-                  {'text': 'No', 'points': 0, 'sort_order': 2},
-                  {'text': 'N/A', 'points': 0, 'sort_order': 3},
+                  {'text': '1 (Poor)', 'points': 1, 'sort_order': 1},
+                  {'text': '2 (Fair)', 'points': 2, 'sort_order': 2},
+                  {'text': '3 (Average)', 'points': 3, 'sort_order': 3},
+                  {'text': '4 (Good)', 'points': 4, 'sort_order': 4},
+                  {'text': '5 (Excellent)', 'points': 5, 'sort_order': 5},
                 ],
               };
             }).toList()
@@ -112,7 +114,9 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
       };
 
       final repository = ref.read(diagnosisRepositoryProvider);
-      final result = await repository.createTemplate(payload);
+      final result = widget.existingProfile != null
+          ? await repository.updateTemplate(widget.existingProfile!.id, payload)
+          : await repository.createTemplate(payload);
 
       result.fold(
         (failure) {
@@ -174,7 +178,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                     children: [
                        Icon(Icons.info_outline, color: Color(0xFF3D5AFE), size: 16),
                        SizedBox(width: 8),
-                       Expanded(child: Text('Questions created here are instantly distributed to all coaches once published. "Yes/No/N.A" choices are added automatically behind the scenes.', style: TextStyle(color: Color(0xFF3D5AFE), fontSize: 12))),
+                       Expanded(child: Text('Questions created here are instantly distributed to all coaches once published. "1 to 5" choices are added automatically behind the scenes.', style: TextStyle(color: Color(0xFF3D5AFE), fontSize: 12))),
                     ],
                   ),
                 ),

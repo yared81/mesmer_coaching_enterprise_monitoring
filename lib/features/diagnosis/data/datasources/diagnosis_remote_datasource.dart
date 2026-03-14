@@ -6,6 +6,7 @@ abstract class DiagnosisRemoteDataSource {
   Future<DiagnosisTemplateModel> getLatestTemplate();
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
   Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
+  Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data);
   Future<Map<String, dynamic>> submitDiagnosis({
     required String sessionId,
     required String templateId,
@@ -47,6 +48,16 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
       return DiagnosisTemplateModel.fromJson(response.data['data']);
     } else {
       throw Exception(response.data['message'] ?? 'Failed to create template');
+    }
+  }
+
+  @override
+  Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data) async {
+    final response = await dio.put('diagnosis/templates/$id', data: data);
+    if (response.data['success'] == true) {
+      return DiagnosisTemplateModel.fromJson(response.data['data']);
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to update template');
     }
   }
 
