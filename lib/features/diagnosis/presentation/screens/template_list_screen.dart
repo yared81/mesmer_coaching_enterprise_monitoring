@@ -183,8 +183,9 @@ class _TemplateCard extends StatelessWidget {
             ],
           ),
         ),
-        ),
-      ),
-    );
+          ), // ListTile
+        ), // InkWell
+      ), // Material
+    ); // Container
   }
 }

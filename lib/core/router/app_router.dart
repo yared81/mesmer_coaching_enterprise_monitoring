@@ -26,6 +26,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentatio
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_detail_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/assessment_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/template_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/template_builder_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
