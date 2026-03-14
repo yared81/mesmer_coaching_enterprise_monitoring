@@ -59,7 +59,7 @@ class AssessmentProfileListScreen extends ConsumerWidget {
         onPressed: () => context.push(AppRoutes.templateBuilder),
         backgroundColor: const Color(0xFFE91E63),
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('New Version', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text('Create Profile', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }

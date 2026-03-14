@@ -67,13 +67,13 @@ CoachingSession.belongsTo(User, {
 Institution.hasMany(DiagnosisTemplate, { foreignKey: 'institution_id', as: 'diagnosisTemplates' });
 DiagnosisTemplate.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });
 
-DiagnosisTemplate.hasMany(DiagnosisCategory, { foreignKey: 'template_id', as: 'categories' });
+DiagnosisTemplate.hasMany(DiagnosisCategory, { foreignKey: 'template_id', as: 'categories', onDelete: 'CASCADE' });
 DiagnosisCategory.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
 
-DiagnosisCategory.hasMany(DiagnosisQuestion, { foreignKey: 'category_id', as: 'questions' });
+DiagnosisCategory.hasMany(DiagnosisQuestion, { foreignKey: 'category_id', as: 'questions', onDelete: 'CASCADE' });
 DiagnosisQuestion.belongsTo(DiagnosisCategory, { foreignKey: 'category_id' });
 
-DiagnosisQuestion.hasMany(DiagnosisChoice, { foreignKey: 'question_id', as: 'choices' });
+DiagnosisQuestion.hasMany(DiagnosisChoice, { foreignKey: 'question_id', as: 'choices', onDelete: 'CASCADE' });
 DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
 
 // Diagnosis Report Associations

@@ -60,16 +60,16 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
   }
 
   @override
-  Future<Either<Failure, Map<String, dynamic>>> submitDiagnosis({
-    required String sessionId,
-    required String templateId,
-    required Map<String, String> responses,
-  }) async {
+  Future<Either<Failure, Map<String, dynamic>>> submitDiagnosis(
+    String sessionId,
+    String templateId,
+    Map<String, String> responses,
+  ) async {
     try {
       final result = await remoteDataSource.submitDiagnosis(
-        sessionId: sessionId,
-        templateId: templateId,
-        responses: responses,
+        sessionId,
+        templateId,
+        responses,
       );
       return Right(result);
     } catch (e) {

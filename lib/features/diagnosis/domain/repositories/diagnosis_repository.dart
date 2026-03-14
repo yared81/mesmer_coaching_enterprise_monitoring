@@ -22,9 +22,9 @@ abstract class DiagnosisRepository {
   Future<Either<Failure, Map<String, dynamic>?>> getReportBySessionId(String sessionId);
 
   /// Submits a completed diagnosis for a specific session
-  Future<Either<Failure, Map<String, dynamic>>> submitDiagnosis({
-    required String sessionId,
-    required String templateId,
-    required Map<String, String> responses, // questionId -> choiceId
-  });
+  Future<Either<Failure, Map<String, dynamic>>> submitDiagnosis(
+    String sessionId,
+    String templateId,
+    Map<String, String> responses, // questionId -> choiceId
+  );
 }

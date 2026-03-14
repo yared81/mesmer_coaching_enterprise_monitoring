@@ -7,11 +7,11 @@ abstract class DiagnosisRemoteDataSource {
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
   Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
   Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data);
-  Future<Map<String, dynamic>> submitDiagnosis({
-    required String sessionId,
-    required String templateId,
-    required Map<String, String> responses,
-  });
+  Future<Map<String, dynamic>> submitDiagnosis(
+    String sessionId,
+    String templateId,
+    Map<String, String> responses,
+  );
   Future<void> deleteTemplate(String id);
 }
 
@@ -77,11 +77,11 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
   }
 
   @override
-  Future<Map<String, dynamic>> submitDiagnosis({
-    required String sessionId,
-    required String templateId,
-    required Map<String, String> responses,
-  }) async {
+  Future<Map<String, dynamic>> submitDiagnosis(
+    String sessionId,
+    String templateId,
+    Map<String, String> responses,
+  ) async {
     final response = await dio.post('diagnosis/reports', data: {
       'session_id': sessionId,
       'template_id': templateId,

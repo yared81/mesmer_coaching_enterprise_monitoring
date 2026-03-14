@@ -34,12 +34,44 @@ class DiagnosisService {
   }
 
   /**
+   * Get a specific template by ID with all nested data
+   */
+  async getTemplateById(id, institutionId) {
+    return await DiagnosisTemplate.findOne({
+      where: { id, institution_id: institutionId },
+      include: [
+        {
+          model: DiagnosisCategory,
+          as: 'categories',
+          include: [{ model: DiagnosisQuestion, as: 'questions', include: [{ model: DiagnosisChoice, as: 'choices' }] }]
+        }
+      ],
+      order: [
+        [{ model: DiagnosisCategory, as: 'categories' }, 'sort_order', 'ASC'],
+        [{ model: DiagnosisCategory, as: 'categories' }, { model: DiagnosisQuestion, as: 'questions' }, 'sort_order', 'ASC'],
+        [{ model: DiagnosisCategory, as: 'categories' }, { model: DiagnosisQuestion, as: 'questions' }, { model: DiagnosisChoice, as: 'choices' }, 'sort_order', 'ASC']
+      ]
+    });
+  }
+
+  /**
    * List all templates for an institution
    */
   async listTemplates(institutionId) {
     return await DiagnosisTemplate.findAll({
       where: { institution_id: institutionId },
-      order: [['version', 'DESC']]
+      include: [
+        {
+          model: DiagnosisCategory,
+          as: 'categories',
+          include: [{ model: DiagnosisQuestion, as: 'questions', include: [{ model: DiagnosisChoice, as: 'choices' }] }]
+        }
+      ],
+      order: [
+        ['version', 'DESC'],
+        [{ model: DiagnosisCategory, as: 'categories' }, 'sort_order', 'ASC'],
+        [{ model: DiagnosisCategory, as: 'categories' }, { model: DiagnosisQuestion, as: 'questions' }, 'sort_order', 'ASC']
+      ]
     });
   }
 
@@ -108,53 +140,72 @@ class DiagnosisService {
    * Update an existing template in place (removing versioning)
    */
   async updateTemplate(id, data, institutionId) {
-    const template = await DiagnosisTemplate.findOne({
-      where: { id, institution_id: institutionId }
-    });
+    const transaction = await sequelize.transaction();
+    try {
+      const template = await DiagnosisTemplate.findOne({
+        where: { id, institution_id: institutionId },
+        transaction
+      });
 
-    if (!template) throw new Error('Assessment Profile not found');
+      if (!template) throw new Error('Assessment Profile not found');
 
-    // Update title if provided
-    if (data.title) {
-      await template.update({ title: data.title });
-    }
+      // Update title if provided
+      if (data.title) {
+        await template.update({ title: data.title }, { transaction });
+      }
 
-    // Completely replace categories, questions, and choices
-    if (data.categories) {
-      // Delete existing categories (cascades to questions/choices based on schema relation, or we delete explicitly)
-      await DiagnosisCategory.destroy({ where: { template_id: template.id } });
+      // Completely replace categories, questions, and choices
+      if (data.categories) {
+        // Fetch existing categories to delete them one by one to trigger cascades if set up, 
+        // or just delete the questions/choices explicitly
+        const oldCategories = await DiagnosisCategory.findAll({ where: { template_id: template.id }, transaction });
+        for (const cat of oldCategories) {
+          const oldQuestions = await DiagnosisQuestion.findAll({ where: { category_id: cat.id }, transaction });
+          for (const q of oldQuestions) {
+            await DiagnosisChoice.destroy({ where: { question_id: q.id }, transaction });
+            await q.destroy({ transaction });
+          }
+          await cat.destroy({ transaction });
+        }
 
-      for (const catData of data.categories) {
-        const category = await DiagnosisCategory.create({
-          template_id: template.id,
-          name: catData.name,
-          sort_order: catData.sort_order
-        });
+        for (const catData of data.categories) {
+          const category = await DiagnosisCategory.create({
+            template_id: template.id,
+            name: catData.name,
+            sort_order: catData.sort_order
+          }, { transaction });
 
-        if (catData.questions) {
-          for (const qData of catData.questions) {
-            const question = await DiagnosisQuestion.create({
-              category_id: category.id,
-              text: qData.text,
-              sort_order: qData.sort_order
-            });
+          if (catData.questions) {
+            for (const qData of catData.questions) {
+              const question = await DiagnosisQuestion.create({
+                category_id: category.id,
+                text: qData.text,
+                sort_order: qData.sort_order
+              }, { transaction });
 
-            if (qData.choices) {
-              for (const choiceData of qData.choices) {
-                await DiagnosisChoice.create({
-                  question_id: question.id,
-                  text: choiceData.text,
-                  points: choiceData.points,
-                  sort_order: choiceData.sort_order
-                });
+              if (qData.choices) {
+                for (const choiceData of qData.choices) {
+                  await DiagnosisChoice.create({
+                    question_id: question.id,
+                    text: choiceData.text,
+                    points: choiceData.points,
+                    sort_order: choiceData.sort_order
+                  }, { transaction });
+                }
               }
             }
           }
         }
       }
-    }
 
-    return template;
+      await transaction.commit();
+      
+      // Return reloaded specific template
+      return await this.getTemplateById(id, institutionId);
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
   /**
    * Delete a template

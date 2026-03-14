@@ -266,17 +266,6 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                   ),
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(8)),
-                  child: const Row(
-                    children: [
-                       Icon(Icons.info_outline, color: Color(0xFF3D5AFE), size: 16),
-                       SizedBox(width: 8),
-                       Expanded(child: Text('Questions created here are instantly distributed to all coaches once published. "1 to 5" choices are added automatically behind the scenes.', style: TextStyle(color: Color(0xFF3D5AFE), fontSize: 12))),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),

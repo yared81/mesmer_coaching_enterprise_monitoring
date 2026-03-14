@@ -186,19 +186,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          Row(
-            children: [
-              Text(
-                'Version ${template.version}',
-                style: const TextStyle(fontSize: 14, color: AppColors.textSecondary),
-              ),
-              const SizedBox(width: 12),
               Text(
                 'Session: ${session.title}',
                 style: const TextStyle(fontSize: 14, color: AppColors.primary, fontWeight: FontWeight.bold),
               ),
-            ],
-          ),
         ],
       ),
     );
