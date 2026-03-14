@@ -8,6 +8,8 @@ abstract class DiagnosisRemoteDataSource {
   Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
   Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data);
   Future<Map<String, dynamic>> submitDiagnosis({
+    required String sessionId,
+    required String templateId,
     required Map<String, String> responses,
   });
   Future<void> deleteTemplate(String id);
