@@ -34,9 +34,9 @@ class TemplateListScreen extends ConsumerWidget {
                 final template = templates[index];
                 return _TemplateCard(
                   title: template.title,
-                  version: template.version,
                   isActive: template.isActive,
                   date: template.updatedAt ?? DateTime.now(),
+                  onTap: () => context.push(AppRoutes.templateBuilder, extra: template),
                 );
               },
             ),
@@ -107,15 +107,15 @@ class TemplateListScreen extends ConsumerWidget {
 
 class _TemplateCard extends StatelessWidget {
   final String title;
-  final int version;
   final bool isActive;
   final DateTime date;
+  final VoidCallback onTap;
 
   const _TemplateCard({
     required this.title,
-    required this.version,
     required this.isActive,
     required this.date,
+    required this.onTap,
   });
 
   @override
@@ -136,9 +136,14 @@ class _TemplateCard extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Container(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isActive ? const Color(0xFF00B09B).withOpacity(0.1) : Colors.grey[100],
@@ -156,17 +161,6 @@ class _TemplateCard extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1A1A1A)),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: const Color(0xFF3D5AFE).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'v$version',
-                style: const TextStyle(color: Color(0xFF3D5AFE), fontWeight: FontWeight.bold, fontSize: 12),
               ),
             ),
           ],
@@ -190,6 +184,6 @@ class _TemplateCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
