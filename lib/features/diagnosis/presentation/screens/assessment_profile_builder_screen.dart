@@ -5,6 +5,7 @@ import '../providers/diagnosis_provider.dart';
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 
+class _CategoryDraft {
   final String? id; // Track original ID for delta updates
   final TextEditingController nameController;
   final FocusNode focusNode;
@@ -215,7 +216,9 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                   'sort_order': qEntry.key,
                   'choices': finalChoices,
                 };
-        }).toList(),
+              }).toList(),
+            };
+          }).toList(),
       };
 
       final repository = ref.read(diagnosisRepositoryProvider);
@@ -239,8 +242,12 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
           }
         },
       );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
-      setState(() => _isSaving = false);
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
