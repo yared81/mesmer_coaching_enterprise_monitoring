@@ -5,6 +5,7 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const { connectDB } = require('./src/config/database');
+const models = require('./src/models/index.js'); // Ensure models are loaded before sync
 
 const app = express();
 const PORT = process.env.PORT || 3000;
