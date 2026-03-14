@@ -6,14 +6,33 @@ import '../providers/diagnosis_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 
 class _CategoryDraft {
-  String name;
+  final TextEditingController nameController;
   List<_QuestionDraft> questions;
-  _CategoryDraft({required this.name, required this.questions});
+
+  _CategoryDraft({required String name, required this.questions})
+      : nameController = TextEditingController(text: name);
+
+  String get name => nameController.text;
+
+  void dispose() {
+    nameController.dispose();
+    for (final q in questions) {
+      q.dispose();
+    }
+  }
 }
 
 class _QuestionDraft {
-  String text;
-  _QuestionDraft({required this.text});
+  final TextEditingController textController;
+
+  _QuestionDraft({required String text})
+      : textController = TextEditingController(text: text);
+
+  String get text => textController.text;
+
+  void dispose() {
+    textController.dispose();
+  }
 }
 
 class AssessmentProfileBuilderScreen extends ConsumerStatefulWidget {
@@ -49,6 +68,15 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     }
   }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    for (final cat in _categories) {
+      cat.dispose();
+    }
+    super.dispose();
+  }
+
   void _addCategory() {
     setState(() {
       _categories.add(_CategoryDraft(name: 'New Category', questions: []));
@@ -63,12 +91,14 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
   void _removeCategory(int categoryIndex) {
     setState(() {
+      _categories[categoryIndex].dispose();
       _categories.removeAt(categoryIndex);
     });
   }
 
   void _removeQuestion(int categoryIndex, int questionIndex) {
     setState(() {
+      _categories[categoryIndex].questions[questionIndex].dispose();
       _categories[categoryIndex].questions.removeAt(questionIndex);
     });
   }
@@ -218,10 +248,9 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
-                            initialValue: category.name,
+                            controller: category.nameController,
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             decoration: const InputDecoration(border: InputBorder.none, hintText: 'Category Name (e.g., Marketing)'),
-                            onChanged: (val) => category.name = val,
                           ),
                         ),
                         IconButton(
@@ -261,15 +290,14 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextFormField(
-                                  initialValue: question.text,
+                                  controller: question.textController,
                                   maxLines: null,
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     border: InputBorder.none,
                                     hintText: 'Type your question...',
                                     isDense: true,
-                                    contentPadding: const EdgeInsets.only(top: 6),
+                                    contentPadding: EdgeInsets.only(top: 6),
                                   ),
-                                  onChanged: (val) => question.text = val,
                                 ),
                               ),
                               IconButton(
