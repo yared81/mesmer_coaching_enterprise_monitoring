@@ -68,13 +68,21 @@ class DiagnosisSummaryScreen extends StatelessWidget {
               Column(
                 children: [
                   Text(
-                    '${percentage.toInt()}%',
+                    '${(report.totalScore).toStringAsFixed(2)} / 5.0',
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 36,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  Text(
+                    '${percentage.toInt()}% Performance',
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     _getHealthLabel(percentage),
                     style: TextStyle(
@@ -137,7 +145,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${score.percentage.toInt()}%',
+                        '${score.averageScore.toStringAsFixed(1)} / 5.0',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: _getHealthColor(score.percentage),

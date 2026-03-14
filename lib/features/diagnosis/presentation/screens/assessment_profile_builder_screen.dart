@@ -24,14 +24,37 @@ class _CategoryDraft {
 
 class _QuestionDraft {
   final TextEditingController textController;
+  String type; // 'yes_no', 'scale_1_5', 'multiple_choice'
+  List<_ChoiceDraft> choices;
 
-  _QuestionDraft({required String text})
-      : textController = TextEditingController(text: text);
+  _QuestionDraft({
+    required String text,
+    this.type = 'scale_1_5',
+    List<_ChoiceDraft>? choices,
+  })  : textController = TextEditingController(text: text),
+        choices = choices ?? [];
 
   String get text => textController.text;
 
   void dispose() {
     textController.dispose();
+    for (final c in choices) {
+      c.dispose();
+    }
+  }
+}
+
+class _ChoiceDraft {
+  final TextEditingController textController;
+  final TextEditingController pointsController;
+
+  _ChoiceDraft({required String text, required int points})
+      : textController = TextEditingController(text: text),
+        pointsController = TextEditingController(text: points.toString());
+
+  void dispose() {
+    textController.dispose();
+    pointsController.dispose();
   }
 }
 
@@ -61,7 +84,23 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
         _categories.add(
           _CategoryDraft(
             name: cat.name,
-            questions: cat.questions.map((q) => _QuestionDraft(text: q.text)).toList(),
+            questions: cat.questions.map((q) {
+              // Try to detect type based on choices
+              String detectedType = 'multiple_choice';
+              if (q.choices.length == 2 && q.choices.any((c) => c.text.toLowerCase() == 'yes') && q.choices.any((c) => c.text.toLowerCase() == 'no')) {
+                detectedType = 'yes_no';
+              } else if (q.choices.length == 5 && q.choices.any((c) => c.text.contains('1')) && q.choices.any((c) => c.text.contains('5'))) {
+                detectedType = 'scale_1_5';
+              }
+
+              return _QuestionDraft(
+                text: q.text,
+                type: detectedType,
+                choices: detectedType == 'multiple_choice'
+                    ? q.choices.map((c) => _ChoiceDraft(text: c.text, points: c.points)).toList()
+                    : [],
+              );
+            }).toList(),
           ),
         );
       }
@@ -124,20 +163,39 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
             'sort_order': catIndex + 1,
             'questions': cat.questions.asMap().entries.map((qEntry) {
               final qIndex = qEntry.key;
-              final q = qEntry.value;
+                final q = qEntry.value;
 
-              return {
-                'text': q.text,
-                'sort_order': qIndex + 1,
-                // Automatically populate 1-5 scoring as requested
-                'choices': [
-                  {'text': '1 (Poor)', 'points': 1, 'sort_order': 1},
-                  {'text': '2 (Fair)', 'points': 2, 'sort_order': 2},
-                  {'text': '3 (Average)', 'points': 3, 'sort_order': 3},
-                  {'text': '4 (Good)', 'points': 4, 'sort_order': 4},
-                  {'text': '5 (Excellent)', 'points': 5, 'sort_order': 5},
-                ],
-              };
+                List<Map<String, dynamic>> finalChoices;
+                if (q.type == 'yes_no') {
+                  finalChoices = [
+                    {'text': 'Yes', 'points': 1, 'sort_order': 1},
+                    {'text': 'No', 'points': 0, 'sort_order': 2},
+                  ];
+                } else if (q.type == 'scale_1_5') {
+                  finalChoices = [
+                    {'text': '1 (Very Poor)', 'points': 1, 'sort_order': 1},
+                    {'text': '2 (Weak)', 'points': 2, 'sort_order': 2},
+                    {'text': '3 (Basic)', 'points': 3, 'sort_order': 3},
+                    {'text': '4 (Good)', 'points': 4, 'sort_order': 4},
+                    {'text': '5 (Strong)', 'points': 5, 'sort_order': 5},
+                  ];
+                } else {
+                  finalChoices = q.choices.asMap().entries.map((choiceEntry) {
+                    final cIndex = choiceEntry.key;
+                    final c = choiceEntry.value;
+                    return {
+                      'text': c.textController.text,
+                      'points': int.tryParse(c.pointsController.text) ?? 0,
+                      'sort_order': cIndex + 1,
+                    };
+                  }).toList();
+                }
+
+                return {
+                  'text': q.text,
+                  'sort_order': qIndex + 1,
+                  'choices': finalChoices,
+                };
             }).toList()
           };
         }).toList(),
@@ -289,15 +347,92 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: TextFormField(
-                                  controller: question.textController,
-                                  maxLines: null,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: 'Type your question...',
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.only(top: 6),
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextFormField(
+                                      controller: question.textController,
+                                      maxLines: null,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        hintText: 'Type your question...',
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.only(top: 6),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Text('Type:', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                        const SizedBox(width: 8),
+                                        DropdownButton<String>(
+                                          value: question.type,
+                                          isDense: true,
+                                          underline: const SizedBox.shrink(),
+                                          style: const TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold),
+                                          items: const [
+                                            DropdownMenuItem(value: 'scale_1_5', child: Text('1–5 Scale')),
+                                            DropdownMenuItem(value: 'yes_no', child: Text('Yes/No')),
+                                            DropdownMenuItem(value: 'multiple_choice', child: Text('Custom Choice')),
+                                          ],
+                                          onChanged: (val) {
+                                            if (val != null) setState(() => question.type = val);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    if (question.type == 'multiple_choice') ...[
+                                      const SizedBox(height: 8),
+                                      ...question.choices.asMap().entries.map((choiceEntry) {
+                                        final cIndex = choiceEntry.key;
+                                        final choice = choiceEntry.value;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 8.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 3,
+                                                child: TextFormField(
+                                                  controller: choice.textController,
+                                                  decoration: const InputDecoration(hintText: 'Option Text', isDense: true, border: OutlineInputBorder()),
+                                                  style: const TextStyle(fontSize: 13),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                flex: 1,
+                                                child: TextFormField(
+                                                  controller: choice.pointsController,
+                                                  decoration: const InputDecoration(hintText: 'Pts', isDense: true, border: OutlineInputBorder()),
+                                                  keyboardType: TextInputType.number,
+                                                  style: const TextStyle(fontSize: 13),
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    choice.dispose();
+                                                    question.choices.removeAt(cIndex);
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
+                                      TextButton.icon(
+                                        onPressed: () {
+                                          setState(() {
+                                            question.choices.add(_ChoiceDraft(text: '', points: 0));
+                                          });
+                                        },
+                                        icon: const Icon(Icons.add_circle_outline, size: 16),
+                                        label: const Text('Add Option', style: TextStyle(fontSize: 12)),
+                                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                               IconButton(
