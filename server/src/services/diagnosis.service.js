@@ -167,8 +167,8 @@ class DiagnosisService {
     const primaryChallenges = [];
 
     // 1. Calculate scores
-    let totalScore = 0;
-    let maxPossibleScore = 0;
+    let totalCategoryAverages = 0;
+    let actualCategoryCount = 0;
 
     // Get all choices in the template to calculate points
     const template = await DiagnosisTemplate.findByPk(template_id, {
@@ -183,24 +183,22 @@ class DiagnosisService {
 
     if (!template) throw new Error('Template not found');
 
-    // Calculate max possible score and category scores
+    // Calculate category averages
     for (const category of template.categories) {
-      let catScore = 0;
-      let catMax = 0;
+      let catPointsSum = 0;
+      let answeredCount = 0;
 
       for (const question of category.questions) {
-        const maxChoicePoints = Math.max(...question.choices.map(c => c.points));
-        catMax += maxChoicePoints;
-
         // Calculate actual score from responses
         const choiceId = responses[question.id];
         if (choiceId) {
           const choice = question.choices.find(c => c.id === choiceId);
           if (choice) {
-            catScore += choice.points;
+            catPointsSum += choice.points;
+            answeredCount++;
             
             // Challenge Detection Logic: 
-            // points <= 1 OR < 30% of max
+            const maxChoicePoints = Math.max(0, ...question.choices.map(c => c.points));
             if (choice.points <= 1 || (maxChoicePoints > 0 && choice.points < maxChoicePoints * 0.3)) {
               primaryChallenges.push({
                 question_id: question.id,
@@ -215,24 +213,30 @@ class DiagnosisService {
         }
       }
 
+      const catAverage = answeredCount > 0 ? catPointsSum / answeredCount : 0;
+
       categoryScores[category.name] = {
-        score: catScore,
-        max: catMax,
-        percentage: catMax > 0 ? (catScore / catMax) * 100 : 0
+        average_score: parseFloat(catAverage.toFixed(2)),
+        sum_points: catPointsSum,
+        questions_answered: answeredCount,
+        percentage: (catAverage / 5) * 100 // Normalize against max value of 5
       };
 
-      totalScore += catScore;
-      maxPossibleScore += catMax;
+      if (answeredCount > 0) {
+        totalCategoryAverages += catAverage;
+        actualCategoryCount++;
+      }
     }
 
-    const healthPercentage = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) * 100 : 0;
+    const overallScore = actualCategoryCount > 0 ? parseFloat((totalCategoryAverages / actualCategoryCount).toFixed(2)) : 0;
+    const healthPercentage = parseFloat(((overallScore / 5) * 100).toFixed(2));
 
     // 2. Create the Report
     const report = await DiagnosisReport.create({
       session_id,
       template_id,
-      total_score: totalScore,
-      max_score: maxPossibleScore,
+      total_score: overallScore, // Now storing the average score (e.g. 3.02)
+      max_score: 5,              // Max is always 5 for this scale
       health_percentage: healthPercentage,
       category_scores: categoryScores,
       primary_challenges: primaryChallenges
