@@ -162,6 +162,9 @@ class DiagnosisService {
         for (const cat of oldCategories) {
           const oldQuestions = await DiagnosisQuestion.findAll({ where: { category_id: cat.id }, transaction });
           for (const q of oldQuestions) {
+            // Manually delete responses associated with this question to satisfy FK constraints 
+            // especially if DB level CASCADE hasn't synced yet.
+            await DiagnosisResponse.destroy({ where: { question_id: q.id }, transaction });
             await DiagnosisChoice.destroy({ where: { question_id: q.id }, transaction });
             await q.destroy({ transaction });
           }

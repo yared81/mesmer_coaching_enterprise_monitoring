@@ -1,3 +1,4 @@
+const { sequelize } = require('../config/database');
 const Institution = require('./institution.model');
 const User = require('./user.model');
 const Enterprise = require('./enterprise.model');
@@ -102,7 +103,8 @@ const db = {
   DiagnosisQuestion,
   DiagnosisChoice,
   DiagnosisReport,
-  DiagnosisResponse
+  DiagnosisResponse,
+  sequelize
 };
 
 module.exports = db;

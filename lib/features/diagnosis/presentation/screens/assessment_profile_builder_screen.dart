@@ -8,9 +8,10 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/
 class _CategoryDraft {
   final TextEditingController nameController;
   final FocusNode focusNode;
+  bool isCustom;
   List<_QuestionDraft> questions;
 
-  _CategoryDraft({required String name, required this.questions})
+  _CategoryDraft({required String name, required this.questions, this.isCustom = false})
       : nameController = TextEditingController(text: name),
         focusNode = FocusNode();
 
@@ -463,11 +464,15 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
   Widget _buildCategoryNameField(_CategoryDraft category, bool isFocused) {
     bool isStandard = _standardCategories.contains(category.name);
     
-    if (isStandard || (category.name.isEmpty && !category.focusNode.hasFocus)) {
+    // Auto-detect custom for existing data
+    if (!isStandard && category.name.isNotEmpty) {
+      category.isCustom = true;
+    }
+
+    if (!category.isCustom) {
       return DropdownButton<String>(
         value: category.name.isEmpty ? null : category.name,
-        hint: const Text('Select Category', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        isExpanded: true,
+        hint: const Text('Select category area...', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 14,
@@ -478,8 +483,8 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
           setState(() {
             if (val == 'CUSTOM') {
               category.nameController.text = '';
-              // We'll trigger a redraw so it shows as a text field
-              Future.delayed(Duration.zero, () => category.focusNode.requestFocus());
+              category.isCustom = true;
+              category.focusNode.requestFocus();
             } else {
               category.nameController.text = val!;
             }
@@ -501,10 +506,12 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     // Custom Mode
     return Row(
       children: [
+        const Text('Custom: ', style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)),
         Expanded(
           child: TextFormField(
             controller: category.nameController,
             focusNode: category.focusNode,
+            autofocus: true,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14,
@@ -513,21 +520,23 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
             onChanged: (v) => setState(() {}),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'Type custom category name...',
+              hintText: 'Type category name...',
               isDense: true,
-              enabledBorder: isFocused ? const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)) : null,
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2.5)),
             ),
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.list_alt_rounded, size: 20, color: Colors.blue),
+          icon: const Icon(Icons.close_rounded, size: 18, color: Colors.grey),
           onPressed: () {
             setState(() {
-              category.nameController.text = _standardCategories.first;
+              category.isCustom = false;
+              category.nameController.text = '';
+              category.focusNode.unfocus();
             });
           },
-          tooltip: 'Back to standard categories',
+          tooltip: 'Cancel custom name',
         ),
       ],
     );
