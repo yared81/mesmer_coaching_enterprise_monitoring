@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/diagnosis_provider.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
+
 class _CategoryDraft {
   String name;
   List<_QuestionDraft> questions;
@@ -15,16 +17,37 @@ class _QuestionDraft {
 }
 
 class TemplateBuilderScreen extends ConsumerStatefulWidget {
-  const TemplateBuilderScreen({super.key});
+  final DiagnosisTemplateEntity? existingProfile;
+
+  const TemplateBuilderScreen({super.key, this.existingProfile});
 
   @override
   ConsumerState<TemplateBuilderScreen> createState() => _TemplateBuilderScreenState();
 }
 
 class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
-  final TextEditingController _titleController = TextEditingController(text: 'Diagnosis Template');
+  late final TextEditingController _titleController;
   final List<_CategoryDraft> _categories = [];
   bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(
+      text: widget.existingProfile?.title ?? 'Diagnosis Template',
+    );
+
+    if (widget.existingProfile != null) {
+      for (final cat in widget.existingProfile!.categories) {
+        _categories.add(
+          _CategoryDraft(
+            name: cat.name,
+            questions: cat.questions.map((q) => _QuestionDraft(text: q.text)).toList(),
+          ),
+        );
+      }
+    }
+  }
 
   void _addCategory() {
     setState(() {
@@ -120,7 +143,7 @@ class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
           else
             TextButton(
               onPressed: _publishTemplate,
-              child: const Text('PUBLISH', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text(widget.existingProfile != null ? 'UPDATE' : 'PUBLISH', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
         ],
       ),
