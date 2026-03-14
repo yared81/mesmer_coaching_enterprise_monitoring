@@ -76,4 +76,14 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, Unit>> deleteTemplate(String id) async {
+    try {
+      await remoteDataSource.deleteTemplate(id);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

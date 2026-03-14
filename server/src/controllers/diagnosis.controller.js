@@ -61,6 +61,14 @@ class DiagnosisController {
       next(error);
     }
   };
+  async deleteTemplate(req, res) {
+    try {
+      await diagnosisService.deleteTemplate(req.params.id, req.user.institution_id);
+      res.json({ success: true, message: 'Assessment Profile deleted successfully' });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  }
 
   /**
    * @route PUT /api/v1/diagnosis/templates/:id

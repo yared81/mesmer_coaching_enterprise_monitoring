@@ -104,6 +104,42 @@ class AssessmentProfileListScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _confirmDeleteProfile(BuildContext context, WidgetRef ref, String id, String title) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Assessment Profile?'),
+        content: Text('Are you sure you want to delete "$title"? This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final repository = ref.read(diagnosisRepositoryProvider);
+              final result = await repository.deleteTemplate(id);
+              
+              if (context.mounted) {
+                result.fold(
+                  (failure) => ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to delete: ${failure.message}'), backgroundColor: Colors.red),
+                  ),
+                  (_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Profile deleted successfully'), backgroundColor: Colors.green),
+                    );
+                    ref.invalidate(allTemplatesProvider);
+                  },
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            child: const Text('DELETE'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _AssessmentProfileCard extends StatelessWidget {

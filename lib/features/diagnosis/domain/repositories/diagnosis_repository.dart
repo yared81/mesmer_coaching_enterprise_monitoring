@@ -15,6 +15,9 @@ abstract class DiagnosisRepository {
   /// Updates an existing template directly
   Future<Either<Failure, DiagnosisTemplateEntity>> updateTemplate(String id, Map<String, dynamic> data);
 
+  /// Deletes an existing template
+  Future<Either<Failure, Unit>> deleteTemplate(String id);
+
   /// Fetches an existing diagnosis report for a session
   Future<Either<Failure, Map<String, dynamic>?>> getReportBySessionId(String sessionId);
 

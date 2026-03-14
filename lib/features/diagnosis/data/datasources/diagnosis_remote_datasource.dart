@@ -8,10 +8,9 @@ abstract class DiagnosisRemoteDataSource {
   Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
   Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data);
   Future<Map<String, dynamic>> submitDiagnosis({
-    required String sessionId,
-    required String templateId,
     required Map<String, String> responses,
   });
+  Future<void> deleteTemplate(String id);
 }
 
 class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
@@ -91,6 +90,14 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
       return response.data['data'];
     } else {
       throw Exception(response.data['message'] ?? 'Failed to submit diagnosis');
+    }
+  }
+
+  @override
+  Future<void> deleteTemplate(String id) async {
+    final response = await dio.delete('diagnosis/templates/$id');
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Failed to delete template');
     }
   }
 }

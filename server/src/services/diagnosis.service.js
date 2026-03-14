@@ -156,6 +156,19 @@ class DiagnosisService {
 
     return template;
   }
+  /**
+   * Delete a template
+   */
+  async deleteTemplate(id, institutionId) {
+    const template = await DiagnosisTemplate.findOne({
+      where: { id, institution_id: institutionId }
+    });
+
+    if (!template) throw new Error('Assessment Profile not found');
+
+    // Delete the template (cascade will handle child models if set up, or we handle it if not)
+    return await template.destroy();
+  }
 
   /**
    * Submit a diagnosis report

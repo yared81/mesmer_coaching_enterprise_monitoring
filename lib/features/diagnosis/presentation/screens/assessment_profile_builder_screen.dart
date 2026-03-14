@@ -27,37 +27,17 @@ class _CategoryDraft {
 
 class _QuestionDraft {
   final TextEditingController textController;
-  String type; // 'yes_no', 'scale_1_5', 'multiple_choice'
-  List<_ChoiceDraft> choices;
+  String type; // 'yes_no', 'scale_1_5'
 
   _QuestionDraft({
     required String text,
     this.type = 'scale_1_5',
-    List<_ChoiceDraft>? choices,
-  })  : textController = TextEditingController(text: text),
-        choices = choices ?? [];
+  }) : textController = TextEditingController(text: text);
 
   String get text => textController.text;
 
   void dispose() {
     textController.dispose();
-    for (final c in choices) {
-      c.dispose();
-    }
-  }
-}
-
-class _ChoiceDraft {
-  final TextEditingController textController;
-  final TextEditingController pointsController;
-
-  _ChoiceDraft({required String text, required int points})
-      : textController = TextEditingController(text: text),
-        pointsController = TextEditingController(text: points.toString());
-
-  void dispose() {
-    textController.dispose();
-    pointsController.dispose();
   }
 }
 
