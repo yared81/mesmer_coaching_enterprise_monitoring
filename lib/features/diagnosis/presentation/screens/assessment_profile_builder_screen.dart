@@ -27,17 +27,20 @@ class _CategoryDraft {
 
 class _QuestionDraft {
   final TextEditingController textController;
+  final FocusNode focusNode;
   String type; // 'yes_no', 'scale_1_5'
 
   _QuestionDraft({
     required String text,
     this.type = 'scale_1_5',
-  }) : textController = TextEditingController(text: text);
+  })  : textController = TextEditingController(text: text),
+        focusNode = FocusNode();
 
   String get text => textController.text;
 
   void dispose() {
     textController.dispose();
+    focusNode.dispose();
   }
 }
 
@@ -64,7 +67,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
     if (widget.existingProfile != null) {
       for (final cat in widget.existingProfile!.categories) {
-        final draft = _CategoryDraft(
+        final draft = _createNewCategory(
           name: cat.name,
           questions: cat.questions.map((q) {
             String detectedType = 'scale_1_5';
@@ -72,21 +75,31 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
               detectedType = 'yes_no';
             }
 
-            return _QuestionDraft(
+            return _createNewQuestion(
               text: q.text,
               type: detectedType,
             );
           }).toList(),
         );
-        
-        // Listen to focus changes to update the UI (for the blue border)
-        draft.focusNode.addListener(() {
-          if (mounted) setState(() {});
-        });
-        
         _categories.add(draft);
       }
     }
+  }
+
+  _CategoryDraft _createNewCategory({required String name, required List<_QuestionDraft> questions}) {
+    final draft = _CategoryDraft(name: name, questions: questions);
+    draft.focusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
+    return draft;
+  }
+
+  _QuestionDraft _createNewQuestion({required String text, String type = 'scale_1_5'}) {
+    final draft = _QuestionDraft(text: text, type: type);
+    draft.focusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
+    return draft;
   }
 
   @override
@@ -100,13 +113,13 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
   void _addCategory() {
     setState(() {
-      _categories.add(_CategoryDraft(name: 'New Category', questions: []));
+      _categories.add(_createNewCategory(name: '', questions: []));
     });
   }
 
   void _addQuestion(int categoryIndex) {
     setState(() {
-      _categories[categoryIndex].questions.add(_QuestionDraft(text: 'New Question'));
+      _categories[categoryIndex].questions.add(_createNewQuestion(text: ''));
     });
   }
 
@@ -282,13 +295,10 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isFocused ? const Color(0xFF3D5AFE) : Colors.grey.shade200,
-                  width: isFocused ? 2 : 1,
-                ),
+                border: Border.all(color: Colors.grey.shade200),
                 boxShadow: [
                   BoxShadow(
-                    color: isFocused ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.black.withOpacity(0.02),
+                    color: Colors.black.withOpacity(0.02),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -318,7 +328,12 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                               fontSize: 16,
                               color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
                             ),
-                            decoration: const InputDecoration(border: InputBorder.none, hintText: 'Category Name (e.g., Marketing)'),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Category Name (e.g., Marketing)',
+                              enabledBorder: isFocused ? const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)) : null,
+                              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+                            ),
                           ),
                         ),
                         IconButton(
@@ -344,7 +359,12 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                       separatorBuilder: (ctx, i) => Divider(height: 1, color: Colors.grey.shade200),
                       itemBuilder: (ctx, qIndex) {
                         final question = category.questions[qIndex];
-                        return Padding(
+                        final isQFocused = question.focusNode.hasFocus;
+
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: isQFocused ? const Color(0xFF3D5AFE).withOpacity(0.02) : Colors.transparent,
+                          ),
                           padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,12 +382,15 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                                   children: [
                                     TextFormField(
                                       controller: question.textController,
+                                      focusNode: question.focusNode,
                                       maxLines: null,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                         border: InputBorder.none,
                                         hintText: 'Type your question...',
                                         isDense: true,
-                                        contentPadding: EdgeInsets.only(top: 6),
+                                        contentPadding: const EdgeInsets.only(top: 6, bottom: 6),
+                                        enabledBorder: isQFocused ? const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 1)) : null,
+                                        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 1.5)),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
