@@ -12,6 +12,7 @@ router.get('/template/latest', diagnosisController.getLatestTemplate);
 // Supervisor/Admin Only Routes
 router.get('/templates', authorize('supervisor', 'admin'), diagnosisController.listTemplates);
 router.post('/templates', authorize('supervisor', 'admin'), diagnosisController.createTemplate);
+router.put('/templates/:id', authorize('supervisor', 'admin'), diagnosisController.updateTemplate);
 router.post('/reports', diagnosisController.submitReport);
 router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
 

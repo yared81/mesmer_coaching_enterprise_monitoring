@@ -63,6 +63,24 @@ class DiagnosisController {
   };
 
   /**
+   * @route PUT /api/v1/diagnosis/templates/:id
+   * @access Supervisor, Admin
+   */
+  updateTemplate = async (req, res, next) => {
+    try {
+      const institutionId = req.user.institution_id || req.user.institutionId;
+      const template = await diagnosisService.updateTemplate(req.params.id, req.body, institutionId);
+      
+      res.status(200).json({
+        success: true,
+        data: template
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * @route POST /api/v1/diagnosis/reports
    * @access Coach, Supervisor, Admin
    */

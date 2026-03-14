@@ -105,6 +105,59 @@ class DiagnosisService {
   }
 
   /**
+   * Update an existing template in place (removing versioning)
+   */
+  async updateTemplate(id, data, institutionId) {
+    const template = await DiagnosisTemplate.findOne({
+      where: { id, institution_id: institutionId }
+    });
+
+    if (!template) throw new Error('Assessment Profile not found');
+
+    // Update title if provided
+    if (data.title) {
+      await template.update({ title: data.title });
+    }
+
+    // Completely replace categories, questions, and choices
+    if (data.categories) {
+      // Delete existing categories (cascades to questions/choices based on schema relation, or we delete explicitly)
+      await DiagnosisCategory.destroy({ where: { template_id: template.id } });
+
+      for (const catData of data.categories) {
+        const category = await DiagnosisCategory.create({
+          template_id: template.id,
+          name: catData.name,
+          sort_order: catData.sort_order
+        });
+
+        if (catData.questions) {
+          for (const qData of catData.questions) {
+            const question = await DiagnosisQuestion.create({
+              category_id: category.id,
+              text: qData.text,
+              sort_order: qData.sort_order
+            });
+
+            if (qData.choices) {
+              for (const choiceData of qData.choices) {
+                await DiagnosisChoice.create({
+                  question_id: question.id,
+                  text: choiceData.text,
+                  points: choiceData.points,
+                  sort_order: choiceData.sort_order
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return template;
+  }
+
+  /**
    * Submit a diagnosis report
    * @param {Object} data - { session_id, template_id, responses: { questionId: choiceId } }
    */
