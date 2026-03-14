@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/router/app_routes.dart';
 import '../providers/diagnosis_provider.dart';
 
-class TemplateListScreen extends ConsumerWidget {
-  const TemplateListScreen({super.key});
+class AssessmentProfileListScreen extends ConsumerWidget {
+  const AssessmentProfileListScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,7 +32,7 @@ class TemplateListScreen extends ConsumerWidget {
               itemCount: templates.length,
               itemBuilder: (context, index) {
                 final template = templates[index];
-                return _TemplateCard(
+                return _AssessmentProfileCard(
                   title: template.title,
                   isActive: template.isActive,
                   date: template.updatedAt ?? DateTime.now(),
@@ -105,13 +105,13 @@ class TemplateListScreen extends ConsumerWidget {
   }
 }
 
-class _TemplateCard extends StatelessWidget {
+class _AssessmentProfileCard extends StatelessWidget {
   final String title;
   final bool isActive;
   final DateTime date;
   final VoidCallback onTap;
 
-  const _TemplateCard({
+  const _AssessmentProfileCard({
     required this.title,
     required this.isActive,
     required this.date,

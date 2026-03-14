@@ -16,16 +16,16 @@ class _QuestionDraft {
   _QuestionDraft({required this.text});
 }
 
-class TemplateBuilderScreen extends ConsumerStatefulWidget {
+class AssessmentProfileBuilderScreen extends ConsumerStatefulWidget {
   final DiagnosisTemplateEntity? existingProfile;
 
-  const TemplateBuilderScreen({super.key, this.existingProfile});
+  const AssessmentProfileBuilderScreen({super.key, this.existingProfile});
 
   @override
-  ConsumerState<TemplateBuilderScreen> createState() => _TemplateBuilderScreenState();
+  ConsumerState<AssessmentProfileBuilderScreen> createState() => _AssessmentProfileBuilderScreenState();
 }
 
-class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
+class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfileBuilderScreen> {
   late final TextEditingController _titleController;
   final List<_CategoryDraft> _categories = [];
   bool _isSaving = false;
