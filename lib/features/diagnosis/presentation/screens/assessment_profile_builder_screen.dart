@@ -331,9 +331,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                       children: [
                         Icon(Icons.folder_open_rounded, color: isFocused ? const Color(0xFF3D5AFE) : Colors.grey, size: 20),
                         const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildCategoryNameField(category, isFocused),
-                        ),
+                        _buildCategoryNameField(category, isFocused),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
                           onPressed: () => _confirmDeleteCategory(catIndex),
@@ -473,77 +471,80 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     // Auto-detect custom for existing data
     if (!isStandard && category.name.isNotEmpty) {
       category.isCustom = true;
-    }
+       }
 
     if (!category.isCustom) {
-      return DropdownButton<String>(
-        value: category.name.isEmpty ? null : category.name,
-        hint: const Text('Select category area...', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-          color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
-        ),
-        underline: const SizedBox.shrink(),
-        onChanged: (val) {
-          setState(() {
-            if (val == 'CUSTOM') {
-              category.nameController.text = '';
-              category.isCustom = true;
-              category.focusNode.requestFocus();
-            } else {
-              category.nameController.text = val!;
-            }
-          });
-        },
-        items: [
-          ..._standardCategories.map((cat) => DropdownMenuItem(
-                value: cat,
-                child: Text(cat),
-              )),
-          const DropdownMenuItem(
-            value: 'CUSTOM',
-            child: Text('Custom...', style: TextStyle(color: Colors.blue, fontStyle: FontStyle.italic)),
+      return Expanded(
+        child: DropdownButton<String>(
+          value: category.name.isEmpty ? null : category.name,
+          hint: const Text('Select category area...', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
           ),
-        ],
+          isExpanded: true,
+          underline: const SizedBox.shrink(),
+          onChanged: (val) {
+            setState(() {
+              if (val == 'CUSTOM') {
+                category.nameController.text = '';
+                category.isCustom = true;
+                category.focusNode.requestFocus();
+              } else {
+                category.nameController.text = val!;
+              }
+            });
+          },
+          items: [
+            ..._standardCategories.map((cat) => DropdownMenuItem(
+                  value: cat,
+                  child: Text(cat),
+                )),
+            const DropdownMenuItem(
+              value: 'CUSTOM',
+              child: Text('Custom...', style: TextStyle(color: Colors.blue, fontStyle: FontStyle.italic)),
+            ),
+          ],
+        ),
       );
     }
 
     // Custom Mode
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: category.nameController,
-            focusNode: category.focusNode,
-            autofocus: true,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF3D5AFE)),
-            onChanged: (v) => setState(() {}), // Keep onChanged to trigger rebuild for UI updates
-            decoration: const InputDecoration(
-              hintText: 'Enter custom name...',
-              prefixText: 'Custom: ',
-              prefixStyle: TextStyle(fontWeight: FontWeight.normal, color: Colors.grey, fontSize: 12),
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 8),
-              border: InputBorder.none,
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2.5)),
+    return Expanded(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: category.nameController,
+              focusNode: category.focusNode,
+              autofocus: true,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF3D5AFE)),
+              onChanged: (v) => setState(() {}),
+              decoration: const InputDecoration(
+                hintText: 'Enter custom name...',
+                prefixText: 'Custom: ',
+                prefixStyle: TextStyle(fontWeight: FontWeight.normal, color: Colors.grey, fontSize: 12),
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(vertical: 8),
+                border: InputBorder.none,
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2.5)),
+              ),
             ),
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.close_rounded, size: 18, color: Colors.grey),
-          onPressed: () {
-            setState(() {
-              category.isCustom = false;
-              category.nameController.text = '';
-              category.focusNode.unfocus();
-            });
-          },
-          tooltip: 'Cancel custom name',
-        ),
-      ],
+          IconButton(
+            icon: const Icon(Icons.close_rounded, size: 18, color: Colors.grey),
+            onPressed: () {
+              setState(() {
+                category.isCustom = false;
+                category.nameController.text = '';
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 }

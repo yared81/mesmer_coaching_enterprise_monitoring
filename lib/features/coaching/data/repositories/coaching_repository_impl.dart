@@ -27,7 +27,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.createSession(model);
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -37,7 +37,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.getMySessions();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -47,7 +47,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.getEnterpriseSessions(enterpriseId);
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -68,7 +68,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.updateSession(model);
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 }

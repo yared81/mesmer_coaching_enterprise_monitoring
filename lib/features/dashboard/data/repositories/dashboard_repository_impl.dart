@@ -15,7 +15,7 @@ class DashboardRepositoryImpl implements DashboardRepository {
       final stats = await remoteDataSource.getAdminStats();
       return Right(stats);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -25,7 +25,7 @@ class DashboardRepositoryImpl implements DashboardRepository {
       final stats = await remoteDataSource.getSupervisorStats();
       return Right(stats);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -35,7 +35,7 @@ class DashboardRepositoryImpl implements DashboardRepository {
       final stats = await remoteDataSource.getCoachStats();
       return Right(stats);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 }

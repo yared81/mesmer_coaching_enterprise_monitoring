@@ -33,7 +33,8 @@ class DiagnosisController {
   listTemplates = async (req, res, next) => {
     try {
       const institutionId = req.user.institution_id || req.user.institutionId;
-      const templates = await diagnosisService.listTemplates(institutionId);
+      const isAdmin = req.user.role === 'admin';
+      const templates = await diagnosisService.listTemplates(institutionId, isAdmin);
       
       res.status(200).json({
         success: true,

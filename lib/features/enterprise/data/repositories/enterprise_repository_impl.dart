@@ -21,7 +21,7 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       );
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -31,7 +31,7 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       final map = await _remoteDatasource.getEnterpriseById(id);
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -41,7 +41,7 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       final map = await _remoteDatasource.createEnterprise(data);
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 

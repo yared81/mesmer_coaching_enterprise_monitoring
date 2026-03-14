@@ -15,7 +15,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       final templates = await remoteDataSource.listTemplates();
       return Right(templates.map((tpl) => tpl.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -25,7 +25,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       final result = await remoteDataSource.getLatestTemplate();
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -35,7 +35,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       final result = await remoteDataSource.createTemplate(data);
       return Right(result.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -45,7 +45,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       final result = await remoteDataSource.updateTemplate(id, data);
       return Right(result.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -55,7 +55,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       final result = await remoteDataSource.getReportBySessionId(sessionId);
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -73,7 +73,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       );
       return Right(result);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -83,7 +83,7 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       await remoteDataSource.deleteTemplate(id);
       return const Right(unit);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 }

@@ -22,13 +22,8 @@ class CoachRepositoryImpl implements CoachRepository {
             createdAt: e.createdAt,
           )).toList();
       return Right(entities);
-    } on AppException catch (e) {
-      if (e.message.contains('401') || e.message.contains('403')) {
-        return Left(UnauthorizedFailure(message: e.message));
-      }
-      return Left(ServerFailure(message: e.message));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -43,10 +38,8 @@ class CoachRepositoryImpl implements CoachRepository {
         isActive: model.isActive,
         createdAt: model.createdAt,
       ));
-    } on AppException catch (e) {
-      return Left(ServerFailure(message: e.message));
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 

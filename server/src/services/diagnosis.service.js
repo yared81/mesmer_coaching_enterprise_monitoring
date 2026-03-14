@@ -57,9 +57,16 @@ class DiagnosisService {
   /**
    * List all templates for an institution
    */
-  async listTemplates(institutionId) {
+  /**
+   * Get templates for an institution
+   * @param {string} institutionId
+   * @param {boolean} isAdmin
+   */
+  async listTemplates(institutionId, isAdmin = false) {
+    const where = isAdmin ? {} : { institution_id: institutionId };
+    
     return await DiagnosisTemplate.findAll({
-      where: { institution_id: institutionId },
+      where,
       include: [
         {
           model: DiagnosisCategory,
@@ -69,71 +76,78 @@ class DiagnosisService {
       ],
       order: [
         ['version', 'DESC'],
-        [{ model: DiagnosisCategory, as: 'categories' }, 'sort_order', 'ASC'],
-        [{ model: DiagnosisCategory, as: 'categories' }, { model: DiagnosisQuestion, as: 'questions' }, 'sort_order', 'ASC']
+        ['created_at', 'DESC']
       ]
     });
   }
 
   /**
    * Create a new template version
-   * This involves deep-cloning or creating new structures
    */
   async createTemplate(data, institutionId) {
-    // 1. Deactivate current active template
-    await DiagnosisTemplate.update(
-      { is_active: false },
-      { where: { institution_id: institutionId, is_active: true } }
-    );
+    return await sequelize.transaction(async (t) => {
+      // 1. Deactivate current active template for THIS institution
+      await DiagnosisTemplate.update(
+        { is_active: false },
+        { 
+          where: { institution_id: institutionId, is_active: true },
+          transaction: t
+        }
+      );
 
-    // 2. Get latest version number
-    const latest = await DiagnosisTemplate.findOne({
-      where: { institution_id: institutionId },
-      order: [['version', 'DESC']]
-    });
-    const nextVersion = latest ? latest.version + 1 : 1;
+      // 2. Get latest version number for THIS institution
+      const latest = await DiagnosisTemplate.findOne({
+        where: { institution_id: institutionId },
+        order: [['version', 'DESC']],
+        transaction: t
+      });
+      const nextVersion = latest ? latest.version + 1 : 1;
 
-    // 3. Create new template
-    const template = await DiagnosisTemplate.create({
-      title: data.title || `Diagnosis Template v${nextVersion}`,
-      version: nextVersion,
-      is_active: true,
-      institution_id: institutionId
-    });
+      // 3. Create new template
+      const template = await DiagnosisTemplate.create({
+        title: data.title || `Diagnosis Template v${nextVersion}`,
+        version: nextVersion,
+        is_active: true,
+        institution_id: institutionId
+      }, { transaction: t });
 
-    // 4. Create Categories/Questions/Choices if provided in data
-    if (data.categories) {
-      for (const catData of data.categories) {
-        const category = await DiagnosisCategory.create({
-          template_id: template.id,
-          name: catData.name,
-          sort_order: catData.sort_order
-        });
+      // 4. Create Categories/Questions/Choices
+      if (data.categories) {
+        for (let cIdx = 0; cIdx < data.categories.length; cIdx++) {
+          const catData = data.categories[cIdx];
+          const category = await DiagnosisCategory.create({
+            template_id: template.id,
+            name: catData.name,
+            sort_order: catData.sort_order || cIdx
+          }, { transaction: t });
 
-        if (catData.questions) {
-          for (const qData of catData.questions) {
-            const question = await DiagnosisQuestion.create({
-              category_id: category.id,
-              text: qData.text,
-              sort_order: qData.sort_order
-            });
+          if (catData.questions) {
+            for (let qIdx = 0; qIdx < catData.questions.length; qIdx++) {
+              const qData = catData.questions[qIdx];
+              const question = await DiagnosisQuestion.create({
+                category_id: category.id,
+                text: qData.text,
+                sort_order: qData.sort_order || qIdx
+              }, { transaction: t });
 
-            if (qData.choices) {
-              for (const choiceData of qData.choices) {
-                await DiagnosisChoice.create({
-                  question_id: question.id,
-                  text: choiceData.text,
-                  points: choiceData.points,
-                  sort_order: choiceData.sort_order
-                });
+              if (qData.choices) {
+                for (let chIdx = 0; chIdx < qData.choices.length; chIdx++) {
+                  const choiceData = qData.choices[chIdx];
+                  await DiagnosisChoice.create({
+                    question_id: question.id,
+                    text: choiceData.text,
+                    points: choiceData.points,
+                    sort_order: choiceData.sort_order || chIdx
+                  }, { transaction: t });
+                }
               }
             }
           }
         }
       }
-    }
 
-    return template;
+      return template;
+    });
   }
 
   /**
@@ -282,145 +296,141 @@ class DiagnosisService {
   }
 
   /**
-   * Delete a template
+   * Delete a template and all its dependencies
    */
   async deleteTemplate(id, institutionId) {
-    const template = await DiagnosisTemplate.findOne({
-      where: { id, institution_id: institutionId }
+    return await sequelize.transaction(async (t) => {
+      const template = await DiagnosisTemplate.findOne({
+        where: { id, institution_id: institutionId },
+        transaction: t
+      });
+
+      if (!template) throw new Error('Template not found or unauthorized');
+
+      // Delete the template (cascade will handle child models if set up, or we handle it if not)
+      await template.destroy({ transaction: t });
+      return true;
     });
-
-    if (!template) throw new Error('Assessment Profile not found');
-
-    // Delete the template (cascade will handle child models if set up, or we handle it if not)
-    return await template.destroy();
   }
 
   /**
-   * Submit a diagnosis report
+   * Submit a diagnosis report (typically from a Coach)
    * @param {Object} data - { session_id, template_id, responses: { questionId: choiceId } }
    */
   async submitReport(data) {
     const { session_id, template_id, responses } = data;
-    const categoryScores = {};
-    const primaryChallenges = [];
+    
+    return await sequelize.transaction(async (t) => {
+      const categoryScores = {};
+      const primaryChallenges = [];
 
-    // 1. Conflict Resolution: Verify if the template matches the responses
-    const template = await DiagnosisTemplate.findByPk(template_id, {
-      include: [
-        {
-          model: DiagnosisCategory,
-          as: 'categories',
-          include: [{ model: DiagnosisQuestion, as: 'questions', include: [{ model: DiagnosisChoice, as: 'choices' }] }]
+      // 1. Fetch Template
+      const template = await DiagnosisTemplate.findByPk(template_id, {
+        include: [
+          {
+            model: DiagnosisCategory,
+            as: 'categories',
+            include: [{ model: DiagnosisQuestion, as: 'questions', include: [{ model: DiagnosisChoice, as: 'choices' }] }]
+          }
+        ],
+        transaction: t
+      });
+
+      if (!template) throw new Error('Template not found');
+
+      // 2. Filter responses to only those that exist in the current template
+      const allTemplateQuestionIds = new Set();
+      template.categories.forEach(cat => {
+        cat.questions.forEach(q => allTemplateQuestionIds.add(q.id));
+      });
+
+      const finalResponses = {};
+      let mismatchCount = 0;
+      for (const qId of Object.keys(responses)) {
+        if (allTemplateQuestionIds.has(qId)) {
+          finalResponses[qId] = responses[qId];
+        } else {
+          mismatchCount++;
         }
-      ]
-    });
-
-    if (!template) throw new Error('Template not found');
-
-    // Filter responses to only those that exist in the current template
-    const validResponses = {};
-    const allTemplateQuestionIds = new Set();
-    template.categories.forEach(cat => {
-      cat.questions.forEach(q => allTemplateQuestionIds.add(q.id));
-    });
-
-    let mismatchCount = 0;
-    for (const qId of Object.keys(responses)) {
-      if (allTemplateQuestionIds.has(qId)) {
-        validResponses[qId] = responses[qId];
-      } else {
-        mismatchCount++;
       }
-    }
 
-    // Critical Conflict: If more than 50% of the questions don't match or total questions changed
-    // We return a custom error identifying a conflict
-    if (mismatchCount > Object.keys(responses).length * 0.5) {
-      const error = new Error('The assessment structure has significantly changed. Please refresh and try again.');
-      error.status = 409; 
-      throw error;
-    }
+      // Conflict detection
+      if (mismatchCount > Object.keys(responses).length * 0.5 && Object.keys(responses).length > 0) {
+        const error = new Error('The assessment structure has significantly changed. Please refresh and try again.');
+        error.status = 409;
+        throw error;
+      }
 
-    // Use validResponses from here on
-    const finalResponses = Object.keys(validResponses).length > 0 ? validResponses : responses;
+      // 3. Calculate scores
+      let totalCategoryAverages = 0;
+      let actualCategoryCount = 0;
 
-    // 2. Calculate scores
-    let totalCategoryAverages = 0;
-    let actualCategoryCount = 0;
+      for (const category of template.categories) {
+        let catPointsSum = 0;
+        let answeredCount = 0;
 
-    // Calculate category averages
-    for (const category of template.categories) {
-      let catPointsSum = 0;
-      let answeredCount = 0;
-
-      for (const question of category.questions) {
-        // Calculate actual score from responses
-        const choiceId = responses[question.id];
-        if (choiceId) {
-          const choice = question.choices.find(c => c.id === choiceId);
-          if (choice) {
-            catPointsSum += choice.points;
-            answeredCount++;
-            
-            // Challenge Detection Logic: 
-            const maxChoicePoints = Math.max(0, ...question.choices.map(c => c.points));
-            if (choice.points <= 1 || (maxChoicePoints > 0 && choice.points < maxChoicePoints * 0.3)) {
-              primaryChallenges.push({
-                question_id: question.id,
-                category_name: category.name,
-                question_text: question.text,
-                selected_choice: choice.text,
-                points: choice.points,
-                max_points: maxChoicePoints
-              });
+        for (const question of category.questions) {
+          const choiceId = finalResponses[question.id];
+          if (choiceId) {
+            const choice = question.choices.find(c => c.id === choiceId);
+            if (choice) {
+              catPointsSum += choice.points;
+              answeredCount++;
+              
+              const maxChoicePoints = Math.max(0, ...question.choices.map(c => c.points));
+              if (choice.points <= 1 || (maxChoicePoints > 0 && choice.points < maxChoicePoints * 0.3)) {
+                primaryChallenges.push({
+                  question_id: question.id,
+                  category_name: category.name,
+                  question_text: question.text,
+                  selected_choice: choice.text,
+                  points: choice.points,
+                  max_points: maxChoicePoints
+                });
+              }
             }
           }
         }
+
+        const catAverage = answeredCount > 0 ? catPointsSum / answeredCount : 0;
+        categoryScores[category.name] = {
+          average_score: parseFloat(catAverage.toFixed(2)),
+          sum_points: catPointsSum,
+          questions_answered: answeredCount,
+          percentage: (catAverage / 5) * 100
+        };
+
+        if (answeredCount > 0) {
+          totalCategoryAverages += catAverage;
+          actualCategoryCount++;
+        }
       }
 
-      const catAverage = answeredCount > 0 ? catPointsSum / answeredCount : 0;
+      const overallScore = actualCategoryCount > 0 ? parseFloat((totalCategoryAverages / actualCategoryCount).toFixed(2)) : 0;
+      const healthPercentage = parseFloat(((overallScore / 5) * 100).toFixed(2));
 
-      categoryScores[category.name] = {
-        average_score: parseFloat(catAverage.toFixed(2)),
-        sum_points: catPointsSum,
-        questions_answered: answeredCount,
-        percentage: (catAverage / 5) * 100 // Normalize against max value of 5
-      };
+      // 4. Create the Report (Atomic)
+      const report = await DiagnosisReport.create({
+        session_id,
+        template_id,
+        total_score: overallScore,
+        max_score: 5,
+        health_percentage: healthPercentage,
+        category_scores: categoryScores,
+        primary_challenges: primaryChallenges
+      }, { transaction: t });
 
-      if (answeredCount > 0) {
-        totalCategoryAverages += catAverage;
-        actualCategoryCount++;
+      // 5. Create individual responses
+      for (const [questionId, choiceId] of Object.entries(finalResponses)) {
+        await DiagnosisResponse.create({
+          report_id: report.id,
+          question_id: questionId,
+          choice_id: choiceId
+        }, { transaction: t });
       }
-    }
 
-    const overallScore = actualCategoryCount > 0 ? parseFloat((totalCategoryAverages / actualCategoryCount).toFixed(2)) : 0;
-    const healthPercentage = parseFloat(((overallScore / 5) * 100).toFixed(2));
-
-    // 2. Create the Report
-    const report = await DiagnosisReport.create({
-      session_id,
-      template_id,
-      total_score: overallScore, // Now storing the average score (e.g. 3.02)
-      max_score: 5,              // Max is always 5 for this scale
-      health_percentage: healthPercentage,
-      category_scores: categoryScores,
-      primary_challenges: primaryChallenges
+      return report;
     });
-
-    // 4. Create individual responses
-    for (const [questionId, choiceId] of Object.entries(finalResponses)) {
-      // Final safety check: double check question exists to prevent crash on late-nanosecond deletion
-      const exists = allTemplateQuestionIds.has(questionId);
-      if (!exists) continue;
-
-      await DiagnosisResponse.create({
-        report_id: report.id,
-        question_id: questionId,
-        choice_id: choiceId
-      });
-    }
-
-    return report;
   }
 
   /**

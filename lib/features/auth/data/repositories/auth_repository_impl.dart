@@ -36,7 +36,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final userModel = UserModel.fromJson(userData as Map<String, dynamic>);
       return Right(userModel.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -47,7 +47,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _secureStorage.clearTokens();
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -57,7 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final userModel = await _remoteDatasource.getMe();
       return Right(userModel.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -67,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _remoteDatasource.forgotPassword(email);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return Left(Failure.fromException(e));
     }
   }
 }
