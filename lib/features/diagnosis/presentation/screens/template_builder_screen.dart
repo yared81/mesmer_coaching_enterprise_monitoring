@@ -96,7 +96,7 @@ class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.message)));
         },
         (template) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Template Published Successfully!')));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Assessment Profile Published Successfully!')));
           ref.refresh(allTemplatesProvider.future);
           context.pop();
         },
@@ -111,7 +111,7 @@ class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
-        title: const Text('Template Builder', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Profile Builder', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF3D5AFE),
         foregroundColor: Colors.white,
         actions: [
@@ -134,7 +134,7 @@ class _TemplateBuilderScreenState extends ConsumerState<TemplateBuilderScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Internal Template Title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
+                const Text('Internal Profile Title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
                 const SizedBox(height: 8),
                 TextFormField(
                   controller: _titleController,

@@ -15,7 +15,7 @@ class TemplateListScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
-        title: const Text('Diagnosis Templates', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Assessment Profiles', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF3D5AFE),
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -78,12 +78,12 @@ class TemplateListScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           const Text(
-            'No Templates Found',
+            'No Assessment Profiles Found',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
           ),
           const SizedBox(height: 12),
           const Text(
-            'Create your first diagnosis template to allow\ncoaches to assess enterprises.',
+            'Create your first assessment profile to allow\ncoaches to assess enterprises.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
@@ -91,7 +91,7 @@ class TemplateListScreen extends ConsumerWidget {
           ElevatedButton.icon(
             onPressed: () => context.push(AppRoutes.templateBuilder),
             icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text('Create Output Template'),
+            label: const Text('Create Profile'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE91E63),
               foregroundColor: Colors.white,

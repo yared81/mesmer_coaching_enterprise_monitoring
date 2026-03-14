@@ -352,7 +352,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                           Expanded(
                             child: _QuickActionButton(
                               icon: Icons.assignment_rounded,
-                              label: 'Templates',
+                              label: 'Profiles',
                               color: const Color(0xFFE91E63), // Pink accent for Templates
                               onTap: () => context.go(AppRoutes.templateList),
                             ),
