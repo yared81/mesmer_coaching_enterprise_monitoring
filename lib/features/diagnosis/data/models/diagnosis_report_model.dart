@@ -45,20 +45,20 @@ class DiagnosisReportModel {
 }
 
 class CategoryScore {
-  final double score;
-  final double max;
+  final double averageScore;
+  final double sumPoints;
   final double percentage;
 
   CategoryScore({
-    required this.score,
-    required this.max,
+    required this.averageScore,
+    required this.sumPoints,
     required this.percentage,
   });
 
   factory CategoryScore.fromJson(Map<String, dynamic> json) {
     return CategoryScore(
-      score: (json['score'] as num).toDouble(),
-      max: (json['max'] as num).toDouble(),
+      averageScore: (json['average_score'] as num).toDouble(),
+      sumPoints: (json['sum_points'] as num).toDouble(),
       percentage: (json['percentage'] as num).toDouble(),
     );
   }
