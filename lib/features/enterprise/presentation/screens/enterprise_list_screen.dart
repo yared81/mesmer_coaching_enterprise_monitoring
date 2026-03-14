@@ -51,15 +51,47 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
             foregroundColor: Colors.white,
             title: const Text('Enterprises', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             actions: [
-              IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    _showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
-                    key: ValueKey(_showFilters),
-                  ),
-                ),
-                onPressed: () => setState(() => _showFilters = !_showFilters),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert_rounded),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                onSelected: (value) {
+                  if (value == 'filter') {
+                    setState(() => _showFilters = !_showFilters);
+                  } else if (value == 'assessment') {
+                    context.push(AppRoutes.templateList);
+                  }
+                },
+                itemBuilder: (context) {
+                  final role = ref.watch(authProvider).user?.role;
+                  return [
+                    PopupMenuItem(
+                      value: 'filter',
+                      child: Row(
+                        children: [
+                          Icon(
+                            _showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
+                            color: const Color(0xFF1A1A1A),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(_showFilters ? 'Hide Filters' : 'Show Filters', style: const TextStyle(color: Color(0xFF1A1A1A))),
+                        ],
+                      ),
+                    ),
+                    if (role != UserRole.coach)
+                      const PopupMenuItem(
+                        value: 'assessment',
+                        child: Row(
+                          children: [
+                            Icon(Icons.assignment_rounded, color: Color(0xFF1A1A1A), size: 20),
+                            SizedBox(width: 12),
+                            Text('Assessment Profiles', style: TextStyle(color: Color(0xFF1A1A1A))),
+                          ],
+                        ),
+                      ),
+                  ];
+                },
               ),
             ],
             bottom: PreferredSize(
