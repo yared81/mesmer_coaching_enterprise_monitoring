@@ -149,51 +149,122 @@ class DiagnosisService {
 
       if (!template) throw new Error('Assessment Profile not found');
 
-      // Update title if provided
+      // 1. Update title if provided
       if (data.title) {
         await template.update({ title: data.title }, { transaction });
       }
 
-      // Completely replace categories, questions, and choices
       if (data.categories) {
-        // Fetch existing categories to delete them one by one to trigger cascades if set up, 
-        // or just delete the questions/choices explicitly
+        const incomingCatIds = data.categories.filter(c => c.id).map(c => c.id);
+        
+        // 2. Delete Categories not in the incoming data
         const oldCategories = await DiagnosisCategory.findAll({ where: { template_id: template.id }, transaction });
-        for (const cat of oldCategories) {
-          const oldQuestions = await DiagnosisQuestion.findAll({ where: { category_id: cat.id }, transaction });
-          for (const q of oldQuestions) {
-            // Manually delete responses associated with this question to satisfy FK constraints 
-            // especially if DB level CASCADE hasn't synced yet.
-            await DiagnosisResponse.destroy({ where: { question_id: q.id }, transaction });
-            await DiagnosisChoice.destroy({ where: { question_id: q.id }, transaction });
-            await q.destroy({ transaction });
+        for (const oldCat of oldCategories) {
+          if (!incomingCatIds.includes(oldCat.id)) {
+            // Delete questions and choices for this category (CASCADE handles responses if linked to Questions)
+            const oldQuestions = await DiagnosisQuestion.findAll({ where: { category_id: oldCat.id }, transaction });
+            for (const q of oldQuestions) {
+              await DiagnosisResponse.destroy({ where: { question_id: q.id }, transaction });
+              await DiagnosisChoice.destroy({ where: { question_id: q.id }, transaction });
+              await q.destroy({ transaction });
+            }
+            await oldCat.destroy({ transaction });
           }
-          await cat.destroy({ transaction });
         }
 
+        // 3. Sync Categories
         for (const catData of data.categories) {
-          const category = await DiagnosisCategory.create({
-            template_id: template.id,
-            name: catData.name,
-            sort_order: catData.sort_order
-          }, { transaction });
-
-          if (catData.questions) {
-            for (const qData of catData.questions) {
-              const question = await DiagnosisQuestion.create({
-                category_id: category.id,
-                text: qData.text,
-                sort_order: qData.sort_order
+          let category;
+          if (catData.id) {
+            category = await DiagnosisCategory.findByPk(catData.id, { transaction });
+            if (category) {
+              await category.update({ 
+                name: catData.name, 
+                sort_order: catData.sort_order 
               }, { transaction });
+            }
+          }
 
-              if (qData.choices) {
-                for (const choiceData of qData.choices) {
-                  await DiagnosisChoice.create({
-                    question_id: question.id,
-                    text: choiceData.text,
-                    points: choiceData.points,
-                    sort_order: choiceData.sort_order
+          if (!category) {
+            category = await DiagnosisCategory.create({
+              template_id: template.id,
+              name: catData.name,
+              sort_order: catData.sort_order
+            }, { transaction });
+          }
+
+          // 4. Sync Questions within the Category
+          if (catData.questions) {
+            const incomingQIds = catData.questions.filter(q => q.id).map(q => q.id);
+            const oldQuestions = await DiagnosisQuestion.findAll({ where: { category_id: category.id }, transaction });
+            
+            // Delete removed questions
+            for (const oldQ of oldQuestions) {
+              if (!incomingQIds.includes(oldQ.id)) {
+                await DiagnosisResponse.destroy({ where: { question_id: oldQ.id }, transaction });
+                await DiagnosisChoice.destroy({ where: { question_id: oldQ.id }, transaction });
+                await oldQ.destroy({ transaction });
+              }
+            }
+
+            for (const qData of catData.questions) {
+              let question;
+              if (qData.id) {
+                question = await DiagnosisQuestion.findByPk(qData.id, { transaction });
+                if (question) {
+                  await question.update({
+                    text: qData.text,
+                    sort_order: qData.sort_order
                   }, { transaction });
+                }
+              }
+
+              if (!question) {
+                question = await DiagnosisQuestion.create({
+                  category_id: category.id,
+                  text: qData.text,
+                  sort_order: qData.sort_order
+                }, { transaction });
+              }
+
+              // 5. Sync Choices (Choice Reconciliation)
+              // We try to match incoming choices with existing ones to preserve IDs
+              if (qData.choices) {
+                const existingChoices = await DiagnosisChoice.findAll({ 
+                  where: { question_id: question.id }, 
+                  transaction 
+                });
+                
+                const usedChoiceIds = [];
+                for (const choiceData of qData.choices) {
+                  // Try to find a matching existing choice
+                  const match = existingChoices.find(ec => 
+                    !usedChoiceIds.includes(ec.id) && 
+                    ec.text === choiceData.text && 
+                    ec.points === choiceData.points
+                  );
+
+                  if (match) {
+                    await match.update({ sort_order: choiceData.sort_order }, { transaction });
+                    usedChoiceIds.push(match.id);
+                  } else {
+                    const newChoice = await DiagnosisChoice.create({
+                      question_id: question.id,
+                      text: choiceData.text,
+                      points: choiceData.points,
+                      sort_order: choiceData.sort_order
+                    }, { transaction });
+                    usedChoiceIds.push(newChoice.id);
+                  }
+                }
+
+                // Delete old choices that weren't matched
+                for (const ec of existingChoices) {
+                  if (!usedChoiceIds.includes(ec.id)) {
+                    // Note: If we delete a choice, responses using it will break. 
+                    // But if text/points changed, the response is arguably invalid anyway.
+                    await ec.destroy({ transaction });
+                  }
                 }
               }
             }
@@ -202,14 +273,14 @@ class DiagnosisService {
       }
 
       await transaction.commit();
-      
-      // Return reloaded specific template
       return await this.getTemplateById(id, institutionId);
     } catch (error) {
-      await transaction.rollback();
+      if (transaction) await transaction.rollback();
+      console.error('Granular Update Failed:', error);
       throw error;
     }
   }
+
   /**
    * Delete a template
    */
@@ -233,11 +304,7 @@ class DiagnosisService {
     const categoryScores = {};
     const primaryChallenges = [];
 
-    // 1. Calculate scores
-    let totalCategoryAverages = 0;
-    let actualCategoryCount = 0;
-
-    // Get all choices in the template to calculate points
+    // 1. Conflict Resolution: Verify if the template matches the responses
     const template = await DiagnosisTemplate.findByPk(template_id, {
       include: [
         {
@@ -249,6 +316,37 @@ class DiagnosisService {
     });
 
     if (!template) throw new Error('Template not found');
+
+    // Filter responses to only those that exist in the current template
+    const validResponses = {};
+    const allTemplateQuestionIds = new Set();
+    template.categories.forEach(cat => {
+      cat.questions.forEach(q => allTemplateQuestionIds.add(q.id));
+    });
+
+    let mismatchCount = 0;
+    for (const qId of Object.keys(responses)) {
+      if (allTemplateQuestionIds.has(qId)) {
+        validResponses[qId] = responses[qId];
+      } else {
+        mismatchCount++;
+      }
+    }
+
+    // Critical Conflict: If more than 50% of the questions don't match or total questions changed
+    // We return a custom error identifying a conflict
+    if (mismatchCount > Object.keys(responses).length * 0.5) {
+      const error = new Error('The assessment structure has significantly changed. Please refresh and try again.');
+      error.status = 409; 
+      throw error;
+    }
+
+    // Use validResponses from here on
+    const finalResponses = Object.keys(validResponses).length > 0 ? validResponses : responses;
+
+    // 2. Calculate scores
+    let totalCategoryAverages = 0;
+    let actualCategoryCount = 0;
 
     // Calculate category averages
     for (const category of template.categories) {
@@ -309,8 +407,12 @@ class DiagnosisService {
       primary_challenges: primaryChallenges
     });
 
-    // 3. Create individual responses
-    for (const [questionId, choiceId] of Object.entries(responses)) {
+    // 4. Create individual responses
+    for (const [questionId, choiceId] of Object.entries(finalResponses)) {
+      // Final safety check: double check question exists to prevent crash on late-nanosecond deletion
+      const exists = allTemplateQuestionIds.has(questionId);
+      if (!exists) continue;
+
       await DiagnosisResponse.create({
         report_id: report.id,
         question_id: questionId,

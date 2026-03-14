@@ -5,13 +5,13 @@ import '../providers/diagnosis_provider.dart';
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 
-class _CategoryDraft {
+  final String? id; // Track original ID for delta updates
   final TextEditingController nameController;
   final FocusNode focusNode;
   bool isCustom;
   List<_QuestionDraft> questions;
 
-  _CategoryDraft({required String name, required this.questions, this.isCustom = false})
+  _CategoryDraft({this.id, required String name, required this.questions, this.isCustom = false})
       : nameController = TextEditingController(text: name),
         focusNode = FocusNode();
 
@@ -27,11 +27,13 @@ class _CategoryDraft {
 }
 
 class _QuestionDraft {
+  final String? id; // Track original ID for delta updates
   final TextEditingController textController;
   final FocusNode focusNode;
   String type; // 'yes_no', 'scale_1_5'
 
   _QuestionDraft({
+    this.id,
     required String text,
     this.type = 'scale_1_5',
   })  : textController = TextEditingController(text: text),
@@ -79,6 +81,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     if (widget.existingProfile != null) {
       for (final cat in widget.existingProfile!.categories) {
         final draft = _createNewCategory(
+          id: cat.id,
           name: cat.name,
           questions: cat.questions.map((q) {
             String detectedType = 'scale_1_5';
@@ -87,6 +90,7 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
             }
 
             return _createNewQuestion(
+              id: q.id,
               text: q.text,
               type: detectedType,
             );
@@ -97,16 +101,16 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     }
   }
 
-  _CategoryDraft _createNewCategory({required String name, required List<_QuestionDraft> questions}) {
-    final draft = _CategoryDraft(name: name, questions: questions);
+  _CategoryDraft _createNewCategory({String? id, required String name, required List<_QuestionDraft> questions}) {
+    final draft = _CategoryDraft(id: id, name: name, questions: questions);
     draft.focusNode.addListener(() {
       if (mounted) setState(() {});
     });
     return draft;
   }
 
-  _QuestionDraft _createNewQuestion({required String text, String type = 'scale_1_5'}) {
-    final draft = _QuestionDraft(text: text, type: type);
+  _QuestionDraft _createNewQuestion({String? id, required String text, String type = 'scale_1_5'}) {
+    final draft = _QuestionDraft(id: id, text: text, type: type);
     draft.focusNode.addListener(() {
       if (mounted) setState(() {});
     });
@@ -182,16 +186,13 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
       final Map<String, dynamic> payload = {
         'title': _titleController.text.trim(),
         'categories': _categories.asMap().entries.map((catEntry) {
-          final catIndex = catEntry.key;
-          final cat = catEntry.value;
-
-          return {
-            'name': cat.name,
-            'sort_order': catIndex + 1,
-            'questions': cat.questions.asMap().entries.map((qEntry) {
-              final qIndex = qEntry.key;
+            final cat = catEntry.value;
+            return {
+              if (cat.id != null) 'id': cat.id,
+              'name': cat.name,
+              'sort_order': catEntry.key,
+              'questions': cat.questions.asMap().entries.map((qEntry) {
                 final q = qEntry.value;
-
                 List<Map<String, dynamic>> finalChoices;
                 if (q.type == 'yes_no') {
                   finalChoices = [
@@ -208,14 +209,12 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                     {'text': '5 (Strong)', 'points': 5, 'sort_order': 5},
                   ];
                 }
-
                 return {
+                  if (q.id != null) 'id': q.id,
                   'text': q.text,
-                  'sort_order': qIndex + 1,
+                  'sort_order': qEntry.key,
                   'choices': finalChoices,
                 };
-            }).toList()
-          };
         }).toList(),
       };
 
@@ -505,25 +504,24 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
     // Custom Mode
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const Text('Custom: ', style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)),
         Expanded(
           child: TextFormField(
             controller: category.nameController,
             focusNode: category.focusNode,
             autofocus: true,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
-            ),
-            onChanged: (v) => setState(() {}),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'Type category name...',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF3D5AFE)),
+            onChanged: (v) => setState(() {}), // Keep onChanged to trigger rebuild for UI updates
+            decoration: const InputDecoration(
+              hintText: 'Enter custom name...',
+              prefixText: 'Custom: ',
+              prefixStyle: TextStyle(fontWeight: FontWeight.normal, color: Colors.grey, fontSize: 12),
               isDense: true,
-              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2.5)),
+              contentPadding: EdgeInsets.symmetric(vertical: 8),
+              border: InputBorder.none,
+              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2)),
+              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF3D5AFE), width: 2.5)),
             ),
           ),
         ),

@@ -276,9 +276,13 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
 
     result.fold(
       (Failure failure) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit: ${failure.message}'), backgroundColor: AppColors.error),
-        );
+        if (failure.message.contains('409') || failure.message.toLowerCase().contains('structure has significantly changed')) {
+          _showConflictDialog();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to submit: ${failure.message}'), backgroundColor: AppColors.error),
+          );
+        }
       },
       (reportData) {
         ref.read(diagnosisStateProvider(widget.sessionId).notifier).reset();
@@ -297,6 +301,30 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _showConflictDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Assessment Updated'),
+        content: const Text(
+          'A supervisor has updated the structure of this assessment. '
+          'We need to refresh the questions to ensure your answers match the new layout.\n\n'
+          'Answers to unchanged questions will be preserved.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              ref.refresh(latestDiagnosisTemplateProvider);
+            },
+            child: const Text('REFRESH NOW'),
+          ),
+        ],
+      ),
     );
   }
 }
