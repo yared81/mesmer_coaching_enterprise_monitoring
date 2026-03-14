@@ -37,6 +37,7 @@ class AssessmentProfileListScreen extends ConsumerWidget {
                   isActive: template.isActive,
                   date: template.updatedAt ?? DateTime.now(),
                   onTap: () => context.push(AppRoutes.templateBuilder, extra: template),
+                  onDelete: () => _confirmDeleteProfile(context, ref, template.id, template.title),
                 );
               },
             ),
@@ -110,12 +111,14 @@ class _AssessmentProfileCard extends StatelessWidget {
   final bool isActive;
   final DateTime date;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   const _AssessmentProfileCard({
     required this.title,
     required this.isActive,
     required this.date,
     required this.onTap,
+    required this.onDelete,
   });
 
   @override
@@ -183,6 +186,11 @@ class _AssessmentProfileCard extends StatelessWidget {
             ],
           ),
         ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete_outline_rounded, color: Colors.grey),
+            onPressed: onDelete,
+            tooltip: 'Delete Profile',
+          ),
           ), // ListTile
         ), // InkWell
       ), // Material

@@ -7,15 +7,18 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/
 
 class _CategoryDraft {
   final TextEditingController nameController;
+  final FocusNode focusNode;
   List<_QuestionDraft> questions;
 
   _CategoryDraft({required String name, required this.questions})
-      : nameController = TextEditingController(text: name);
+      : nameController = TextEditingController(text: name),
+        focusNode = FocusNode();
 
   String get name => nameController.text;
 
   void dispose() {
     nameController.dispose();
+    focusNode.dispose();
     for (final q in questions) {
       q.dispose();
     }
@@ -81,28 +84,27 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
     if (widget.existingProfile != null) {
       for (final cat in widget.existingProfile!.categories) {
-        _categories.add(
-          _CategoryDraft(
-            name: cat.name,
-            questions: cat.questions.map((q) {
-              // Try to detect type based on choices
-              String detectedType = 'multiple_choice';
-              if (q.choices.length == 2 && q.choices.any((c) => c.text.toLowerCase() == 'yes') && q.choices.any((c) => c.text.toLowerCase() == 'no')) {
-                detectedType = 'yes_no';
-              } else if (q.choices.length == 5 && q.choices.any((c) => c.text.contains('1')) && q.choices.any((c) => c.text.contains('5'))) {
-                detectedType = 'scale_1_5';
-              }
+        final draft = _CategoryDraft(
+          name: cat.name,
+          questions: cat.questions.map((q) {
+            String detectedType = 'scale_1_5';
+            if (q.choices.length == 2 && q.choices.any((c) => c.text.toLowerCase() == 'yes') && q.choices.any((c) => c.text.toLowerCase() == 'no')) {
+              detectedType = 'yes_no';
+            }
 
-              return _QuestionDraft(
-                text: q.text,
-                type: detectedType,
-                choices: detectedType == 'multiple_choice'
-                    ? q.choices.map((c) => _ChoiceDraft(text: c.text, points: c.points)).toList()
-                    : [],
-              );
-            }).toList(),
-          ),
+            return _QuestionDraft(
+              text: q.text,
+              type: detectedType,
+            );
+          }).toList(),
         );
+        
+        // Listen to focus changes to update the UI (for the blue border)
+        draft.focusNode.addListener(() {
+          if (mounted) setState(() {});
+        });
+        
+        _categories.add(draft);
       }
     }
   }
@@ -142,6 +144,27 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
     });
   }
 
+  void _confirmDeleteCategory(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Category?'),
+        content: const Text('Are you sure you want to delete this category and all its questions? This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
+          ElevatedButton(
+            onPressed: () {
+              _removeCategory(index);
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            child: const Text('DELETE'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _publishTemplate() async {
     if (_categories.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('At least one category is required.')));
@@ -171,7 +194,8 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                     {'text': 'Yes', 'points': 1, 'sort_order': 1},
                     {'text': 'No', 'points': 0, 'sort_order': 2},
                   ];
-                } else if (q.type == 'scale_1_5') {
+                } else {
+                  // Default to 1-5 Scale
                   finalChoices = [
                     {'text': '1 (Very Poor)', 'points': 1, 'sort_order': 1},
                     {'text': '2 (Weak)', 'points': 2, 'sort_order': 2},
@@ -179,16 +203,6 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                     {'text': '4 (Good)', 'points': 4, 'sort_order': 4},
                     {'text': '5 (Strong)', 'points': 5, 'sort_order': 5},
                   ];
-                } else {
-                  finalChoices = q.choices.asMap().entries.map((choiceEntry) {
-                    final cIndex = choiceEntry.key;
-                    final c = choiceEntry.value;
-                    return {
-                      'text': c.textController.text,
-                      'points': int.tryParse(c.pointsController.text) ?? 0,
-                      'sort_order': cIndex + 1,
-                    };
-                  }).toList();
                 }
 
                 return {
@@ -281,13 +295,24 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
             final catIndex = catEntry.key;
             final category = catEntry.value;
 
+            final isFocused = category.focusNode.hasFocus;
+
             return Container(
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+                border: Border.all(
+                  color: isFocused ? const Color(0xFF3D5AFE) : Colors.grey.shade200,
+                  width: isFocused ? 2 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isFocused ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -296,24 +321,29 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
+                      color: isFocused ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.grey.shade50,
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                      border: Border(bottom: BorderSide(color: isFocused ? const Color(0xFF3D5AFE).withOpacity(0.2) : Colors.grey.shade200)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.folder_open_rounded, color: Colors.grey, size: 20),
+                        Icon(Icons.folder_open_rounded, color: isFocused ? const Color(0xFF3D5AFE) : Colors.grey, size: 20),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             controller: category.nameController,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            focusNode: category.focusNode,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: isFocused ? const Color(0xFF3D5AFE) : const Color(0xFF1A1A1A),
+                            ),
                             decoration: const InputDecoration(border: InputBorder.none, hintText: 'Category Name (e.g., Marketing)'),
                           ),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.red),
-                          onPressed: () => _removeCategory(catIndex),
+                          onPressed: () => _confirmDeleteCategory(catIndex),
                           tooltip: 'Delete Category',
                         ),
                       ],
@@ -373,7 +403,6 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                                           items: const [
                                             DropdownMenuItem(value: 'scale_1_5', child: Text('1–5 Scale')),
                                             DropdownMenuItem(value: 'yes_no', child: Text('Yes/No')),
-                                            DropdownMenuItem(value: 'multiple_choice', child: Text('Custom Choice')),
                                           ],
                                           onChanged: (val) {
                                             if (val != null) setState(() => question.type = val);
@@ -381,57 +410,6 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
                                         ),
                                       ],
                                     ),
-                                    if (question.type == 'multiple_choice') ...[
-                                      const SizedBox(height: 8),
-                                      ...question.choices.asMap().entries.map((choiceEntry) {
-                                        final cIndex = choiceEntry.key;
-                                        final choice = choiceEntry.value;
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 8.0),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 3,
-                                                child: TextFormField(
-                                                  controller: choice.textController,
-                                                  decoration: const InputDecoration(hintText: 'Option Text', isDense: true, border: OutlineInputBorder()),
-                                                  style: const TextStyle(fontSize: 13),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Expanded(
-                                                flex: 1,
-                                                child: TextFormField(
-                                                  controller: choice.pointsController,
-                                                  decoration: const InputDecoration(hintText: 'Pts', isDense: true, border: OutlineInputBorder()),
-                                                  keyboardType: TextInputType.number,
-                                                  style: const TextStyle(fontSize: 13),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.remove_circle_outline, size: 18, color: Colors.red),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    choice.dispose();
-                                                    question.choices.removeAt(cIndex);
-                                                  });
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }),
-                                      TextButton.icon(
-                                        onPressed: () {
-                                          setState(() {
-                                            question.choices.add(_ChoiceDraft(text: '', points: 0));
-                                          });
-                                        },
-                                        icon: const Icon(Icons.add_circle_outline, size: 16),
-                                        label: const Text('Add Option', style: TextStyle(fontSize: 12)),
-                                        style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
-                                      ),
-                                    ],
                                   ],
                                 ),
                               ),
