@@ -10,10 +10,30 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
   DiagnosisRepositoryImpl({required this.remoteDataSource});
 
   @override
+  Future<Either<Failure, List<DiagnosisTemplateEntity>>> listTemplates() async {
+    try {
+      final templates = await remoteDataSource.listTemplates();
+      return Right(templates.map((tpl) => tpl.toEntity()).toList());
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, DiagnosisTemplateEntity>> getLatestTemplate() async {
     try {
       final result = await remoteDataSource.getLatestTemplate();
       return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, DiagnosisTemplateEntity>> createTemplate(Map<String, dynamic> data) async {
+    try {
+      final result = await remoteDataSource.createTemplate(data);
+      return Right(result.toEntity());
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }

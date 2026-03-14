@@ -25,6 +25,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presen
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/add_coach_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/screens/coach_detail_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/assessment_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/template_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/template_builder_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -128,6 +130,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               final sessionId = state.extra as String;
               return AssessmentScreen(sessionId: sessionId);
             },
+          ),
+          GoRoute(
+            path: AppRoutes.templateList,
+            builder: (context, state) => const TemplateListScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.templateBuilder,
+            builder: (context, state) => const TemplateBuilderScreen(),
           ),
         ],
       ),

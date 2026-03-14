@@ -1,0 +1,195 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/router/app_routes.dart';
+import '../providers/diagnosis_provider.dart';
+
+class TemplateListScreen extends ConsumerWidget {
+  const TemplateListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final templatesAsync = ref.watch(allTemplatesProvider);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FB),
+      appBar: AppBar(
+        title: const Text('Diagnosis Templates', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+      ),
+      body: templatesAsync.when(
+        data: (templates) {
+          if (templates.isEmpty) {
+            return _buildEmptyState(context);
+          }
+          return RefreshIndicator(
+            onRefresh: () => ref.refresh(allTemplatesProvider.future),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: templates.length,
+              itemBuilder: (context, index) {
+                final template = templates[index];
+                return _TemplateCard(
+                  title: template.title,
+                  version: template.version,
+                  isActive: template.isActive,
+                  date: template.updatedAt ?? DateTime.now(),
+                );
+              },
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline_rounded, size: 48, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text('Failed to load templates: $err', textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(AppRoutes.templateBuilder),
+        backgroundColor: const Color(0xFFE91E63),
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: const Text('New Version', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE91E63).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.assignment_rounded, size: 64, color: Color(0xFFE91E63)),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'No Templates Found',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Create your first diagnosis template to allow\ncoaches to assess enterprises.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: Colors.grey),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () => context.push(AppRoutes.templateBuilder),
+            icon: const Icon(Icons.add, color: Colors.white),
+            label: const Text('Create Output Template'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE91E63),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TemplateCard extends StatelessWidget {
+  final String title;
+  final int version;
+  final bool isActive;
+  final DateTime date;
+
+  const _TemplateCard({
+    required this.title,
+    required this.version,
+    required this.isActive,
+    required this.date,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final dateStr = DateFormat('MMM d, yyyy').format(date);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: isActive ? Border.all(color: const Color(0xFF00B09B), width: 1.5) : Border.all(color: Colors.grey[200]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isActive ? const Color(0xFF00B09B).withOpacity(0.1) : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            Icons.article_rounded,
+            color: isActive ? const Color(0xFF00B09B) : Colors.grey[500],
+            size: 28,
+          ),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1A1A1A)),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3D5AFE).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'v$version',
+                style: const TextStyle(color: Color(0xFF3D5AFE), fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.top(8.0),
+          child: Row(
+            children: [
+              if (isActive) ...[
+                const Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF00B09B)),
+                const SizedBox(width: 4),
+                const Text('Active', style: TextStyle(color: Color(0xFF00B09B), fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 12),
+                const Text('•', style: TextStyle(color: Colors.grey)),
+                const SizedBox(width: 12),
+              ],
+              Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey[500]),
+              const SizedBox(width: 4),
+              Text(dateStr, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

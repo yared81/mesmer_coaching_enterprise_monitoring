@@ -19,6 +19,15 @@ final diagnosisRepositoryProvider = Provider<DiagnosisRepository>((ref) {
 });
 
 /// Data Providers
+final allTemplatesProvider = FutureProvider<List<DiagnosisTemplateEntity>>((ref) async {
+  final repository = ref.watch(diagnosisRepositoryProvider);
+  final result = await repository.listTemplates();
+  return result.fold(
+    (Failure failure) => throw failure.message,
+    (templates) => templates,
+  );
+});
+
 final latestDiagnosisTemplateProvider = FutureProvider<DiagnosisTemplateEntity>((ref) async {
   final repository = ref.watch(diagnosisRepositoryProvider);
   final result = await repository.getLatestTemplate();

@@ -37,5 +37,9 @@ abstract class AppRoutes {
   // Reports
   static const String supervisorReports = '/reports';
   static const String diagnosis = '/diagnosis';
+
+  // Templates
+  static const String templateList = '/supervisor/templates';
+  static const String templateBuilder = '/supervisor/templates/build';
 }
 

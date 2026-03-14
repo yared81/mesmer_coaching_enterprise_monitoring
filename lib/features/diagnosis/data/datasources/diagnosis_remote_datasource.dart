@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import '../models/diagnosis_template_model.dart';
 
 abstract class DiagnosisRemoteDataSource {
+  Future<List<DiagnosisTemplateModel>> listTemplates();
   Future<DiagnosisTemplateModel> getLatestTemplate();
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
+  Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
   Future<Map<String, dynamic>> submitDiagnosis({
     required String sessionId,
     required String templateId,
@@ -24,6 +26,27 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
       return DiagnosisTemplateModel.fromJson(response.data['data']);
     } else {
       throw Exception(response.data['message'] ?? 'Failed to fetch latest template');
+    }
+  }
+
+  @override
+  Future<List<DiagnosisTemplateModel>> listTemplates() async {
+    final response = await dio.get('diagnosis/templates');
+    if (response.data['success'] == true) {
+      final List data = response.data['data'];
+      return data.map((json) => DiagnosisTemplateModel.fromJson(json)).toList();
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to list templates');
+    }
+  }
+
+  @override
+  Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data) async {
+    final response = await dio.post('diagnosis/templates', data: data);
+    if (response.data['success'] == true) {
+      return DiagnosisTemplateModel.fromJson(response.data['data']);
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to create template');
     }
   }
 

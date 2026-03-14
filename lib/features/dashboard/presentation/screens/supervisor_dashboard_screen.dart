@@ -351,10 +351,10 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _QuickActionButton(
-                              icon: Icons.domain_rounded,
-                              label: 'Enterprises',
-                              color: const Color(0xFFFF6F00),
-                              onTap: () => context.go(AppRoutes.enterpriseList),
+                              icon: Icons.assignment_rounded,
+                              label: 'Templates',
+                              color: const Color(0xFFE91E63), // Pink accent for Templates
+                              onTap: () => context.go(AppRoutes.templateList),
                             ),
                           ),
                         ],
