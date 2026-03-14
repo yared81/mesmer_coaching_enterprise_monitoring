@@ -4,17 +4,21 @@ class DiagnosisTemplateEntity extends Equatable {
   final String id;
   final String title;
   final int version;
+  final bool isActive;
+  final DateTime? updatedAt;
   final List<DiagnosisCategoryEntity> categories;
 
   const DiagnosisTemplateEntity({
     required this.id,
     required this.title,
     required this.version,
+    required this.isActive,
+    this.updatedAt,
     required this.categories,
   });
 
   @override
-  List<Object?> get props => [id, title, version, categories];
+  List<Object?> get props => [id, title, version, isActive, updatedAt, categories];
 }
 
 class DiagnosisCategoryEntity extends Equatable {

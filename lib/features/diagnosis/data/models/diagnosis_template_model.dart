@@ -5,6 +5,8 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
     required super.id,
     required super.title,
     required super.version,
+    required super.isActive,
+    super.updatedAt,
     required super.categories,
   });
 
@@ -13,11 +15,15 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
       id: json['id'],
       title: json['title'],
       version: json['version'],
-      categories: (json['categories'] as List)
-          .map((c) => DiagnosisCategoryModel.fromJson(c))
-          .toList(),
+      isActive: json['is_active'] ?? false,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      categories: json['categories'] != null 
+          ? (json['categories'] as List).map((c) => DiagnosisCategoryModel.fromJson(c)).toList()
+          : [],
     );
   }
+
+  DiagnosisTemplateEntity toEntity() => this;
 }
 
 class DiagnosisCategoryModel extends DiagnosisCategoryEntity {
@@ -33,9 +39,9 @@ class DiagnosisCategoryModel extends DiagnosisCategoryEntity {
       id: json['id'],
       name: json['name'],
       sortOrder: json['sort_order'],
-      questions: (json['questions'] as List)
-          .map((q) => DiagnosisQuestionModel.fromJson(q))
-          .toList(),
+      questions: json['questions'] != null
+          ? (json['questions'] as List).map((q) => DiagnosisQuestionModel.fromJson(q)).toList()
+          : [],
     );
   }
 }
@@ -53,9 +59,9 @@ class DiagnosisQuestionModel extends DiagnosisQuestionEntity {
       id: json['id'],
       text: json['text'],
       sortOrder: json['sort_order'],
-      choices: (json['choices'] as List)
-          .map((c) => DiagnosisChoiceModel.fromJson(c))
-          .toList(),
+      choices: json['choices'] != null
+          ? (json['choices'] as List).map((c) => DiagnosisChoiceModel.fromJson(c)).toList()
+          : [],
     );
   }
 }
