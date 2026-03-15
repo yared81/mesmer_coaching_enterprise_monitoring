@@ -58,6 +58,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     try {
       await ref.read(coachingSessionsProvider.notifier).updateSession(updatedSession);
       
+      // Force refresh the specific enterprise's session list and the single session
+      ref.invalidate(enterpriseSessionsProvider(widget.session.enterpriseId));
+      ref.invalidate(coachingSessionProvider(widget.session.id));
+      
       if (mounted) {
         setState(() => _isSaving = false);
         CustomToaster.show(
@@ -283,8 +287,6 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           maxLines: maxLines,
           enabled: !readOnly,
           decoration: InputDecoration(
-            hintText: readOnly ? 'No information provided' : 'Tap to add $label...',
-            hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
             fillColor: readOnly ? Colors.grey[50] : Colors.grey[50],
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
