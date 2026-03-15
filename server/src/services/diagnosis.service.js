@@ -62,8 +62,11 @@ class DiagnosisService {
    * @param {string} institutionId
    * @param {boolean} isAdmin
    */
-  async listTemplates(institutionId, isAdmin = false) {
-    const where = isAdmin ? {} : { institution_id: institutionId };
+  async listTemplates(institutionId, isAdmin = false, activeOnly = false) {
+    let where = isAdmin ? {} : { institution_id: institutionId };
+    if (activeOnly) {
+      where.is_active = true;
+    }
     
     return await DiagnosisTemplate.findAll({
       where,
@@ -86,11 +89,15 @@ class DiagnosisService {
    */
   async createTemplate(data, institutionId) {
     return await sequelize.transaction(async (t) => {
-      // 1. Deactivate current active template for THIS institution
+      // 1. Deactivate previous versions of THIS specific profile (by title) for THIS institution
       await DiagnosisTemplate.update(
         { is_active: false },
         { 
-          where: { institution_id: institutionId, is_active: true },
+          where: { 
+            institution_id: institutionId, 
+            is_active: true,
+            title: data.title // Only deactivate if it's an update to the SAME assessment type
+          },
           transaction: t
         }
       );

@@ -59,7 +59,12 @@ class DiagnosisController {
     try {
       const institutionId = req.user.institution_id || req.user.institutionId;
       const isAdmin = req.user.role === 'admin';
-      const templates = await diagnosisService.listTemplates(institutionId, isAdmin);
+      const isSupervisor = req.user.role === 'supervisor';
+      
+      // Coaches only see ACTIVE templates
+      const activeOnly = !isAdmin && !isSupervisor;
+      
+      const templates = await diagnosisService.listTemplates(institutionId, isAdmin, activeOnly);
       
       res.status(200).json({
         success: true,
