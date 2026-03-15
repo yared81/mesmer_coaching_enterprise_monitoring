@@ -131,10 +131,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 52, 24, 60), // Add bottom padding for TabBar
+                    padding: const EdgeInsets.fromLTRB(24, 48, 24, 64), // Optimized for different screen heights
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center, // Prevents bottom crowding
                       children: [
                         Row(
                           children: [

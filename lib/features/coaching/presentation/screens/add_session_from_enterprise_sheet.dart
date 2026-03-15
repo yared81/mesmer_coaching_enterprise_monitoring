@@ -90,144 +90,146 @@ class _AddSessionFromEnterpriseSheetState
         top: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'New Coaching Session',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E3A8A),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Recording a new session for this enterprise.',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 24),
-
-            // Title field
-            TextFormField(
-              controller: _titleController,
-              autofocus: true,
-              validator: (val) =>
-                  val == null || val.isEmpty ? 'Please enter a session title' : null,
-              decoration: InputDecoration(
-                labelText: 'Session Title',
-                hintText: 'e.g. Initial Assessment, Follow-up Review...',
-                prefixIcon: const Icon(Icons.edit_note_rounded, color: Color(0xFF3D5AFE)),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                filled: true,
-                fillColor: Colors.grey[50],
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
+              const SizedBox(height: 20),
+              const Text(
+                'New Coaching Session',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E3A8A),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 4),
+              Text(
+                'Recording a new session for this enterprise.',
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 24),
 
-            // Assessment Profile Dropdown
-            const Text(
-              'Assessment Profile',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
-            ),
-            const SizedBox(height: 8),
-            ref.watch(allTemplatesProvider).when(
-              data: (list) => DropdownButtonFormField<String>(
-                value: _selectedTemplateId,
+              // Title field
+              TextFormField(
+                controller: _titleController,
+                autofocus: true,
+                validator: (val) =>
+                    val == null || val.isEmpty ? 'Please enter a session title' : null,
                 decoration: InputDecoration(
-                  hintText: 'Select Assessment Tool',
-                  prefixIcon: const Icon(Icons.assessment_outlined, color: Color(0xFF3D5AFE)),
+                  labelText: 'Session Title',
+                  hintText: 'e.g. Initial Assessment, Follow-up Review...',
+                  prefixIcon: const Icon(Icons.edit_note_rounded, color: Color(0xFF3D5AFE)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
                   fillColor: Colors.grey[50],
-                ),
-                items: list.map((t) => DropdownMenuItem(
-                  value: t.id,
-                  child: Text(t.title),
-                )).toList(),
-                onChanged: (val) => setState(() => _selectedTemplateId = val),
-                validator: (val) => val == null ? 'Please select a profile' : null,
-              ),
-              loading: () => const LinearProgressIndicator(),
-              error: (err, _) => Text('Error loading profiles: $err', style: const TextStyle(color: Colors.red)),
-            ),
-            const SizedBox(height: 16),
-
-            // Date picker
-            InkWell(
-              onTap: _pickDate,
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[400]!),
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey[50],
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_month_rounded, color: Color(0xFF3D5AFE), size: 20),
-                    const SizedBox(width: 12),
-                    Text(
-                      DateFormat('EEEE, MMM dd, yyyy').format(_selectedDate),
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                    const Spacer(),
-                    const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
-                  ],
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-            // Submit button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _isSubmitting ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3D5AFE),
-                  disabledBackgroundColor: Colors.grey[300],
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  elevation: 0,
+              // Assessment Profile Dropdown
+              const Text(
+                'Assessment Profile',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              const SizedBox(height: 8),
+              ref.watch(allTemplatesProvider).when(
+                data: (list) => DropdownButtonFormField<String>(
+                  value: _selectedTemplateId,
+                  decoration: InputDecoration(
+                    hintText: 'Select Assessment Tool',
+                    prefixIcon: const Icon(Icons.assessment_outlined, color: Color(0xFF3D5AFE)),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                  ),
+                  items: list.map((t) => DropdownMenuItem(
+                    value: t.id,
+                    child: Text(t.title),
+                  )).toList(),
+                  onChanged: (val) => setState(() => _selectedTemplateId = val),
+                  validator: (val) => val == null ? 'Please select a profile' : null,
                 ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Text(
-                        'Create Session',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
+                loading: () => const LinearProgressIndicator(),
+                error: (err, _) => Text('Error loading profiles: $err', style: const TextStyle(color: Colors.red)),
+              ),
+              const SizedBox(height: 16),
+
+              // Date picker
+              InkWell(
+                onTap: _pickDate,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey[400]!),
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[50],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_month_rounded, color: Color(0xFF3D5AFE), size: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        DateFormat('EEEE, MMM dd, yyyy').format(_selectedDate),
+                        style: const TextStyle(fontSize: 15),
                       ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3D5AFE),
+                    disabledBackgroundColor: Colors.grey[300],
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Create Session',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
