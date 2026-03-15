@@ -8,7 +8,7 @@ import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/widgets/custom_toaster.dart';
-import '../../enterprise/presentation/providers/enterprise_document_provider.dart';
+import '../../../enterprise/presentation/providers/enterprise_document_provider.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -22,7 +22,6 @@ class SessionDetailScreen extends ConsumerStatefulWidget {
 class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _problemsController;
   late TextEditingController _recommendationsController;
-  late TextEditingController _notesController;
   late TextEditingController _notesController;
   bool _isSaving = false;
   bool _isUploading = false;
@@ -381,7 +380,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
         );
       },
       loading: () => const LinearProgressIndicator(),
-      error: (e, st) => const Text('Could not load attachments', style: TextStyle(color: Colors.red)),
+      error: (e, st) => const Text('No attachments yet.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
     );
   }
 }

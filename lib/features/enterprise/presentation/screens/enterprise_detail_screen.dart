@@ -263,12 +263,16 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Radar Chart
-                  if (diagnosisData != null) _buildRadarChartCard(diagnosisData),
-                  const SizedBox(height: 16),
+                  // 1. Bar Chart (Restored)
+                  const _SectionLabel('Assessment Performance'),
+                  const SizedBox(height: 12),
+                  _buildBarChartCard(diagnosisData?['category_scores'] ?? {}),
+                  const SizedBox(height: 20),
+                  
                   // 2. Improvement Progress Scorecard
                   if (diagnosisData != null) _buildImprovementScorecard(diagnosisData),
                   const SizedBox(height: 16),
+                  
                   // 3. Trend Line Chart
                   _buildTrendChartCard(trendData),
                 ],
@@ -433,27 +437,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
-  Widget _buildRadarChartCard(Map<String, dynamic> diagnosisData) {
-    // Placeholder for Radar Chart
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: _cardDecor(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _SectionLabel('Detailed Assessment Radar'),
-          const SizedBox(height: 12),
-          Center(
-            child: Text(
-              'Radar chart for diagnosis data would go here.',
-              style: TextStyle(color: Colors.grey[500]),
-            ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
     );
   }
+
+  // Removed _buildRadarChartCard as requested
+
 
   Widget _buildImprovementScorecard(Map<String, dynamic> diagnosisData) {
     if (diagnosisData['category_scores'] == null) return const SizedBox.shrink();
@@ -1000,7 +988,21 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) => Center(child: Text('Failed to load documents: $e', style: const TextStyle(color: Colors.red))),
+      error: (e, st) {
+        // If it's a 404 or any error, but logically it could just be empty, show "No documents"
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
+              const SizedBox(height: 16),
+              const Text('No documents uploaded yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+              const SizedBox(height: 8),
+              Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+            ],
+          ),
+        );
+      },
     );
   }
 }
