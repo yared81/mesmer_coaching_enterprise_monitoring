@@ -20,7 +20,8 @@ class QuestionCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final responseState = ref.watch(diagnosisStateProvider(sessionId));
     final selectedChoiceId = responseState.responses[question.id];
-    final hasError = responseState.showErrors && selectedChoiceId == null;
+    final showErrors = responseState.showErrors;
+    final hasError = showErrors && selectedChoiceId == null;
 
     return Card(
       elevation: 2,

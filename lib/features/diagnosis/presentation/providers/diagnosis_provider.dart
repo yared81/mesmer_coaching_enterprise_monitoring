@@ -109,7 +109,7 @@ class DiagnosisResponseState {
         if (responses.containsKey(question.id)) answered++;
       }
     }
-    return total == 0 ? 0 : answered / total;
+    return total == 0 ? 0.0 : answered / total;
   }
 }
 

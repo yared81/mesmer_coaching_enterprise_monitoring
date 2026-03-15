@@ -94,7 +94,8 @@ class DiagnosisController {
   };
   async deleteTemplate(req, res) {
     try {
-      await diagnosisService.deleteTemplate(req.params.id, req.user.institution_id);
+      const institutionId = req.user.institution_id || req.user.institutionId;
+      await diagnosisService.deleteTemplate(req.params.id, institutionId);
       res.json({ success: true, message: 'Assessment Profile deleted successfully' });
     } catch (error) {
       res.status(400).json({ success: false, message: error.message });

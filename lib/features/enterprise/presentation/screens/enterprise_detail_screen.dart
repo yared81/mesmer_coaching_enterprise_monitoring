@@ -251,8 +251,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               }
 
               final current = perf['current'];
-              final trends = (perf['trends'] as List);
-              final categoryMap = (current['categoryScores'] as Map<String, dynamic>);
+              final trends = (perf['trends'] as List?) ?? [];
+              final categoryMap = (current?['categoryScores'] as Map<String, dynamic>?) ?? {};
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           const Text(
             'Complete an assessment in the Sessions tab to see performance charts.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey, fontSize: 13),
+            style: TextStyle(color: Colors.grey[400], fontSize: 13),
           ),
         ],
       ),
@@ -373,7 +373,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(catNames.length, (i) {
-                  final score = (categoryMap[catNames[i]]['average_score'] as num).toDouble();
+                  final catData = categoryMap[catNames[i]];
+                  final scoreVal = catData?['average_score'] ?? 0.0;
+                  final score = (scoreVal as num).toDouble();
                   return _makeBarData(i, score);
                 }),
               ),
@@ -385,7 +387,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             runSpacing: 8,
             children: List.generate(catNames.length, (i) {
               final name = catNames[i];
-              final score = (categoryMap[name]['average_score'] as num).toDouble();
+              final catData = categoryMap[name];
+              final scoreVal = catData?['average_score'] ?? 0.0;
+              final score = (scoreVal as num).toDouble();
               final shortName = name.length > 3 ? name.substring(0, 3).toUpperCase() : name.toUpperCase();
               return _LegendBadge(shortName, name, score);
             }),
@@ -399,7 +403,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     if (trends.isEmpty) return const SizedBox.shrink();
 
     final List<FlSpot> spots = List.generate(trends.length, (i) {
-      final score = (trends[i]['score'] as num).toDouble();
+      final trendItem = trends[i];
+      final scoreVal = trendItem?['score'] ?? 0.0;
+      final score = (scoreVal as num).toDouble();
       return FlSpot(i.toDouble(), score);
     });
 
@@ -658,7 +664,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     fit: StackFit.expand,
                     children: [
                       CircularProgressIndicator(
-                        value: _tasks.isEmpty ? 0 : completed / _tasks.length,
+                        value: _tasks.isEmpty ? 0.0 : completed / _tasks.length,
                         strokeWidth: 6,
                         backgroundColor: Colors.grey[200],
                         valueColor: AlwaysStoppedAnimation(_healthColor),
