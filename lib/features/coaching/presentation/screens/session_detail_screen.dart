@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import '../../domain/entities/coaching_session_entity.dart';
 import '../providers/coaching_provider.dart';
+import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
@@ -81,6 +82,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isReadOnly = widget.session.status == SessionStatus.completed;
+    final diagnosisReportAsync = ref.watch(existingDiagnosisReportProvider(widget.session.id));
+    final hasDiagnosis = diagnosisReportAsync.valueOrNull != null;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -159,7 +162,39 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             // ─── ACTION BUTTONS ───
             if (!isReadOnly) ...[
               const Divider(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // Diagnosis status indicator
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: hasDiagnosis ? const Color(0xFFF0FDF4) : const Color(0xFFFFF7ED),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: hasDiagnosis ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      hasDiagnosis ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
+                      color: hasDiagnosis ? Colors.green : Colors.orange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        hasDiagnosis ? 'Diagnosis assessment completed ✓' : 'Diagnosis assessment not yet completed',
+                        style: TextStyle(
+                          color: hasDiagnosis ? Colors.green[800] : Colors.orange[800],
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
               SizedBox(
                 width: double.infinity,
                 height: 60,
@@ -168,7 +203,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     context.push(AppRoutes.diagnosis, extra: widget.session.id);
                   },
                   icon: const Icon(Icons.analytics_outlined),
-                  label: const Text('ASSESS & DIAGNOSE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  label: Text(
+                    hasDiagnosis ? 'VIEW / UPDATE DIAGNOSIS' : 'ASSESS & DIAGNOSE',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF3D5AFE),
                     side: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
@@ -182,6 +220,17 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : () {
+                    // Check diagnosis first
+                    if (!hasDiagnosis) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Complete the diagnosis assessment first before finalizing.'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      return;
+                    }
+                    // Check session detail fields
                     if (_problemsController.text.isEmpty || _recommendationsController.text.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

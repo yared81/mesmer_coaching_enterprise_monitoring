@@ -93,12 +93,20 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompleted = session.status == SessionStatus.completed;
+    
+    // Theme colors based on status
+    final themeColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
+    final lightBg = isCompleted ? const Color(0xFFEFF6FF) : const Color(0xFFF0FDF4);
+    final statusLabel = isCompleted ? 'Completed' : 'Draft';
+    final statusIcon = isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded;
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: themeColor.withOpacity(0.2)),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
@@ -116,20 +124,28 @@ class _SessionCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       session.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E3A8A)),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: themeColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      borderRadius: BorderRadius.circular(8),
+                      color: lightBg,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: themeColor.withOpacity(0.3)),
                     ),
-                    child: const Text('View/Edit', 
-                      style: TextStyle(color: Colors.blueAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(statusIcon, size: 13, color: themeColor),
+                        const SizedBox(width: 4),
+                        Text(statusLabel, 
+                          style: TextStyle(color: themeColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ],
               ),

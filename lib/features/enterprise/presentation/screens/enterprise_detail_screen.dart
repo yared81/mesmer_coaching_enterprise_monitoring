@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
+import '../../../coaching/domain/entities/coaching_session_entity.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -308,6 +309,21 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
+  /// Strips leading number prefixes like "4. " from category names
+  String _cleanCategoryName(String name) {
+    return name.replaceFirst(RegExp(r'^\d+\.\s*'), '');
+  }
+
+  /// Creates a short abbreviation from a clean category name
+  String _abbreviate(String cleanName) {
+    final words = cleanName.trim().split(RegExp(r'\s+'));
+    if (words.length >= 2) {
+      // Take first letter of each word, max 3
+      return words.take(3).map((w) => w[0].toUpperCase()).join();
+    }
+    return cleanName.length > 3 ? cleanName.substring(0, 3).toUpperCase() : cleanName.toUpperCase();
+  }
+
   Widget _buildBarChartCard(Map<String, dynamic> categoryMap) {
     final List<String> catNames = categoryMap.keys.toList();
 
@@ -329,7 +345,18 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 alignment: BarChartAlignment.spaceAround,
                 maxY: 5,
                 minY: 0,
-                barTouchData: BarTouchData(enabled: true),
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      final cleanName = _cleanCategoryName(catNames[group.x]);
+                      return BarTooltipItem(
+                        '$cleanName\n${rod.toY.toStringAsFixed(1)} / 5.0',
+                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                      );
+                    },
+                  ),
+                ),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
@@ -339,12 +366,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
                         if (index < 0 || index >= catNames.length) return const SizedBox.shrink();
-                        final name = catNames[index];
-                        final shortName = name.length > 3 ? name.substring(0, 3).toUpperCase() : name.toUpperCase();
+                        final cleanName = _cleanCategoryName(catNames[index]);
+                        final abbr = _abbreviate(cleanName);
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            shortName,
+                            abbr,
                             style: const TextStyle(color: Color(0xFF616161), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
                         );
@@ -356,10 +383,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       showTitles: true,
                       interval: 1,
                       reservedSize: 28,
-                      getTitlesWidget: (value, meta) => Text(
-                        value.toInt().toString(),
-                        style: TextStyle(color: Colors.grey[400], fontSize: 11),
-                      ),
+                      getTitlesWidget: (value, meta) {
+                        if (value > 5 || value < 0) return const SizedBox.shrink();
+                        return Text(
+                          value.toInt().toString(),
+                          style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                        );
+                      },
                     ),
                   ),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -387,11 +417,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             runSpacing: 8,
             children: List.generate(catNames.length, (i) {
               final name = catNames[i];
+              final cleanName = _cleanCategoryName(name);
               final catData = categoryMap[name];
               final scoreVal = catData?['average_score'] ?? 0.0;
               final score = (scoreVal as num).toDouble();
-              final shortName = name.length > 3 ? name.substring(0, 3).toUpperCase() : name.toUpperCase();
-              return _LegendBadge(shortName, name, score);
+              final abbr = _abbreviate(cleanName);
+              return _LegendBadge(abbr, cleanName, score);
             }),
           ),
         ],
@@ -402,12 +433,24 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   Widget _buildTrendChartCard(List<dynamic> trends) {
     if (trends.isEmpty) return const SizedBox.shrink();
 
+    // Parse all dates and compute day-offset from earliest
+    final parsedDates = trends.map((t) => DateTime.parse(t['date'].toString())).toList();
+    final firstDate = parsedDates.reduce((a, b) => a.isBefore(b) ? a : b);
+
     final List<FlSpot> spots = List.generate(trends.length, (i) {
-      final trendItem = trends[i];
-      final scoreVal = trendItem?['score'] ?? 0.0;
+      final dayOffset = parsedDates[i].difference(firstDate).inDays.toDouble();
+      final scoreVal = trends[i]?['score'] ?? 0.0;
       final score = (scoreVal as num).toDouble();
-      return FlSpot(i.toDouble(), score);
+      return FlSpot(dayOffset, score);
     });
+
+    // Compute the max X for chart bounds
+    final maxX = spots.map((s) => s.x).reduce((a, b) => a > b ? a : b);
+    // Use at least 1 day range to avoid zero-width
+    final xRange = maxX > 0 ? maxX : 1.0;
+
+    // Deduplicate X-axis date labels
+    final Set<String> shownDates = {};
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
@@ -426,20 +469,41 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               LineChartData(
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
-                maxY: 5.5,
+                maxY: 5,
                 minY: 0,
+                minX: 0,
+                maxX: xRange,
+                lineTouchData: LineTouchData(
+                  touchTooltipData: LineTouchTooltipData(
+                    getTooltipItems: (touchedSpots) {
+                      return touchedSpots.map((spot) {
+                        // Find the matching trend data
+                        final matchIdx = spots.indexWhere((s) => s.x == spot.x && s.y == spot.y);
+                        final title = matchIdx >= 0 ? (trends[matchIdx]['sessionTitle'] ?? '') : '';
+                        final date = matchIdx >= 0 ? DateFormat('MMM dd').format(parsedDates[matchIdx]) : '';
+                        return LineTooltipItem(
+                          '$title\n$date: ${spot.y.toStringAsFixed(1)}/5.0',
+                          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                        );
+                      }).toList();
+                    },
+                  ),
+                ),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 24,
                       getTitlesWidget: (v, m) {
-                        final i = v.toInt();
-                        if (i < 0 || i >= trends.length) return const SizedBox.shrink();
-                        final date = DateTime.parse(trends[i]['date']);
+                        // Find nearest spot to this X value
+                        final matchIdx = spots.indexWhere((s) => s.x == v);
+                        if (matchIdx < 0) return const SizedBox.shrink();
+                        final label = DateFormat('MMM dd').format(parsedDates[matchIdx]);
+                        if (shownDates.contains(label)) return const SizedBox.shrink();
+                        shownDates.add(label);
                         return SideTitleWidget(
                           meta: m,
-                          child: Text(DateFormat('MMM dd').format(date), style: const TextStyle(fontSize: 9, color: Colors.grey)),
+                          child: Text(label, style: const TextStyle(fontSize: 9, color: Colors.grey)),
                         );
                       },
                     ),
@@ -449,7 +513,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       showTitles: true,
                       interval: 1,
                       reservedSize: 20,
-                      getTitlesWidget: (v, m) => Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                      getTitlesWidget: (v, m) {
+                        if (v < 0 || v > 5) return const SizedBox.shrink();
+                        return Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey));
+                      },
                     ),
                   ),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -552,6 +619,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     itemCount: sorted.length,
                     itemBuilder: (_, i) {
                       final s = sorted[i];
+                      final isCompleted = s.status == SessionStatus.completed;
+                      final dotColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
+                      final accentColor = isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A);
+                      
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -561,15 +632,15 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                 width: 14,
                                 height: 14,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF3D5AFE),
+                                  color: dotColor,
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white, width: 2),
-                                  boxShadow: [BoxShadow(color: const Color(0xFF3D5AFE).withOpacity(0.4), blurRadius: 6)],
+                                  boxShadow: [BoxShadow(color: dotColor.withOpacity(0.4), blurRadius: 6)],
                                 ),
                               ),
                               if (i < sorted.length - 1)
-                                Container(width: 2, height: 70, decoration: const BoxDecoration(
-                                  gradient: LinearGradient(colors: [Color(0xFF3D5AFE), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                                Container(width: 2, height: 70, decoration: BoxDecoration(
+                                  gradient: LinearGradient(colors: [dotColor, Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                                 )),
                             ],
                           ),
@@ -586,6 +657,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: accentColor.withOpacity(0.15)),
                                   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
                                 ),
                                 child: Column(
@@ -593,12 +665,24 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF3D5AFE)),
+                                        Icon(Icons.calendar_today_rounded, size: 12, color: accentColor),
                                         const SizedBox(width: 4),
                                         Expanded(
-                                          child: Text(s.title, style: const TextStyle(color: Color(0xFF3D5AFE), fontSize: 12, fontWeight: FontWeight.bold),
+                                          child: Text(s.title, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
                                             overflow: TextOverflow.ellipsis),
                                         ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: accentColor.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            isCompleted ? 'Done' : 'Draft',
+                                            style: TextStyle(color: accentColor, fontSize: 9, fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
                                         Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
                                       ],
                                     ),
@@ -616,8 +700,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                           icon: const Icon(Icons.assessment_outlined, size: 16),
                                           label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
                                           style: OutlinedButton.styleFrom(
-                                            foregroundColor: AppColors.primary,
-                                            side: const BorderSide(color: AppColors.primary),
+                                            foregroundColor: accentColor,
+                                            side: BorderSide(color: accentColor),
                                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                           ),

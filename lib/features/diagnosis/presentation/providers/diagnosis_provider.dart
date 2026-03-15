@@ -128,18 +128,29 @@ class DiagnosisNotifier extends StateNotifier<DiagnosisResponseState> {
     }
   }
 
-  /// Merges responses from an existing server report if local draft is empty
+  /// Merges responses from an existing server report.
+  /// This takes precedence over local drafts to ensure completed assessments
+  /// aren't overwritten by stale local data.
   void mergeServerResponses(List<dynamic> serverResponses) {
-    if (state.responses.isNotEmpty) return; // Keep draft if it exists
+    if (serverResponses.isEmpty) return;
 
-    final Map<String, String> merged = {};
+    final Map<String, String> newResponses = Map<String, String>.from(state.responses);
+    bool changed = false;
+
+    // Merge server responses into the current state
     for (var resp in serverResponses) {
-      merged[resp['question_id']] = resp['choice_id'];
+      final qId = resp['question_id'] as String;
+      final cId = resp['choice_id'] as String;
+      
+      if (newResponses[qId] != cId) {
+        newResponses[qId] = cId;
+        changed = true;
+      }
     }
     
-    if (merged.isNotEmpty) {
-      state = state.copyWith(responses: merged);
-      HiveStorage.saveDraft(sessionId, merged);
+    if (changed) {
+      state = state.copyWith(responses: newResponses);
+      HiveStorage.saveDraft(sessionId, newResponses);
     }
   }
 
