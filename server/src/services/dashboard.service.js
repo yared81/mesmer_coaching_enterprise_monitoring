@@ -1,4 +1,4 @@
-const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, sequelize } = require('../models');
+const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class DashboardService {
@@ -62,7 +62,7 @@ class DashboardService {
       stats: {
         totalCoaches,
         totalEnterprises,
-        avgAssessmentScore: avgReport ? parseFloat(avgReport.avgHealth || 0).toFixed(1) : 0
+        avgAssessmentScore: avgReport ? parseFloat(parseFloat(avgReport.avgHealth || 0).toFixed(1)) : 0
       },
       recentActivity
     };
@@ -78,7 +78,7 @@ class DashboardService {
       DiagnosisReport.findOne({
         include: [{
           model: CoachingSession,
-          as: 'CoachingSession', // Matches model name as no "as" in index.js for this side
+          as: 'session',
           where: { coach_id: coachId },
           attributes: []
         }],
@@ -100,7 +100,7 @@ class DashboardService {
         totalEnterprises,
         totalSessions,
         pendingTasks: 0, 
-        avgAssessmentScore: avgReport ? parseFloat(avgReport.avgHealth || 0).toFixed(1) : 0
+        avgAssessmentScore: avgReport ? parseFloat(parseFloat(avgReport.avgHealth || 0).toFixed(1)) : 0
       },
       recentActivity
     };

@@ -15,6 +15,7 @@ import '../../../../core/router/app_routes.dart';
 import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 import '../../../coaching/domain/entities/coaching_session_entity.dart';
 import '../../presentation/providers/enterprise_document_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -411,8 +412,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(catNames.length, (i) {
                   final catData = categoryMap[catNames[i]];
-                  final scoreVal = catData?['average_score'] ?? 0.0;
-                  final score = (scoreVal as num).toDouble();
+                  final score = NumUtils.toDouble(catData?['average_score']);
                   return _makeBarData(i, score);
                 }),
               ),
@@ -426,8 +426,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               final name = catNames[i];
               final cleanName = _cleanCategoryName(name);
               final catData = categoryMap[name];
-              final scoreVal = catData?['average_score'] ?? 0.0;
-              final score = (scoreVal as num).toDouble();
+              final score = NumUtils.toDouble(catData?['average_score']);
               final abbr = _abbreviate(cleanName);
               return _LegendBadge(abbr, cleanName, score);
             }),
@@ -444,7 +443,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     // Find the weakest categories (< 3.0) to generate impact metrics
     int weakCategoriesCount = 0;
     categories.forEach((name, data) {
-      if ((data['average_score'] as num) < 3.0) {
+      if (NumUtils.toDouble(data['average_score']) < 3.0) {
         weakCategoriesCount++;
       }
     });
@@ -506,8 +505,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
     final List<FlSpot> spots = List.generate(trends.length, (i) {
       final dayOffset = parsedDates[i].difference(firstDate).inDays.toDouble();
-      final scoreVal = trends[i]?['score'] ?? 0.0;
-      final score = (scoreVal as num).toDouble();
+      final score = NumUtils.toDouble(trends[i]?['score']);
       return FlSpot(dayOffset, score);
     });
 

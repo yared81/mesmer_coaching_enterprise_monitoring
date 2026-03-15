@@ -102,20 +102,20 @@ Institution.hasMany(DiagnosisTemplate, { foreignKey: 'institution_id', as: 'diag
 DiagnosisTemplate.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });
 
 DiagnosisTemplate.hasMany(DiagnosisCategory, { foreignKey: 'template_id', as: 'categories', onDelete: 'CASCADE' });
-DiagnosisCategory.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
+DiagnosisCategory.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id', as: 'template' });
 
 DiagnosisCategory.hasMany(DiagnosisQuestion, { foreignKey: 'category_id', as: 'questions', onDelete: 'CASCADE' });
-DiagnosisQuestion.belongsTo(DiagnosisCategory, { foreignKey: 'category_id' });
+DiagnosisQuestion.belongsTo(DiagnosisCategory, { foreignKey: 'category_id', as: 'category' });
 
 DiagnosisQuestion.hasMany(DiagnosisChoice, { foreignKey: 'question_id', as: 'choices', onDelete: 'CASCADE' });
-DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
+DiagnosisChoice.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id', as: 'question' });
 
 // Diagnosis Report Associations
 CoachingSession.hasOne(DiagnosisReport, { foreignKey: 'session_id', as: 'diagnosisReport' });
-DiagnosisReport.belongsTo(CoachingSession, { foreignKey: 'session_id' });
+DiagnosisReport.belongsTo(CoachingSession, { foreignKey: 'session_id', as: 'session' });
 
 DiagnosisTemplate.hasMany(DiagnosisReport, { foreignKey: 'template_id', as: 'reports', onDelete: 'CASCADE' });
-DiagnosisReport.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id' });
+DiagnosisReport.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id', as: 'template' });
 
 DiagnosisReport.hasMany(DiagnosisResponse, { foreignKey: 'report_id', as: 'responses', onDelete: 'CASCADE' });
 DiagnosisResponse.belongsTo(DiagnosisReport, { foreignKey: 'report_id' });

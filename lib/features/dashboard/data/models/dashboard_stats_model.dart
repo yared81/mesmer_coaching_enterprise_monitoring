@@ -1,3 +1,4 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/entities/dashboard_stats_entity.dart';
 
 class ActivityModel extends ActivityEntity {
@@ -62,9 +63,9 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
         .toList();
 
     return SupervisorStatsModel(
-      totalCoaches: stats['totalCoaches'] as int,
-      totalEnterprises: stats['totalEnterprises'] as int,
-      avgAssessmentScore: (stats['avgAssessmentScore'] as num).toDouble(),
+      totalCoaches: NumUtils.toInt(stats['totalCoaches']),
+      totalEnterprises: NumUtils.toInt(stats['totalEnterprises']),
+      avgAssessmentScore: NumUtils.toDouble(stats['avgAssessmentScore']),
       recentActivity: recent,
     );
   }
@@ -86,10 +87,10 @@ class CoachStatsModel extends CoachStatsEntity {
         .toList();
 
     return CoachStatsModel(
-      totalEnterprises: stats['totalEnterprises'] as int,
-      totalSessions: stats['totalSessions'] as int,
-      pendingTasks: stats['pendingTasks'] as int,
-      avgAssessmentScore: (stats['avgAssessmentScore'] as num).toDouble(),
+      totalEnterprises: NumUtils.toInt(stats['totalEnterprises']),
+      totalSessions: NumUtils.toInt(stats['totalSessions']),
+      pendingTasks: NumUtils.toInt(stats['pendingTasks']),
+      avgAssessmentScore: NumUtils.toDouble(stats['avgAssessmentScore']),
       recentActivity: recent,
     );
   }

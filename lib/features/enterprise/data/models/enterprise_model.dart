@@ -1,3 +1,4 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import '../../domain/entities/enterprise_entity.dart';
 
 class EnterpriseModel {
@@ -41,14 +42,14 @@ class EnterpriseModel {
       businessName: json['business_name'] as String,
       ownerName: json['owner_name'] as String,
       sector: json['sector'] as String,
-      employeeCount: json['employee_count'] as int,
+      employeeCount: NumUtils.toInt(json['employee_count']),
       location: json['location'] as String,
       phone: json['phone'] as String,
       email: json['email'] as String?,
-      businessAge: json['business_age'] as int?,
+      businessAge: json['business_age'] != null ? NumUtils.toInt(json['business_age']) : null,
       ownerGender: json['owner_gender'] as String?,
       premiseType: json['premise_type'] as String?,
-      baselineScore: (json['baseline_score'] as num?)?.toDouble(),
+      baselineScore: json['baseline_score'] != null ? NumUtils.toDouble(json['baseline_score']) : null,
       coachId: json['coach_id'] as String,
       institutionId: json['institution_id'] as String,
       registeredAt: DateTime.parse(json['registered_at'] as String),

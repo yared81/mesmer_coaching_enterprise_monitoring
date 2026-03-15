@@ -1,3 +1,4 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import '../../domain/entities/enterprise_dashboard_stats.dart';
 
 class EnterpriseDashboardModel extends EnterpriseDashboardStats {
@@ -21,7 +22,7 @@ class EnterpriseDashboardModel extends EnterpriseDashboardStats {
       sector: enterprise['sector'] ?? '',
       radarScores: scores,
       latestRecommendation: json['latestRecommendation'] ?? 'No recommendations yet.',
-      totalSessions: json['totalSessions'] ?? 0,
+      totalSessions: NumUtils.toInt(json['totalSessions']),
       lastSessionDate: json['lastSessionDate'],
     );
   }

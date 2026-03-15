@@ -1,3 +1,5 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
+
 class RadarScore {
   final String name;
   final double value;
@@ -7,7 +9,7 @@ class RadarScore {
   factory RadarScore.fromJson(Map<String, dynamic> json) {
     return RadarScore(
       name: json['name'] ?? '',
-      value: (json['value'] as num).toDouble(),
+      value: NumUtils.toDouble(json['value']),
     );
   }
 }

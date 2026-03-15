@@ -7,6 +7,7 @@ import '../../domain/usecases/get_enterprises_usecase.dart';
 import '../../domain/usecases/register_enterprise_usecase.dart';
 import '../../domain/usecases/update_enterprise_usecase.dart';
 import '../../domain/entities/enterprise_entity.dart';
+import '../../domain/entities/enterprise_dashboard_stats.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 // 1. Datasource Provider

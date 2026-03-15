@@ -1,3 +1,5 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
+
 class DiagnosisReportModel {
   final String id;
   final String sessionId;
@@ -35,9 +37,9 @@ class DiagnosisReportModel {
     return DiagnosisReportModel(
       id: json['id'],
       sessionId: json['session_id'],
-      totalScore: (json['total_score'] as num).toDouble(),
-      maxScore: (json['max_score'] as num).toDouble(),
-      healthPercentage: (json['health_percentage'] as num).toDouble(),
+      totalScore: NumUtils.toDouble(json['total_score']),
+      maxScore: NumUtils.toDouble(json['max_score']),
+      healthPercentage: NumUtils.toDouble(json['health_percentage']),
       categoryScores: catScores,
       primaryChallenges: challenges,
     );
@@ -57,9 +59,9 @@ class CategoryScore {
 
   factory CategoryScore.fromJson(Map<String, dynamic> json) {
     return CategoryScore(
-      averageScore: (json['average_score'] as num).toDouble(),
-      sumPoints: (json['sum_points'] as num).toDouble(),
-      percentage: (json['percentage'] as num).toDouble(),
+      averageScore: NumUtils.toDouble(json['average_score']),
+      sumPoints: NumUtils.toDouble(json['sum_points']),
+      percentage: NumUtils.toDouble(json['percentage']),
     );
   }
 }
@@ -87,8 +89,8 @@ class PrimaryChallenge {
       categoryName: json['category_name'],
       questionText: json['question_text'],
       selectedChoice: json['selected_choice'],
-      points: (json['points'] as num).toDouble(),
-      maxPoints: (json['max_points'] as num).toDouble(),
+      points: NumUtils.toDouble(json['points']),
+      maxPoints: NumUtils.toDouble(json['max_points']),
     );
   }
 }

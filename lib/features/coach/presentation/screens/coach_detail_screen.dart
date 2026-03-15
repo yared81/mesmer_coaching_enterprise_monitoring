@@ -1,5 +1,15 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entities/user_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/domain/entities/coach_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/providers/coach_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/domain/entities/dashboard_stats_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 
 class CoachDetailScreen extends ConsumerWidget {
   final String coachId;
@@ -51,8 +61,8 @@ class CoachDetailScreen extends ConsumerWidget {
 
     // Mapping real metrics
     final totalAssigned = enterprises.length;
-    final sessionCount = stats?.stats.totalSessions ?? 0;
-    final avgScore = stats?.stats.avgAssessmentScore ?? 0.0;
+    final sessionCount = stats?.totalSessions ?? 0;
+    final avgScore = stats?.avgAssessmentScore ?? 0.0;
     
     final metrics = [
       (totalAssigned.toString(), 'Enterprises\nAssigned', Icons.storefront_rounded, const Color(0xFF3D5AFE)),

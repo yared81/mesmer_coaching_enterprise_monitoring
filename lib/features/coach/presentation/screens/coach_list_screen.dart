@@ -281,8 +281,8 @@ class _CoachCard extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          Flexible(child: _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first)),
-                          Flexible(child: _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last)),
+                          _StatPill(Icons.storefront_rounded, '$enterprises Enterprises', gradient.first),
+                          _StatPill(Icons.handshake_rounded, '$sessions Sessions', gradient.last),
                         ],
                       ),
                     ],

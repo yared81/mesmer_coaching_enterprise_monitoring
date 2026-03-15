@@ -1,3 +1,4 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import '../../domain/entities/diagnosis_template_entity.dart';
 
 class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
@@ -14,7 +15,7 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
     return DiagnosisTemplateModel(
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? '',
-      version: (json['version'] as num?)?.toInt() ?? 1,
+      version: NumUtils.toInt(json['version']) != 0 ? NumUtils.toInt(json['version']) : 1,
       isActive: json['is_active'] is bool ? json['is_active'] as bool : (json['is_active'] == true || json['is_active'] == 1),
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
       categories: json['categories'] != null 
@@ -38,7 +39,7 @@ class DiagnosisCategoryModel extends DiagnosisCategoryEntity {
     return DiagnosisCategoryModel(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
-      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+      sortOrder: NumUtils.toInt(json['sort_order']),
       questions: json['questions'] != null
           ? (json['questions'] as List).map((q) => DiagnosisQuestionModel.fromJson(q)).toList()
           : [],
@@ -58,7 +59,7 @@ class DiagnosisQuestionModel extends DiagnosisQuestionEntity {
     return DiagnosisQuestionModel(
       id: json['id']?.toString() ?? '',
       text: json['text']?.toString() ?? '',
-      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+      sortOrder: NumUtils.toInt(json['sort_order']),
       choices: json['choices'] != null
           ? (json['choices'] as List).map((c) => DiagnosisChoiceModel.fromJson(c)).toList()
           : [],
@@ -78,8 +79,8 @@ class DiagnosisChoiceModel extends DiagnosisChoiceEntity {
     return DiagnosisChoiceModel(
       id: json['id']?.toString() ?? '',
       text: json['text']?.toString() ?? '',
-      points: (json['points'] as num?)?.toInt() ?? 0,
-      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+      points: NumUtils.toInt(json['points']),
+      sortOrder: NumUtils.toInt(json['sort_order']),
     );
   }
 }
