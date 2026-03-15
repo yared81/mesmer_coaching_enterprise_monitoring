@@ -120,10 +120,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                             SliverToBoxAdapter(
                               child: Padding(
                                 padding: const EdgeInsets.all(24.0),
-                                child: ElevatedButton(
-                                  onPressed: (isComplete && !responseState.isLoading) 
-                                    ? () => _submit(template.id) 
-                                    : null,
+                                  child: ElevatedButton(
+                                    onPressed: !responseState.isLoading
+                                      ? () => _submit(template) 
+                                      : null,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
@@ -291,13 +291,26 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
     );
   }
 
-  void _submit(String templateId) async {
+  void _submit(DiagnosisTemplateEntity template) async {
     final notifier = ref.read(diagnosisStateProvider(widget.sessionId).notifier);
+    final isComplete = ref.read(diagnosisStateProvider(widget.sessionId)).isComplete(template);
+
+    if (!isComplete) {
+      notifier.setShowErrors(true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please mark the unfinished questions.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     final repository = ref.read(diagnosisRepositoryProvider);
 
     final result = await notifier.submitDiagnosis(
       repository,
-      templateId,
+      template.id,
     );
 
     if (!mounted) return;

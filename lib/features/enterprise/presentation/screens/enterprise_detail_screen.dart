@@ -12,6 +12,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/auth/domain/entit
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -472,7 +473,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       ),
     );
   }
-  }
 
   // ─── TAB 2: Sessions Timeline ──────────────────────────────────────────────
 
@@ -845,13 +845,6 @@ BarChartGroupData _makeBarData(int x, double y) {
     x: x,
     barRods: [
       BarChartRodData(
-        toY: y,
-        width: 18,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF3D5AFE), Color(0xFF536DFE)],
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-        ),
         toY: y,
         width: 18,
         gradient: const LinearGradient(

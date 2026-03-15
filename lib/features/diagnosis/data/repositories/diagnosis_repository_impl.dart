@@ -96,4 +96,14 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
       return Left(Failure.fromException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, Map<String, dynamic>?>> getEnterprisePerformance(String enterpriseId) async {
+    try {
+      final result = await remoteDataSource.getEnterprisePerformance(enterpriseId);
+      return Right(result);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
 }

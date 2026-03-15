@@ -20,11 +20,17 @@ class QuestionCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final responseState = ref.watch(diagnosisStateProvider(sessionId));
     final selectedChoiceId = responseState.responses[question.id];
+    final hasError = responseState.showErrors && selectedChoiceId == null;
 
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: hasError 
+            ? const BorderSide(color: AppColors.error, width: 2) 
+            : BorderSide.none,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

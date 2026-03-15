@@ -69,19 +69,23 @@ final enterprisePerformanceProvider = FutureProvider.family<Map<String, dynamic>
 class DiagnosisResponseState {
   final Map<String, String> responses; // questionId -> choiceId
   final bool isLoading;
+  final bool showErrors;
 
   DiagnosisResponseState({
     this.responses = const {},
     this.isLoading = false,
+    this.showErrors = false,
   });
 
   DiagnosisResponseState copyWith({
     Map<String, String>? responses,
     bool? isLoading,
+    bool? showErrors,
   }) {
     return DiagnosisResponseState(
       responses: responses ?? this.responses,
       isLoading: isLoading ?? this.isLoading,
+      showErrors: showErrors ?? this.showErrors,
     );
   }
 
@@ -146,6 +150,10 @@ class DiagnosisNotifier extends StateNotifier<DiagnosisResponseState> {
     
     // Autosave to Hive
     HiveStorage.saveDraft(sessionId, newResponses);
+  }
+
+  void setShowErrors(bool show) {
+    state = state.copyWith(showErrors: show);
   }
 
   void reset() {
