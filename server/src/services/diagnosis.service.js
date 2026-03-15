@@ -338,6 +338,21 @@ class DiagnosisService {
 
       if (!template) throw new Error('Template not found');
 
+      // 1.5 Delete existing report for this session if it exists
+      // This allows replacing a draft or an old version
+      const existingReport = await DiagnosisReport.findOne({
+        where: { session_id },
+        transaction: t
+      });
+      if (existingReport) {
+        // Responses will be deleted cascaded if set up, or we can do it explicitly
+        await DiagnosisResponse.destroy({ 
+          where: { report_id: existingReport.id }, 
+          transaction: t 
+        });
+        await existingReport.destroy({ transaction: t });
+      }
+
       // 2. Filter responses to only those that exist in the current template
       const allTemplateQuestionIds = new Set();
       template.categories.forEach(cat => {

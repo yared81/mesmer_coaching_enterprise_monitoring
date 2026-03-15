@@ -110,7 +110,9 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(24.0),
                             child: ElevatedButton(
-                              onPressed: isComplete ? () => _submit(template.id) : null,
+                              onPressed: (isComplete && !responseState.isLoading) 
+                                ? () => _submit(template.id) 
+                                : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
@@ -142,6 +144,26 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, stack) => _buildErrorState(err),
           ),
+          // Submitting Overlay
+          if (responseState.isLoading)
+            Container(
+              color: Colors.black26,
+              child: const Center(
+                child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Saving Diagnosis...', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -257,22 +279,15 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
   }
 
   void _submit(String templateId) async {
-    final responseState = ref.read(diagnosisStateProvider(widget.sessionId));
+    final notifier = ref.read(diagnosisStateProvider(widget.sessionId).notifier);
     final repository = ref.read(diagnosisRepositoryProvider);
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    final result = await repository.submitDiagnosis(
-      widget.sessionId,
+    final result = await notifier.submitDiagnosis(
+      repository,
       templateId,
-      responseState.responses,
     );
 
-    if (mounted) Navigator.pop(context); // Pop loading
+    if (!mounted) return;
 
     result.fold(
       (Failure failure) {
@@ -285,8 +300,6 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         }
       },
       (reportData) {
-        ref.read(diagnosisStateProvider(widget.sessionId).notifier).reset();
-        
         final report = DiagnosisReportModel.fromJson(reportData);
         
         ScaffoldMessenger.of(context).showSnackBar(

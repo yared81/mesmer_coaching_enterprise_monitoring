@@ -66,6 +66,8 @@ class DiagnosisResponseState {
     );
   }
 
+  bool get hasError => !isLoading && responses.isEmpty;
+
   bool isComplete(DiagnosisTemplateEntity template) {
     for (final category in template.categories) {
       for (final question in category.questions) {
@@ -130,6 +132,34 @@ class DiagnosisNotifier extends StateNotifier<DiagnosisResponseState> {
   void reset() {
     state = DiagnosisResponseState();
     HiveStorage.clearDraft(sessionId);
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> submitDiagnosis(
+    DiagnosisRepository repository,
+    String templateId,
+  ) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final result = await repository.submitDiagnosis(
+        sessionId,
+        templateId,
+        state.responses,
+      );
+      
+      return result.fold(
+        (failure) {
+          state = state.copyWith(isLoading: false);
+          return Left(failure);
+        },
+        (data) {
+          reset();
+          return Right(data);
+        },
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      return Left(Failure.fromException(e));
+    }
   }
 }
 
