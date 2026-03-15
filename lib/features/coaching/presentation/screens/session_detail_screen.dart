@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import '../../domain/entities/coaching_session_entity.dart';
 import '../providers/coaching_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -35,7 +37,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     super.dispose();
   }
 
-  Future<void> _saveNotes() async {
+  Future<void> _saveNotes({bool isFinalizing = false}) async {
     setState(() => _isSaving = true);
     
     final updatedSession = CoachingSessionEntity(
@@ -44,10 +46,11 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       enterpriseId: widget.session.enterpriseId,
       coachId: widget.session.coachId,
       scheduledDate: widget.session.scheduledDate,
-      status: SessionStatus.completed, // Completing the session via notes
+      status: isFinalizing ? SessionStatus.completed : widget.session.status,
       problemsIdentified: _problemsController.text,
       recommendations: _recommendationsController.text,
       notes: _notesController.text,
+      templateId: widget.session.templateId,
     );
 
     try {
@@ -56,9 +59,11 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       if (mounted) {
         setState(() => _isSaving = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Session notes saved successfully')),
+          SnackBar(content: Text(isFinalizing ? 'Session finalized successfully' : 'Draft saved successfully')),
         );
-        Navigator.pop(context); // Go back after saving
+        if (isFinalizing) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -75,6 +80,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isReadOnly = widget.session.status == SessionStatus.completed;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -82,6 +89,13 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
         backgroundColor: const Color(0xFF3D5AFE),
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          if (!isReadOnly)
+            TextButton(
+              onPressed: _isSaving ? null : () => _saveNotes(),
+              child: const Text('SAVE DRAFT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -89,56 +103,127 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header Info
-            Text(
-              widget.session.title,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE)),
-            ),
-            const SizedBox(height: 8),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.calendar_month, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(
-                  DateFormat('MMMM dd, yyyy').format(widget.session.scheduledDate),
-                  style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.session.title,
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE)),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_month, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(
+                            DateFormat('MMMM dd, yyyy').format(widget.session.scheduledDate),
+                            style: const TextStyle(color: Colors.grey, fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: (isReadOnly ? Colors.green : Colors.orange).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: isReadOnly ? Colors.green : Colors.orange),
+                  ),
+                  child: Text(
+                    isReadOnly ? 'COMPLETED' : 'IN PROGRESS',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isReadOnly ? Colors.green : Colors.orange),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 32),
             
             // Editable Notes Section
-            const Text('Session Log', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text('Observations & Notes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 16),
             
-            _buildNoteField('Problems Identified', _problemsController),
+            _buildNoteField('Problems Identified', _problemsController, readOnly: isReadOnly),
             const SizedBox(height: 20),
-            _buildNoteField('Recommendations', _recommendationsController),
+            _buildNoteField('Recommendations', _recommendationsController, readOnly: isReadOnly),
             const SizedBox(height: 20),
-            _buildNoteField('General Notes', _notesController, maxLines: 5),
+            _buildNoteField('General Notes', _notesController, maxLines: 5, readOnly: isReadOnly),
             
-            const SizedBox(height: 48),
-            
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: _isSaving ? null : _saveNotes,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1E3A8A),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            const SizedBox(height: 32),
+
+            // ─── ACTION BUTTONS ───
+            if (!isReadOnly) ...[
+              const Divider(),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.push(AppRoutes.diagnosis, extra: widget.session.id);
+                  },
+                  icon: const Icon(Icons.analytics_outlined),
+                  label: const Text('ASSESS & DIAGNOSE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF3D5AFE),
+                    side: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
                 ),
-                child: _isSaving 
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text('Save Session Notes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5)),
               ),
-            ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : () {
+                    if (_problemsController.text.isEmpty || _recommendationsController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please fill in Problems and Recommendations before finalizing.'),
+                          backgroundColor: Colors.orange,
+                        ),
+                      );
+                      return;
+                    }
+                    _saveNotes(isFinalizing: true);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E3A8A),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: _isSaving 
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('FINALIZE SESSION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 0.5)),
+                ),
+              ),
+            ] else 
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    context.push(AppRoutes.diagnosis, extra: widget.session.id);
+                  },
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('VIEW ASSESSMENT', style: TextStyle(fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNoteField(String label, TextEditingController controller, {int maxLines = 3}) {
+  Widget _buildNoteField(String label, TextEditingController controller, {int maxLines = 3, bool readOnly = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,11 +232,12 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          enabled: !readOnly,
           decoration: InputDecoration(
-            hintText: 'Tap to add $label...',
+            hintText: readOnly ? 'No information provided' : 'Tap to add $label...',
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: readOnly ? Colors.grey[50] : Colors.grey[50],
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3B82F6))),

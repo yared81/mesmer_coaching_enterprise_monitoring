@@ -45,6 +45,17 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
       });
     });
 
+    // Proactive merge if state is empty but server has data
+    if (responseState.responses.isEmpty && existingReportAsync.hasValue) {
+      final report = existingReportAsync.value;
+      if (report != null && report['responses'] != null) {
+        Future.microtask(() {
+          ref.read(diagnosisStateProvider(widget.sessionId).notifier)
+              .mergeServerResponses(report['responses']);
+        });
+      }
+    }
+
     return sessionAsync.when(
       data: (session) {
         if (session == null) {
