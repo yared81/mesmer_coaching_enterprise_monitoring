@@ -12,6 +12,7 @@ class CoachingSessionEntity {
     required this.scheduledDate,
     required this.status,
     this.templateId,
+    this.enterpriseName,
     this.problemsIdentified,
     this.recommendations,
     this.notes,
@@ -20,6 +21,7 @@ class CoachingSessionEntity {
   final String id;
   final String title;
   final String enterpriseId;
+  final String? enterpriseName;
   final String coachId;
   final DateTime scheduledDate;
   final SessionStatus status;

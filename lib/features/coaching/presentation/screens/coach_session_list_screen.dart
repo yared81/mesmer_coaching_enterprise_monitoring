@@ -152,7 +152,7 @@ class _SessionCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.business_rounded, size: 14, color: Colors.grey),
                       const SizedBox(width: 6),
-                      Text('Enterprise ID: ${session.enterpriseId.substring(0, 8)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(session.enterpriseName ?? 'Enterprise ID: ${session.enterpriseId.substring(0, 8)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                     ],
                   ),
                   Row(
