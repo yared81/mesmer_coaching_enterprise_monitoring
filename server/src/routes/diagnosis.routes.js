@@ -17,5 +17,6 @@ router.put('/templates/:id', authorize('supervisor', 'admin'), diagnosisControll
 router.delete('/templates/:id', authorize('supervisor', 'admin'), diagnosisController.deleteTemplate);
 router.post('/reports', diagnosisController.submitReport);
 router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
+router.get('/enterprise/:enterpriseId/performance', diagnosisController.getEnterprisePerformance);
 
 module.exports = router;

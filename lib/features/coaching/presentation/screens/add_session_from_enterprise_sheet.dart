@@ -154,6 +154,7 @@ class _AddSessionFromEnterpriseSheetState
               ref.watch(allTemplatesProvider).when(
                 data: (list) => DropdownButtonFormField<String>(
                   value: _selectedTemplateId,
+                  isExpanded: true,
                   decoration: InputDecoration(
                     hintText: 'Select Assessment Tool',
                     prefixIcon: const Icon(Icons.assessment_outlined, color: Color(0xFF3D5AFE)),
@@ -163,7 +164,10 @@ class _AddSessionFromEnterpriseSheetState
                   ),
                   items: list.map((t) => DropdownMenuItem(
                     value: t.id,
-                    child: Text(t.title),
+                    child: Text(
+                      t.title,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   )).toList(),
                   onChanged: (val) => setState(() => _selectedTemplateId = val),
                   validator: (val) => val == null ? 'Please select a profile' : null,
