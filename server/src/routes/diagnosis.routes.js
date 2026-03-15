@@ -11,7 +11,7 @@ router.get('/template/latest', diagnosisController.getLatestTemplate);
 router.get('/templates/:id', diagnosisController.getTemplateById);
 
 // Supervisor/Admin Only Routes
-router.get('/templates', authorize('supervisor', 'admin'), diagnosisController.listTemplates);
+router.get('/templates', authorize('supervisor', 'admin', 'coach'), diagnosisController.listTemplates);
 router.post('/templates', authorize('supervisor', 'admin'), diagnosisController.createTemplate);
 router.put('/templates/:id', authorize('supervisor', 'admin'), diagnosisController.updateTemplate);
 router.delete('/templates/:id', authorize('supervisor', 'admin'), diagnosisController.deleteTemplate);
