@@ -42,3 +42,12 @@ final coachStatsProvider = FutureProvider<CoachStatsEntity>((ref) async {
     (stats) => stats,
   );
 });
+
+final coachStatsByIdProvider = FutureProvider.family<CoachStatsEntity, String>((ref, id) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
+  final result = await repository.getCoachStatsById(id);
+  return result.fold(
+    (failure) => throw failure.message,
+    (stats) => stats,
+  );
+});

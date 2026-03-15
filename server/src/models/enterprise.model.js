@@ -37,6 +37,24 @@ const Enterprise = sequelize.define('Enterprise', {
       isEmail: true
     }
   },
+  business_age: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: 0
+  },
+  owner_gender: {
+    type: DataTypes.ENUM('male', 'female', 'other'),
+    allowNull: true
+  },
+  premise_type: {
+    type: DataTypes.ENUM('rented', 'owned', 'home_based', 'other'),
+    allowNull: true
+  },
+  baseline_score: {
+    type: DataTypes.DECIMAL(3, 2),
+    allowNull: true,
+    defaultValue: 0.0
+  },
   coach_id: {
     type: DataTypes.UUID,
     allowNull: false,

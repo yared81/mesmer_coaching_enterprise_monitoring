@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/coach/domain/entities/coach_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/providers/coach_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/domain/entities/enterprise_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/providers/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/providers/dashboard_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
 
 class CoachDetailScreen extends ConsumerWidget {
   final String coachId;
@@ -18,6 +14,7 @@ class CoachDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final coachesAsync = ref.watch(coachListProvider);
     final enterprisesAsync = ref.watch(enterpriseListProvider);
+    final statsAsync = ref.watch(coachStatsByIdProvider(coachId));
 
     return coachesAsync.when(
       data: (coaches) {
@@ -29,7 +26,11 @@ class CoachDetailScreen extends ConsumerWidget {
         return enterprisesAsync.when(
           data: (allEnterprises) {
             final assignedEnterprises = allEnterprises.where((e) => e.coachId == coachId).toList();
-            return _buildBody(context, ref, coach, assignedEnterprises);
+            return statsAsync.when(
+              data: (stats) => _buildBody(context, ref, coach, assignedEnterprises, stats),
+              loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+              error: (err, _) => _buildBody(context, ref, coach, assignedEnterprises, null),
+            );
           },
           loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (err, _) => Scaffold(body: Center(child: Text('Error loading enterprises: $err'))),
@@ -40,7 +41,7 @@ class CoachDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref, CoachEntity coach, List<EnterpriseEntity> enterprises) {
+  Widget _buildBody(BuildContext context, WidgetRef ref, CoachEntity coach, List<EnterpriseEntity> enterprises, CoachStatsEntity? stats) {
     final initials = coach.name
         .trim()
         .split(' ')
@@ -48,13 +49,15 @@ class CoachDetailScreen extends ConsumerWidget {
         .map((w) => w.isNotEmpty ? w[0].toUpperCase() : '')
         .join();
 
-    // Calculate real metrics
-    final activeEnterprises = enterprises.length; // Simplified for now
+    // Mapping real metrics
+    final totalAssigned = enterprises.length;
+    final sessionCount = stats?.stats.totalSessions ?? 0;
+    final avgScore = stats?.stats.avgAssessmentScore ?? 0.0;
     
     final metrics = [
-      (activeEnterprises.toString(), 'Enterprises\nAssigned', Icons.storefront_rounded, const Color(0xFF3D5AFE)),
-      ('0', 'Sessions\nThis Month', Icons.handshake_rounded, const Color(0xFF00B09B)),
-      ('N/A', 'Avg. Health\nScore', Icons.trending_up_rounded, const Color(0xFFFF6F00)),
+      (totalAssigned.toString(), 'Enterprises\nAssigned', Icons.storefront_rounded, const Color(0xFF3D5AFE)),
+      (sessionCount.toString(), 'Total\nSessions', Icons.handshake_rounded, const Color(0xFF00B09B)),
+      (avgScore > 0 ? avgScore.toStringAsFixed(1) : 'N/A', 'Avg. Health\nScore', Icons.trending_up_rounded, const Color(0xFFFF6F00)),
       ('New', 'Last\nActivity', Icons.schedule_rounded, const Color(0xFF9C27B0)),
     ];
 
@@ -109,18 +112,23 @@ class CoachDetailScreen extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text(coach.email, style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 13)),
                       const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: coach.isActive
-                              ? Colors.green.withOpacity(0.25)
-                              : Colors.red.withOpacity(0.25),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withOpacity(0.3)),
-                        ),
-                        child: Text(
-                          coach.isActive ? '● Active' : '● Inactive',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                      Tooltip(
+                        message: coach.isActive 
+                          ? 'This coach is active and can perform coaching tasks.'
+                          : 'This coach is currently inactive and cannot access the system.',
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: coach.isActive
+                                ? Colors.green.withOpacity(0.25)
+                                : Colors.red.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withOpacity(0.3)),
+                          ),
+                          child: Text(
+                            coach.isActive ? '● Active' : '● Inactive',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
                         ),
                       ),
                     ],
@@ -186,57 +194,61 @@ class CoachDetailScreen extends ConsumerWidget {
                         : mockScore >= 50
                             ? Colors.orange
                             : Colors.red;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 16, offset: const Offset(0, 6)),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: healthColor.withOpacity(0.1),
-                              shape: BoxShape.circle,
+                    return InkWell(
+                      onTap: () => context.push('/enterprises/${e.id}'),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 16, offset: const Offset(0, 6)),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: healthColor.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Center(child: Text(mockScore.toString(), style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 12))),
                             ),
-                            child: Center(child: Text(mockScore.toString(), style: TextStyle(color: healthColor, fontWeight: FontWeight.bold, fontSize: 12))),
-                          ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
-                                Text(e.sector.name.toUpperCase(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
+                                  Text(e.sector.name.toUpperCase(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+                              onSelected: (value) async {
+                                if (value == 'unassign') {
+                                  final success = await ref.read(enterpriseListProvider.notifier).assignEnterprise(e.id, null);
+                                  if (success && context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('${e.businessName} unassigned.'), backgroundColor: Colors.orange),
+                                    );
+                                  }
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'unassign',
+                                  child: Text('Unassign Coach'),
+                                ),
                               ],
                             ),
-                          ),
-                          PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert, color: Colors.grey, size: 20),
-                            onSelected: (value) async {
-                              if (value == 'unassign') {
-                                final success = await ref.read(enterpriseListProvider.notifier).assignEnterprise(e.id, null);
-                                if (success && context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('${e.businessName} unassigned.'), backgroundColor: Colors.orange),
-                                  );
-                                }
-                              }
-                            },
-                            itemBuilder: (context) => [
-                              const PopupMenuItem(
-                                value: 'unassign',
-                                child: Text('Unassign Coach'),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },

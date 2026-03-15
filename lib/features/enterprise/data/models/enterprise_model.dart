@@ -13,6 +13,10 @@ class EnterpriseModel {
     required this.institutionId,
     required this.registeredAt,
     this.email,
+    this.businessAge,
+    this.ownerGender,
+    this.premiseType,
+    this.baselineScore,
   });
 
   final String id;
@@ -23,6 +27,10 @@ class EnterpriseModel {
   final String location;
   final String phone;
   final String? email;
+  final int? businessAge;
+  final String? ownerGender;
+  final String? premiseType;
+  final double? baselineScore;
   final String coachId;
   final String institutionId;
   final DateTime registeredAt;
@@ -37,6 +45,10 @@ class EnterpriseModel {
       location: json['location'] as String,
       phone: json['phone'] as String,
       email: json['email'] as String?,
+      businessAge: json['business_age'] as int?,
+      ownerGender: json['owner_gender'] as String?,
+      premiseType: json['premise_type'] as String?,
+      baselineScore: (json['baseline_score'] as num?)?.toDouble(),
       coachId: json['coach_id'] as String,
       institutionId: json['institution_id'] as String,
       registeredAt: DateTime.parse(json['registered_at'] as String),
@@ -53,6 +65,10 @@ class EnterpriseModel {
       location: location,
       phone: phone,
       email: email,
+      businessAge: businessAge,
+      ownerGender: _mapStringToGender(ownerGender),
+      premiseType: _mapStringToPremiseType(premiseType),
+      baselineScore: baselineScore,
       coachId: coachId,
       institutionId: institutionId,
       registeredAt: registeredAt,
@@ -63,6 +79,22 @@ class EnterpriseModel {
     return Sector.values.firstWhere(
       (s) => s.name == sector,
       orElse: () => Sector.other,
+    );
+  }
+
+  static OwnerGender? _mapStringToGender(String? gender) {
+    if (gender == null) return null;
+    return OwnerGender.values.firstWhere(
+      (g) => g.name == gender,
+      orElse: () => OwnerGender.other,
+    );
+  }
+
+  static PremiseType? _mapStringToPremiseType(String? type) {
+    if (type == null) return null;
+    return PremiseType.values.firstWhere(
+      (t) => t.name == type,
+      orElse: () => PremiseType.other,
     );
   }
 }

@@ -1,4 +1,6 @@
 enum Sector { agriculture, manufacturing, trade, services, construction, other }
+enum OwnerGender { male, female, other }
+enum PremiseType { rented, owned, home_based, other }
 
 class EnterpriseEntity {
   const EnterpriseEntity({
@@ -13,6 +15,10 @@ class EnterpriseEntity {
     required this.institutionId,
     required this.registeredAt,
     this.email,
+    this.businessAge,
+    this.ownerGender,
+    this.premiseType,
+    this.baselineScore,
   });
 
   final String id;
@@ -23,6 +29,10 @@ class EnterpriseEntity {
   final String location;
   final String phone;
   final String? email;
+  final int? businessAge;
+  final OwnerGender? ownerGender;
+  final PremiseType? premiseType;
+  final double? baselineScore;
   final String coachId;
   final String institutionId;
   final DateTime registeredAt;
@@ -36,6 +46,10 @@ class EnterpriseEntity {
     String? location,
     String? phone,
     String? email,
+    int? businessAge,
+    OwnerGender? ownerGender,
+    PremiseType? premiseType,
+    double? baselineScore,
     String? coachId,
     String? institutionId,
     DateTime? registeredAt,
@@ -49,6 +63,10 @@ class EnterpriseEntity {
       location: location ?? this.location,
       phone: phone ?? this.phone,
       email: email ?? this.email,
+      businessAge: businessAge ?? this.businessAge,
+      ownerGender: ownerGender ?? this.ownerGender,
+      premiseType: premiseType ?? this.premiseType,
+      baselineScore: baselineScore ?? this.baselineScore,
       coachId: coachId ?? this.coachId,
       institutionId: institutionId ?? this.institutionId,
       registeredAt: registeredAt ?? this.registeredAt,

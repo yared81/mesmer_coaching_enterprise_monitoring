@@ -28,7 +28,12 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _employeeCountController = TextEditingController();
+  final TextEditingController _businessAgeController = TextEditingController();
+  final TextEditingController _baselineScoreController = TextEditingController();
+  
   Sector _selectedSector = Sector.other;
+  OwnerGender _selectedGender = OwnerGender.male;
+  PremiseType _selectedPremiseType = PremiseType.rented;
 
   @override
   void dispose() {
@@ -39,6 +44,8 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
     _phoneController.dispose();
     _emailController.dispose();
     _employeeCountController.dispose();
+    _businessAgeController.dispose();
+    _baselineScoreController.dispose();
     super.dispose();
   }
 
@@ -77,6 +84,10 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       'location': _locationController.text,
       'phone': _phoneController.text,
       'email': _emailController.text.isEmpty ? null : _emailController.text,
+      'business_age': int.tryParse(_businessAgeController.text) ?? 0,
+      'owner_gender': _selectedGender.name,
+      'premise_type': _selectedPremiseType.name,
+      'baseline_score': double.tryParse(_baselineScoreController.text) ?? 0.0,
     };
 
     final result = await ref.read(registerEnterpriseUseCaseProvider)(data);
@@ -137,7 +148,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
         children: [
           _buildStepCircle(0, 'Business Info'),
           Expanded(child: Container(height: 2, color: _currentStep > 0 ? AppColors.primary : Colors.grey[300])),
-          _buildStepCircle(1, 'Contact Info'),
+          _buildStepCircle(1, 'Owner & Layout'),
         ],
       ),
     );
@@ -184,6 +195,30 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
             validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
           ),
           const SizedBox(height: AppSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: AppTextField(
+                  controller: _businessAgeController,
+                  label: 'Business Age (Years)',
+                  hint: 'e.g. 5',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: const Icon(Icons.calendar_today),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: AppTextField(
+                  controller: _employeeCountController,
+                  label: 'Employee Count',
+                  hint: 'e.g. 10',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: const Icon(Icons.people),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
           const Text('Sector', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Container(
@@ -206,12 +241,34 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          const Text('Premise Type', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<PremiseType>(
+                value: _selectedPremiseType,
+                isExpanded: true,
+                items: PremiseType.values.map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Text(t.name.replaceAll('_', ' ').split(' ').map((e) => e[0].toUpperCase() + e.substring(1)).join(' ')),
+                )).toList(),
+                onChanged: (v) => setState(() => _selectedPremiseType = v!),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
           AppTextField(
-            controller: _employeeCountController,
-            label: 'Employee Count',
-            hint: 'Number of employees',
-            keyboardType: TextInputType.number,
-            prefixIcon: const Icon(Icons.people),
+            controller: _baselineScoreController,
+            label: 'Baseline Score (0-5)',
+            hint: 'e.g. 3.5',
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            prefixIcon: const Icon(Icons.assessment),
           ),
         ],
       ),
@@ -232,6 +289,20 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
             hint: 'Full name',
             prefixIcon: const Icon(Icons.person),
             validator: (v) => v == null || v.isEmpty ? 'Owner name is required' : null,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          const Text('Gender', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Row(
+            children: OwnerGender.values.map((g) => Expanded(
+              child: RadioListTile<OwnerGender>(
+                title: Text(g.name[0].toUpperCase() + g.name.substring(1), style: const TextStyle(fontSize: 12)),
+                value: g,
+                groupValue: _selectedGender,
+                onChanged: (v) => setState(() => _selectedGender = v!),
+                contentPadding: EdgeInsets.zero,
+              ),
+            )).toList(),
           ),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
@@ -271,23 +342,27 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (_currentStep > 0)
             Expanded(
+              flex: 1,
               child: OutlinedButton(
                 onPressed: _isLoading ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  minimumSize: const Size(0, 56), // Ensure consistent height
                 ),
                 child: const Text('Back'),
               ),
             ),
           if (_currentStep > 0) const SizedBox(width: AppSpacing.md),
           Expanded(
+            flex: 2, // Give more room to the primary action button
             child: PrimaryButton(
-              onPressed: _isLoading ? () {} : _nextStep,
+              onPressed: _isLoading ? null : _nextStep,
               label: _currentStep == 1 ? 'Complete Registration' : 'Next Step',
               isLoading: _isLoading,
             ),

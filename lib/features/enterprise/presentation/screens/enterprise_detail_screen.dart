@@ -437,12 +437,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
-    );
-  }
-
-  // Removed _buildRadarChartCard as requested
-
-
   Widget _buildImprovementScorecard(Map<String, dynamic> diagnosisData) {
     if (diagnosisData['category_scores'] == null) return const SizedBox.shrink();
     final categories = Map<String, dynamic>.from(diagnosisData['category_scores']);

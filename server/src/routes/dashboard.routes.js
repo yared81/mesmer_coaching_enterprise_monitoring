@@ -9,7 +9,10 @@ router.get('/admin', protect, authorize('admin'), dashboardController.getAdminSt
 // Supervisor stats
 router.get('/supervisor', protect, authorize('supervisor'), dashboardController.getSupervisorStats);
 
-// Coach stats
+// Coach stats (Self)
 router.get('/coach', protect, authorize('coach'), dashboardController.getCoachStats);
+
+// Supervisor: Get specific coach stats
+router.get('/coach/:coachId', protect, authorize('supervisor'), dashboardController.getSpecificCoachStats);
 
 module.exports = router;

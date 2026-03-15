@@ -1,4 +1,4 @@
-const { Institution, User, Enterprise } = require('../models');
+const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class DashboardService {
@@ -35,9 +35,21 @@ class DashboardService {
    * Get aggregate stats for Supervisor
    */
   async getSupervisorStats(institutionId) {
-    const [totalCoaches, totalEnterprises, recentActivity] = await Promise.all([
+    const [totalCoaches, totalEnterprises, avgReport, recentActivity] = await Promise.all([
       User.count({ where: { institution_id: institutionId, role: 'coach' } }),
       Enterprise.count({ where: { institution_id: institutionId } }),
+      DiagnosisReport.findOne({
+        include: [{
+          model: DiagnosisTemplate,
+          as: 'template',
+          where: { institution_id: institutionId },
+          attributes: []
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('health_percentage')), 'avgHealth']
+        ],
+        raw: true
+      }),
       Enterprise.findAll({
         where: { institution_id: institutionId },
         limit: 5,
@@ -50,7 +62,7 @@ class DashboardService {
       stats: {
         totalCoaches,
         totalEnterprises,
-        avgAssessmentScore: 0 // TODO: Implement when Phase 4 is done
+        avgAssessmentScore: avgReport ? parseFloat(avgReport.avgHealth || 0).toFixed(1) : 0
       },
       recentActivity
     };
@@ -60,8 +72,21 @@ class DashboardService {
    * Get aggregate stats for Coach
    */
   async getCoachStats(coachId) {
-    const [totalEnterprises, recentActivity] = await Promise.all([
+    const [totalEnterprises, totalSessions, avgReport, recentActivity] = await Promise.all([
       Enterprise.count({ where: { coach_id: coachId } }),
+      CoachingSession.count({ where: { coach_id: coachId } }),
+      DiagnosisReport.findOne({
+        include: [{
+          model: CoachingSession,
+          as: 'CoachingSession', // Matches model name as no "as" in index.js for this side
+          where: { coach_id: coachId },
+          attributes: []
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('health_percentage')), 'avgHealth']
+        ],
+        raw: true
+      }),
       Enterprise.findAll({
         where: { coach_id: coachId },
         limit: 5,
@@ -73,9 +98,9 @@ class DashboardService {
     return {
       stats: {
         totalEnterprises,
-        totalSessions: 0, 
-        pendingTasks: 0,
-        avgAssessmentScore: 0
+        totalSessions,
+        pendingTasks: 0, 
+        avgAssessmentScore: avgReport ? parseFloat(avgReport.avgHealth || 0).toFixed(1) : 0
       },
       recentActivity
     };
