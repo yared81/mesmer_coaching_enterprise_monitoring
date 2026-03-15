@@ -44,6 +44,17 @@ Enterprise.belongsTo(Institution, {
   as: 'institution'
 });
 
+// Enterprise <-> User (Account Link)
+User.hasOne(Enterprise, {
+  foreignKey: 'user_id',
+  as: 'enterpriseAccount'
+});
+
+Enterprise.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'userAccount'
+});
+
 // CoachingSession Associations
 Enterprise.hasMany(CoachingSession, {
   foreignKey: 'enterprise_id',

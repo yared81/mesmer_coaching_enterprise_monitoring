@@ -35,4 +35,9 @@ class EnterpriseRemoteDatasource {
     final response = await _dio.put('${ApiConstants.enterprises}/$id', data: data);
     return response.data['data'];
   }
+
+  Future<Map<String, dynamic>> getEnterpriseDashboardStats() async {
+    final response = await _dio.get(ApiConstants.enterpriseDashboardStats);
+    return response.data['data'];
+  }
 }

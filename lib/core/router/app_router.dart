@@ -28,6 +28,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/assessment_profile_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/assessment_profile_builder_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_dashboard_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -157,6 +158,7 @@ class _DashboardHome extends ConsumerWidget {
     final role = ref.watch(authProvider).user?.role;
     if (role == UserRole.admin) return AdminDashboardScreen();
     if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
+    if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
     return CoachDashboardScreen();
   }
 }

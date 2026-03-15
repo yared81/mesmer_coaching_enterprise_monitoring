@@ -1,9 +1,5 @@
-import 'package:dartz/dartz.dart';
-import '../../../../core/errors/failure.dart';
-import '../../domain/entities/enterprise_entity.dart';
-import '../../domain/repositories/enterprise_repository.dart';
-import '../datasources/enterprise_remote_datasource.dart';
-import '../models/enterprise_model.dart';
+import '../../domain/entities/enterprise_dashboard_stats.dart';
+import '../models/enterprise_dashboard_model.dart';
 
 class EnterpriseRepositoryImpl implements EnterpriseRepository {
   EnterpriseRepositoryImpl(this._remoteDatasource);
@@ -52,6 +48,16 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats() async {
+    try {
+      final map = await _remoteDatasource.getEnterpriseDashboardStats();
+      return Right(EnterpriseDashboardModel.fromJson(map));
+    } catch (e) {
+      return Left(Failure.fromException(e));
     }
   }
 }

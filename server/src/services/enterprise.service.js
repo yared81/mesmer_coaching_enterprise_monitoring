@@ -1,18 +1,40 @@
-const { Enterprise, User, Institution } = require('../models');
+const { Enterprise, User, Institution, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class EnterpriseService {
   /**
-   * Register a new enterprise
+   * Register a new enterprise and create a corresponding user account
    */
   async registerEnterprise(data, coachId, institutionId) {
-    const enterprise = await Enterprise.create({
-      ...data,
-      coach_id: coachId,
-      institution_id: institutionId
-    });
+    const transaction = await sequelize.transaction();
+    try {
+      // 1. Create the User account for the enterprise owner
+      const defaultPassword = 'Welcome123!';
+      const hashedPassword = await User.hashPassword(defaultPassword);
 
-    return enterprise;
+      const user = await User.create({
+        email: data.email,
+        name: data.owner_name,
+        password_hash: hashedPassword,
+        role: 'enterprise',
+        institution_id: institutionId,
+        is_active: true
+      }, { transaction });
+
+      // 2. Create the Enterprise and link to the user
+      const enterprise = await Enterprise.create({
+        ...data,
+        coach_id: coachId,
+        institution_id: institutionId,
+        user_id: user.id
+      }, { transaction });
+
+      await transaction.commit();
+      return enterprise;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   /**

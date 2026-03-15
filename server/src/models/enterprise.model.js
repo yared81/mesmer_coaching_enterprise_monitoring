@@ -71,6 +71,14 @@ const Enterprise = sequelize.define('Enterprise', {
       key: 'id'
     }
   },
+  user_id: {
+    type: DataTypes.UUID,
+    allowNull: true, // Optional initially, but will be filled on registration
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
   registered_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

@@ -90,3 +90,13 @@ final filteredEnterprisesProvider = Provider<AsyncValue<List<EnterpriseEntity>>>
     }).toList();
   });
 });
+
+// 6. Enterprise Dashboard Provider
+final enterpriseDashboardStatsProvider = FutureProvider<EnterpriseDashboardStats>((ref) async {
+  final repo = ref.watch(enterpriseRepositoryProvider);
+  final result = await repo.getEnterpriseDashboardStats();
+  return result.fold(
+    (failure) => throw failure.message,
+    (stats) => stats,
+  );
+});

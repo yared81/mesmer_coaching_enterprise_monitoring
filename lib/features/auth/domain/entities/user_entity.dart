@@ -6,7 +6,8 @@ import 'package:json_annotation/json_annotation.dart';
 enum UserRole {
   @JsonValue('admin') admin,
   @JsonValue('supervisor') supervisor,
-  @JsonValue('coach') coach
+  @JsonValue('coach') coach,
+  @JsonValue('enterprise') enterprise
 }
 
 class UserEntity {

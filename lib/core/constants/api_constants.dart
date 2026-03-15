@@ -25,7 +25,10 @@ abstract class ApiConstants {
   static const String adminStats = 'dashboard/admin';
   static const String supervisorStats = 'dashboard/supervisor';
   static const String coachStats = 'dashboard/coach';
-  static String coachStatsById(String id) => 'dashboard/coach/$id';
+  static String coachStatsById(String id) => '/dashboard/coach/$id';
+
+  // Enterprise Dashboard
+  static const String enterpriseDashboardStats = '/enterprise-dashboard/stats';
 
   // Session Endpoints
   static const String sessions = 'sessions';
