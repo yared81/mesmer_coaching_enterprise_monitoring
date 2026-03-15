@@ -5,6 +5,7 @@ import '../../../enterprise/presentation/providers/enterprise_provider.dart';
 import '../providers/coaching_provider.dart';
 import '../../domain/entities/coaching_session_entity.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 
 class AddSessionScreen extends ConsumerStatefulWidget {
   const AddSessionScreen({super.key});
@@ -17,6 +18,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   String? _selectedEnterpriseId;
+  String? _selectedTemplateId;
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -35,6 +37,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       id: '', // Backend generates UUID
       title: _titleController.text.trim(),
       enterpriseId: _selectedEnterpriseId!,
+      templateId: _selectedTemplateId,
       coachId: user.id,
       scheduledDate: _selectedDate,
       status: SessionStatus.scheduled, // Initially just scheduled/created
@@ -132,6 +135,29 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 ),
                 loading: () => const LinearProgressIndicator(),
                 error: (err, _) => Text('Error loading enterprises: $err'),
+              ),
+              const SizedBox(height: 24),
+
+              const Text('Assessment Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              ref.watch(allTemplatesProvider).when(
+                data: (list) => DropdownButtonFormField<String>(
+                  value: _selectedTemplateId,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                  ),
+                  hint: const Text('Select Assessment Tool'),
+                  items: list.map((t) => DropdownMenuItem(
+                    value: t.id,
+                    child: Text(t.title),
+                  )).toList(),
+                  onChanged: (val) => setState(() => _selectedTemplateId = val),
+                  validator: (val) => val == null ? 'Please select a profile' : null,
+                ),
+                loading: () => const LinearProgressIndicator(),
+                error: (err, _) => Text('Error loading profiles: $err'),
               ),
               const SizedBox(height: 24),
               

@@ -4,6 +4,8 @@ import '../models/diagnosis_template_model.dart';
 abstract class DiagnosisRemoteDataSource {
   Future<List<DiagnosisTemplateModel>> listTemplates();
   Future<DiagnosisTemplateModel> getLatestTemplate();
+
+  Future<DiagnosisTemplateModel> getTemplateById(String id);
   Future<Map<String, dynamic>?> getReportBySessionId(String sessionId);
   Future<DiagnosisTemplateModel> createTemplate(Map<String, dynamic> data);
   Future<DiagnosisTemplateModel> updateTemplate(String id, Map<String, dynamic> data);
@@ -28,6 +30,17 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
       return DiagnosisTemplateModel.fromJson(response.data['data']);
     } else {
       throw Exception(response.data['message'] ?? 'Failed to fetch latest template');
+    }
+  }
+
+  @override
+  Future<DiagnosisTemplateModel> getTemplateById(String id) async {
+    final response = await dio.get('diagnosis/templates/$id');
+    
+    if (response.data['success'] == true) {
+      return DiagnosisTemplateModel.fromJson(response.data['data']);
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to fetch template');
     }
   }
 

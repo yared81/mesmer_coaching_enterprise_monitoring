@@ -38,6 +38,15 @@ final latestDiagnosisTemplateProvider = FutureProvider<DiagnosisTemplateEntity>(
   );
 });
 
+final diagnosisTemplateByIdProvider = FutureProvider.family<DiagnosisTemplateEntity, String>((ref, id) async {
+  final repository = ref.watch(diagnosisRepositoryProvider);
+  final result = await repository.getTemplateById(id);
+  return result.fold(
+    (Failure failure) => throw failure.message,
+    (template) => template,
+  );
+});
+
 final existingDiagnosisReportProvider = FutureProvider.family<Map<String, dynamic>?, String>((ref, sessionId) async {
   final repository = ref.watch(diagnosisRepositoryProvider);
   final result = await repository.getReportBySessionId(sessionId);

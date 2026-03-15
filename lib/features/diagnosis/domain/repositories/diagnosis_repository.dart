@@ -9,6 +9,9 @@ abstract class DiagnosisRepository {
   /// Fetches the latest active diagnosis template for the institution
   Future<Either<Failure, DiagnosisTemplateEntity>> getLatestTemplate();
 
+  /// Fetches a specific diagnosis template by ID
+  Future<Either<Failure, DiagnosisTemplateEntity>> getTemplateById(String id);
+
   /// Creates a new template version
   Future<Either<Failure, DiagnosisTemplateEntity>> createTemplate(Map<String, dynamic> data);
 

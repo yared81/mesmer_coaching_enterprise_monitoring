@@ -47,6 +47,14 @@ const CoachingSession = sequelize.define('CoachingSession', {
   },
   notes: {
     type: DataTypes.TEXT
+  },
+  template_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'diagnosis_templates',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'coaching_sessions',

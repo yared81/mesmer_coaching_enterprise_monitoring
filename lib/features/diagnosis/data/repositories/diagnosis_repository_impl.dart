@@ -23,7 +23,17 @@ class DiagnosisRepositoryImpl implements DiagnosisRepository {
   Future<Either<Failure, DiagnosisTemplateEntity>> getLatestTemplate() async {
     try {
       final result = await remoteDataSource.getLatestTemplate();
-      return Right(result);
+      return Right(result.toEntity());
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, DiagnosisTemplateEntity>> getTemplateById(String id) async {
+    try {
+      final result = await remoteDataSource.getTemplateById(id);
+      return Right(result.toEntity());
     } catch (e) {
       return Left(Failure.fromException(e));
     }

@@ -64,6 +64,17 @@ CoachingSession.belongsTo(User, {
   as: 'coach'
 });
 
+// Link Session to Diagnosis Template
+CoachingSession.belongsTo(DiagnosisTemplate, {
+  foreignKey: 'template_id',
+  as: 'template'
+});
+
+DiagnosisTemplate.hasMany(CoachingSession, {
+  foreignKey: 'template_id',
+  as: 'sessions'
+});
+
 // Diagnosis Template Associations (1:N Hierarchy)
 Institution.hasMany(DiagnosisTemplate, { foreignKey: 'institution_id', as: 'diagnosisTemplates' });
 DiagnosisTemplate.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });

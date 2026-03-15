@@ -22,8 +22,15 @@ class AssessmentScreen extends ConsumerStatefulWidget {
 class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
   @override
   Widget build(BuildContext context) {
-    final templateAsync = ref.watch(latestDiagnosisTemplateProvider);
     final sessionAsync = ref.watch(coachingSessionProvider(widget.sessionId));
+    final session = sessionAsync.valueOrNull;
+    
+    final AsyncValue<DiagnosisTemplateEntity> templateAsync;
+    if (session?.templateId != null) {
+      templateAsync = ref.watch(diagnosisTemplateByIdProvider(session!.templateId!));
+    } else {
+      templateAsync = ref.watch(latestDiagnosisTemplateProvider);
+    }
     final existingReportAsync = ref.watch(existingDiagnosisReportProvider(widget.sessionId));
     final responseState = ref.watch(diagnosisStateProvider(widget.sessionId));
 
