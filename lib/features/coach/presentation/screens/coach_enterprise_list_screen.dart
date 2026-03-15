@@ -82,10 +82,10 @@ class _CoachEnterpriseListScreenState extends ConsumerState<CoachEnterpriseListS
         onSelected: (selected) {
           ref.read(coachEnterpriseSectorFilterProvider.notifier).state = selected ? sector : null;
         },
-        backgroundColor: Colors.white.withOpacity(0.1),
+        backgroundColor: Colors.white.withOpacity(0.85),
         selectedColor: Colors.white,
         labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF3D5AFE) : Colors.white.withOpacity(0.9),
+          color: isSelected ? const Color(0xFF3D5AFE) : Colors.black,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),

@@ -87,10 +87,10 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
                               label: Text(f),
                               selected: selected,
                               onSelected: (_) => setState(() => _activeFilter = f),
-                              backgroundColor: Colors.white.withOpacity(0.1),
+                              backgroundColor: Colors.white.withOpacity(0.85),
                               selectedColor: Colors.white,
                               labelStyle: TextStyle(
-                                color: selected ? const Color(0xFF3D5AFE) : Colors.white.withOpacity(0.9),
+                                color: selected ? const Color(0xFF3D5AFE) : Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
