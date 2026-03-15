@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/diagnosis_provider.dart';
-
+import '../../../../core/widgets/custom_toaster.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 
 class _CategoryDraft {
@@ -176,7 +176,11 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
 
   Future<void> _publishTemplate() async {
     if (_categories.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('At least one category is required.')));
+      CustomToaster.show(
+        context: context,
+        message: 'At least one category is required.',
+        isError: true,
+      );
       return;
     }
 
@@ -231,12 +235,19 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
       result.fold(
         (failure) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.message)));
+            CustomToaster.show(
+              context: context,
+              message: failure.message,
+              isError: true,
+            );
           }
         },
         (template) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Assessment Profile Published Successfully!')));
+            CustomToaster.show(
+              context: context,
+              message: 'Assessment Profile Published Successfully!',
+            );
             ref.refresh(allTemplatesProvider.future);
             context.pop();
           }
@@ -244,7 +255,11 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        CustomToaster.show(
+          context: context,
+          message: 'Error: $e',
+          isError: true,
+        );
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

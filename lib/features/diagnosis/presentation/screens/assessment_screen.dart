@@ -10,6 +10,7 @@ import '../providers/diagnosis_provider.dart';
 import '../../domain/entities/diagnosis_template_entity.dart';
 import '../widgets/question_card.dart';
 import 'diagnosis_summary_screen.dart';
+import '../../../../core/widgets/custom_toaster.dart';
 
 class AssessmentScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -308,11 +309,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
 
     if (!isComplete) {
       notifier.setShowErrors(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please mark the unfinished questions.'),
-          backgroundColor: AppColors.error,
-        ),
+      CustomToaster.show(
+        context: context,
+        message: 'Please mark the unfinished questions.',
+        isError: true,
       );
       return;
     }
@@ -331,16 +331,22 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         if (failure.message.contains('409') || failure.message.toLowerCase().contains('structure has significantly changed')) {
           _showConflictDialog();
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to submit: ${failure.message}'), backgroundColor: AppColors.error),
+          CustomToaster.show(
+            context: context,
+            message: 'Failed to submit: ${failure.message}',
+            isError: true,
           );
         }
       },
       (reportData) {
         final report = DiagnosisReportModel.fromJson(reportData);
         
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Diagnosis submitted successfully!'), backgroundColor: AppColors.success),
+        // Invalidate the cache so the Session Detail screen refetches the report
+        ref.invalidate(existingDiagnosisReportProvider(widget.sessionId));
+        
+        CustomToaster.show(
+          context: context,
+          message: 'Diagnosis submitted successfully!',
         );
         
         // Navigate to Summary Screen

@@ -5,6 +5,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dar
 import '../../domain/entities/coaching_session_entity.dart';
 import '../providers/coaching_provider.dart';
 import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
+import '../../../../core/widgets/custom_toaster.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
@@ -59,8 +60,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isFinalizing ? 'Session finalized successfully' : 'Draft saved successfully')),
+        CustomToaster.show(
+          context: context,
+          message: isFinalizing ? 'Session finalized successfully' : 'Notes saved successfully',
         );
         if (isFinalizing) {
           Navigator.pop(context);
@@ -222,21 +224,19 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                   onPressed: _isSaving ? null : () {
                     // Check diagnosis first
                     if (!hasDiagnosis) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Complete the diagnosis assessment first before finalizing.'),
-                          backgroundColor: Colors.orange,
-                        ),
+                      CustomToaster.show(
+                        context: context,
+                        message: 'Complete the diagnosis assessment first before finalizing.',
+                        isError: true,
                       );
                       return;
                     }
                     // Check session detail fields
                     if (_problemsController.text.isEmpty || _recommendationsController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill in Problems and Recommendations before finalizing.'),
-                          backgroundColor: Colors.orange,
-                        ),
+                      CustomToaster.show(
+                        context: context,
+                        message: 'Please fill in Problems and Recommendations before finalizing.',
+                        isError: true,
                       );
                       return;
                     }

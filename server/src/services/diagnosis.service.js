@@ -390,6 +390,7 @@ class DiagnosisService {
       for (const category of template.categories) {
         let catPointsSum = 0;
         let answeredCount = 0;
+        let normalizedScoreSum = 0; // Sum of percentages (0-1) for each question
 
         for (const question of category.questions) {
           const choiceId = finalResponses[question.id];
@@ -400,6 +401,11 @@ class DiagnosisService {
               answeredCount++;
               
               const maxChoicePoints = Math.max(0, ...question.choices.map(c => c.points));
+              
+              // Normalize the score for this question (0 to 1 scale)
+              const normalizedScore = maxChoicePoints > 0 ? (choice.points / maxChoicePoints) : 0;
+              normalizedScoreSum += normalizedScore;
+              
               if (choice.points <= 1 || (maxChoicePoints > 0 && choice.points < maxChoicePoints * 0.3)) {
                 primaryChallenges.push({
                   question_id: question.id,
@@ -414,7 +420,10 @@ class DiagnosisService {
           }
         }
 
-        const catAverage = answeredCount > 0 ? catPointsSum / answeredCount : 0;
+        // Calculate average normalized score (0 to 1) and scale to 5
+        const catAverageNormalized = answeredCount > 0 ? normalizedScoreSum / answeredCount : 0;
+        const catAverage = catAverageNormalized * 5;
+
         categoryScores[category.name] = {
           average_score: parseFloat(catAverage.toFixed(2)),
           sum_points: catPointsSum,
