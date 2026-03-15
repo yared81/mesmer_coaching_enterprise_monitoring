@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/domain/entities/coaching_session_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/providers/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/presentation/providers/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/providers/diagnosis_provider.dart';
 
 /// A lighter session creation sheet that pre-selects the enterprise.
 /// Designed to be shown as a modal bottom sheet from the EnterpriseDetailScreen.
@@ -20,6 +21,7 @@ class _AddSessionFromEnterpriseSheetState
     extends ConsumerState<AddSessionFromEnterpriseSheet> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
+  String? _selectedTemplateId;
   DateTime _selectedDate = DateTime.now();
   bool _isSubmitting = false;
 
@@ -51,6 +53,7 @@ class _AddSessionFromEnterpriseSheetState
       id: '',
       title: _titleController.text.trim(),
       enterpriseId: widget.enterpriseId,
+      templateId: _selectedTemplateId,
       coachId: user.id,
       scheduledDate: _selectedDate,
       status: SessionStatus.scheduled,
@@ -138,6 +141,34 @@ class _AddSessionFromEnterpriseSheetState
                   borderSide: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
+
+            // Assessment Profile Dropdown
+            const Text(
+              'Assessment Profile',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+            ),
+            const SizedBox(height: 8),
+            ref.watch(allTemplatesProvider).when(
+              data: (list) => DropdownButtonFormField<String>(
+                value: _selectedTemplateId,
+                decoration: InputDecoration(
+                  hintText: 'Select Assessment Tool',
+                  prefixIcon: const Icon(Icons.assessment_outlined, color: Color(0xFF3D5AFE)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+                items: list.map((t) => DropdownMenuItem(
+                  value: t.id,
+                  child: Text(t.title),
+                )).toList(),
+                onChanged: (val) => setState(() => _selectedTemplateId = val),
+                validator: (val) => val == null ? 'Please select a profile' : null,
+              ),
+              loading: () => const LinearProgressIndicator(),
+              error: (err, _) => Text('Error loading profiles: $err', style: const TextStyle(color: Colors.red)),
             ),
             const SizedBox(height: 16),
 
