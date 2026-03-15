@@ -218,7 +218,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             _buildOverviewTab(enterprise, ref),
             _buildTimelineTab(),
             _buildTasksTab(),
-            _buildDocumentsTab(),
+            _buildDocumentsTab(ref),
           ],
         ),
       ),
@@ -802,6 +802,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   // ─── TAB 3: Tasks & Recommendations ──────────────────────────────────────
 
   Widget _buildTasksTab() {
+    // Local copy for the builder scope if needed, or just use the member variable
     final completed = _tasks.where((t) => t.done).length;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -852,58 +853,66 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           const SizedBox(height: 20),
           const _SectionLabel('Recommendations'),
           const SizedBox(height: 12),
-          ...List.generate(_tasks.length, (i) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
-              ),
-              child: ListTile(
-                leading: GestureDetector(
-                  onTap: () => setState(() => _tasks[i].done = !_tasks[i].done),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: _tasks[i].done ? const Color(0xFF3D5AFE) : Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _tasks[i].done ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+          if (_tasks.isEmpty)
+             Center(
+               child: Padding(
+                 padding: const EdgeInsets.all(32.0),
+                 child: Text('No recommendations generated yet.', style: TextStyle(color: Colors.grey[400])),
+               ),
+             )
+          else
+            ...List.generate(_tasks.length, (i) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                ),
+                child: ListTile(
+                  leading: GestureDetector(
+                    onTap: () => setState(() => _tasks[i].done = !_tasks[i].done),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: _tasks[i].done ? const Color(0xFF3D5AFE) : Colors.transparent,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _tasks[i].done ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+                      ),
+                      child: _tasks[i].done
+                          ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+                          : null,
                     ),
-                    child: _tasks[i].done
-                        ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
-                        : null,
                   ),
-                ),
-                title: Text(
-                  _tasks[i].label,
-                  style: TextStyle(
-                    decoration: _tasks[i].done ? TextDecoration.lineThrough : null,
-                    color: _tasks[i].done ? Colors.grey : const Color(0xFF1A1A1A),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: (_tasks[i].done ? Colors.green : Colors.orange).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    _tasks[i].done ? 'Done' : 'Pending',
+                  title: Text(
+                    _tasks[i].label,
                     style: TextStyle(
-                      color: _tasks[i].done ? Colors.green[700] : Colors.orange[700],
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                      decoration: _tasks[i].done ? TextDecoration.lineThrough : null,
+                      color: _tasks[i].done ? Colors.grey : const Color(0xFF1A1A1A),
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: (_tasks[i].done ? Colors.green : Colors.orange).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _tasks[i].done ? 'Done' : 'Pending',
+                      style: TextStyle(
+                        color: _tasks[i].done ? Colors.green[700] : Colors.orange[700],
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
           const SizedBox(height: 48),
         ],
       ),
@@ -912,7 +921,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   // ─── TAB 4: Documents & Evidence ──────────────────────────────────────────
 
-  Widget _buildDocumentsTab() {
+  Widget _buildDocumentsTab(WidgetRef ref) {
+    // Correctly using ref passed from build
     final docsAsync = ref.watch(enterpriseDocumentsProvider(widget.enterpriseId));
     
     return docsAsync.when(
