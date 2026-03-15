@@ -1,3 +1,5 @@
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const { sequelize, DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, Institution } = require('../src/models');
 
 async function seedAssessment() {
@@ -17,9 +19,16 @@ async function seedAssessment() {
       // 1. Create or find the Template
       const [template] = await DiagnosisTemplate.findOrCreate({
         where: { title: 'Enterprise Assessment Form', institution_id: inst.id },
-        defaults: { description: 'Official Enterprise Assessment Tool (Mixed Format)' },
+        defaults: { 
+          description: 'Official Enterprise Assessment Tool (Mixed Format)',
+          is_active: true
+        },
         transaction
       });
+
+      // Ensure it is active even if it was found instead of created
+      template.is_active = true;
+      await template.save({ transaction });
 
       // 2. Clear existing structure (Clean start)
       const oldCats = await DiagnosisCategory.findAll({ where: { template_id: template.id }, transaction });
