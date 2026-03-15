@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';

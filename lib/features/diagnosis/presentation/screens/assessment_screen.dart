@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
@@ -60,110 +61,114 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                 ),
             ],
           ),
-          body: templateAsync.when(
-            data: (template) {
-              final progress = responseState.getProgress(template);
-              final isComplete = responseState.isComplete(template);
+          body: Stack(
+            children: [
+              templateAsync.when(
+                data: (template) {
+                  final progress = responseState.getProgress(template);
+                  final isComplete = responseState.isComplete(template);
 
-              return Stack(
-                children: [
-                  CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: _buildHeader(template, session, isReadOnly),
-                      ),
-                      ...template.categories.map((category) {
-                        return SliverMainAxisGroup(
-                          slivers: [
+                  return Stack(
+                    children: [
+                      CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: _buildHeader(template, session, isReadOnly),
+                          ),
+                          ...template.categories.map((category) {
+                            return SliverMainAxisGroup(
+                              slivers: [
+                                SliverToBoxAdapter(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    color: AppColors.background,
+                                    child: Text(
+                                      category.name.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primary,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      return QuestionCard(
+                                        sessionId: widget.sessionId,
+                                        question: category.questions[index],
+                                        readOnly: isReadOnly,
+                                      );
+                                    },
+                                    childCount: category.questions.length,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                          if (!isReadOnly)
                             SliverToBoxAdapter(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                color: AppColors.background,
-                                child: Text(
-                                  category.name.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                    letterSpacing: 1.2,
+                              child: Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: ElevatedButton(
+                                  onPressed: (isComplete && !responseState.isLoading) 
+                                    ? () => _submit(template.id) 
+                                    : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    disabledBackgroundColor: Colors.grey[300],
+                                  ),
+                                  child: Text(
+                                    isComplete ? 'Submit Diagnosis' : 'Complete all questions to submit',
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
                             ),
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  return QuestionCard(
-                                    sessionId: widget.sessionId,
-                                    question: category.questions[index],
-                                    readOnly: isReadOnly,
-                                  );
-                                },
-                                childCount: category.questions.length,
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-                      if (!isReadOnly)
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: ElevatedButton(
-                              onPressed: (isComplete && !responseState.isLoading) 
-                                ? () => _submit(template.id) 
-                                : null,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                disabledBackgroundColor: Colors.grey[300],
-                              ),
-                              child: Text(
-                                isComplete ? 'Submit Diagnosis' : 'Complete all questions to submit',
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                          const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                        ],
+                      ),
+                      // Progress HUD
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: _buildProgressHUD(progress),
+                      ),
                     ],
-                  ),
-                  // Progress HUD
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: _buildProgressHUD(progress),
-                  ),
-                ],
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => _buildErrorState(err),
-          ),
-          // Submitting Overlay
-          if (responseState.isLoading)
-            Container(
-              color: Colors.black26,
-              child: const Center(
-                child: Card(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Saving Diagnosis...', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ],
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => _buildErrorState(err),
+              ),
+              // Submitting Overlay
+              if (responseState.isLoading)
+                Container(
+                  color: Colors.black26,
+                  child: const Center(
+                    child: Card(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16),
+                            Text('Saving Diagnosis...', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
+            ],
+          ),
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
