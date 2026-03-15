@@ -5,8 +5,10 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dar
 import '../../domain/entities/coaching_session_entity.dart';
 import '../providers/coaching_provider.dart';
 import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
-import '../../../../core/widgets/custom_toaster.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../core/widgets/custom_toaster.dart';
+import '../../enterprise/presentation/providers/enterprise_document_provider.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -21,7 +23,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _problemsController;
   late TextEditingController _recommendationsController;
   late TextEditingController _notesController;
+  late TextEditingController _notesController;
   bool _isSaving = false;
+  bool _isUploading = false;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -81,6 +86,42 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             backgroundColor: Colors.red[700],
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+    
+    setState(() => _isUploading = true);
+    
+    try {
+      final repo = ref.read(enterpriseDocumentRepositoryProvider);
+      final result = await repo.uploadDocument(
+        enterpriseId: widget.session.enterpriseId,
+        sessionId: widget.session.id,
+        fileName: image.name,
+        fileUrl: image.path, // For hackathon, just using local path. Ideally send to S3
+        fileType: 'image/jpeg',
+      );
+      
+      if (mounted) {
+        setState(() => _isUploading = false);
+        result.fold(
+          (failure) => CustomToaster.show(context: context, message: failure.message, isError: true),
+          (success) {
+            CustomToaster.show(context: context, message: 'Attachment uploaded automatically');
+            // Refresh list
+            ref.invalidate(sessionDocumentsProvider(widget.session.id));
+            ref.invalidate(enterpriseDocumentsProvider(widget.session.enterpriseId));
+          }
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploading = false);
+        CustomToaster.show(context: context, message: 'Upload failed.', isError: true);
       }
     }
   }
@@ -162,7 +203,24 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             _buildNoteField('Recommendations', _recommendationsController, readOnly: isReadOnly),
             const SizedBox(height: 20),
             _buildNoteField('General Notes', _notesController, maxLines: 5, readOnly: isReadOnly),
+            const SizedBox(height: 24),
             
+            // Attachments Section
+            const Text('Attachments & Evidence', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 12),
+            if (!isReadOnly)
+              OutlinedButton.icon(
+                onPressed: _isUploading ? null : _pickAndUploadImage,
+                icon: _isUploading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.add_photo_alternate_outlined),
+                label: Text(_isUploading ? 'Uploading...' : 'Add Photo / Document'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            const SizedBox(height: 8),
+            _buildAttachmentsGallery(),
+
             const SizedBox(height: 32),
 
             // ─── ACTION BUTTONS ───
@@ -295,6 +353,35 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAttachmentsGallery() {
+    final docsAsync = ref.watch(sessionDocumentsProvider(widget.session.id));
+    return docsAsync.when(
+      data: (docs) {
+        if (docs.isEmpty) {
+          return const Text('No attachments yet.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic));
+        }
+        return Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: docs.map((d) => Chip(
+            avatar: const Icon(Icons.image, size: 16),
+            label: Text(d.fileName, maxLines: 1, overflow: TextOverflow.ellipsis),
+            onDeleted: widget.session.status == SessionStatus.completed 
+              ? null 
+              : () async {
+                final repo = ref.read(enterpriseDocumentRepositoryProvider);
+                await repo.deleteDocument(d.id);
+                ref.invalidate(sessionDocumentsProvider(widget.session.id));
+                ref.invalidate(enterpriseDocumentsProvider(widget.session.enterpriseId));
+              },
+          )).toList(),
+        );
+      },
+      loading: () => const LinearProgressIndicator(),
+      error: (e, st) => const Text('Could not load attachments', style: TextStyle(color: Colors.red)),
     );
   }
 }

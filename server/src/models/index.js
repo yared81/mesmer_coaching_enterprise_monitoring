@@ -3,6 +3,7 @@ const Institution = require('./institution.model');
 const User = require('./user.model');
 const Enterprise = require('./enterprise.model');
 const CoachingSession = require('./session.model');
+const EnterpriseDocument = require('./enterprise_document.model');
 const DiagnosisTemplate = require('./diagnosis_template.model');
 const DiagnosisCategory = require('./diagnosis_category.model');
 const DiagnosisQuestion = require('./diagnosis_question.model');
@@ -64,6 +65,16 @@ CoachingSession.belongsTo(User, {
   as: 'coach'
 });
 
+// Document Associations
+Enterprise.hasMany(EnterpriseDocument, { foreignKey: 'enterprise_id', as: 'documents' });
+EnterpriseDocument.belongsTo(Enterprise, { foreignKey: 'enterprise_id' });
+
+CoachingSession.hasMany(EnterpriseDocument, { foreignKey: 'session_id', as: 'attachments' });
+EnterpriseDocument.belongsTo(CoachingSession, { foreignKey: 'session_id' });
+
+User.hasMany(EnterpriseDocument, { foreignKey: 'uploader_id', as: 'uploadedFiles' });
+EnterpriseDocument.belongsTo(User, { foreignKey: 'uploader_id' });
+
 // Link Session to Diagnosis Template
 CoachingSession.belongsTo(DiagnosisTemplate, {
   foreignKey: 'template_id',
@@ -115,6 +126,7 @@ const db = {
   DiagnosisChoice,
   DiagnosisReport,
   DiagnosisResponse,
+  EnterpriseDocument,
   sequelize
 };
 

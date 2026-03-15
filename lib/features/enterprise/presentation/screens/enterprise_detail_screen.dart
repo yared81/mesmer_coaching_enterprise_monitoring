@@ -14,6 +14,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 import '../../../coaching/domain/entities/coaching_session_entity.dart';
+import '../../presentation/providers/enterprise_document_provider.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -33,7 +34,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -203,9 +204,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
               tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Sessions'),
-                Tab(text: 'Tasks'),
+                Tab(icon: Icon(Icons.explore_outlined), text: 'OVERVIEW'),
+                Tab(icon: Icon(Icons.history_outlined), text: 'SESSIONS'),
+                Tab(icon: Icon(Icons.checklist_rtl_outlined), text: 'TASKS'),
+                Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
               ],
             ),
           ),
@@ -216,6 +218,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             _buildOverviewTab(enterprise, ref),
             _buildTimelineTab(),
             _buildTasksTab(),
+            _buildDocumentsTab(),
           ],
         ),
       ),
@@ -252,22 +255,22 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               }
 
               final current = perf['current'];
-              final trends = (perf['trends'] as List?) ?? [];
-              final categoryMap = (current?['categoryScores'] as Map<String, dynamic>?) ?? {};
+              final trendData = (perf['trends'] as List?) ?? [];
+              final diagnosisData = (current?['categoryScores'] as Map<String, dynamic>?) != null
+                  ? {'category_scores': current?['categoryScores']}
+                  : null;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Bar Chart for Category Scores
-                  const _SectionLabel('Assessment Performance'),
-                  const SizedBox(height: 12),
-                  _buildBarChartCard(categoryMap),
-                  const SizedBox(height: 20),
-
-                  // Performance Trend Chart
-                  const _SectionLabel('Performance Trend'),
-                  const SizedBox(height: 12),
-                  _buildTrendChartCard(trends),
+                  // 1. Radar Chart
+                  if (diagnosisData != null) _buildRadarChartCard(diagnosisData),
+                  const SizedBox(height: 16),
+                  // 2. Improvement Progress Scorecard
+                  if (diagnosisData != null) _buildImprovementScorecard(diagnosisData),
+                  const SizedBox(height: 16),
+                  // 3. Trend Line Chart
+                  _buildTrendChartCard(trendData),
                 ],
               );
             },
@@ -424,6 +427,88 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               final abbr = _abbreviate(cleanName);
               return _LegendBadge(abbr, cleanName, score);
             }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRadarChartCard(Map<String, dynamic> diagnosisData) {
+    // Placeholder for Radar Chart
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: _cardDecor(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionLabel('Detailed Assessment Radar'),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(
+              'Radar chart for diagnosis data would go here.',
+              style: TextStyle(color: Colors.grey[500]),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImprovementScorecard(Map<String, dynamic> diagnosisData) {
+    if (diagnosisData['category_scores'] == null) return const SizedBox.shrink();
+    final categories = Map<String, dynamic>.from(diagnosisData['category_scores']);
+    
+    // Find the weakest categories (< 3.0) to generate impact metrics
+    int weakCategoriesCount = 0;
+    categories.forEach((name, data) {
+      if ((data['average_score'] as num) < 3.0) {
+        weakCategoriesCount++;
+      }
+    });
+
+    if (weakCategoriesCount == 0) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0FDF4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.green.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.auto_awesome, color: Colors.green, size: 20),
+              SizedBox(width: 8),
+              Text('Improvement Impact', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            '$weakCategoriesCount improvement tasks generated based on low scoring diagnostics.',
+            style: TextStyle(color: Colors.green[800], fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          // Mock progress until Tasks tab is built
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: const LinearProgressIndicator(
+                    value: 0.25, // Mock 25% complete
+                    backgroundColor: Colors.white,
+                    color: Colors.green,
+                    minHeight: 8,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text('25% Complete', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 12)),
+            ],
           ),
         ],
       ),
@@ -834,6 +919,88 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           const SizedBox(height: 48),
         ],
       ),
+    );
+  }
+
+  // ─── TAB 4: Documents & Evidence ──────────────────────────────────────────
+
+  Widget _buildDocumentsTab() {
+    final docsAsync = ref.watch(enterpriseDocumentsProvider(widget.enterpriseId));
+    
+    return docsAsync.when(
+      data: (docs) {
+        if (docs.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
+                const SizedBox(height: 16),
+                const Text('No documents uploaded', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+                const SizedBox(height: 8),
+                Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+              ],
+            ),
+          );
+        }
+        
+        return GridView.builder(
+          padding: const EdgeInsets.all(20),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 0.8,
+          ),
+          itemCount: docs.length,
+          itemBuilder: (context, i) {
+            final doc = docs[i];
+            return Container(
+              decoration: _cardDecor(),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          color: Colors.grey[100],
+                          child: const Icon(Icons.insert_drive_file, size: 48, color: Colors.grey),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(doc.fileName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 4),
+                            Text(doc.sessionTitle ?? 'General Upload', style: TextStyle(color: Colors.grey[600], fontSize: 10), maxLines: 1),
+                            const SizedBox(height: 4),
+                            Text(DateFormat('MMM dd, yyyy').format(doc.uploadedAt), style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: const Color(0xFF3D5AFE), borderRadius: BorderRadius.circular(4)),
+                      child: Text(doc.documentType.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, st) => Center(child: Text('Failed to load documents: $e', style: const TextStyle(color: Colors.red))),
     );
   }
 }

@@ -45,6 +45,7 @@ const startServer = async () => {
     app.use('/api/v1/coaches', require('./src/routes/coach.routes'));
     app.use('/api/v1/sessions', require('./src/routes/session.routes'));
     app.use('/api/v1/diagnosis', require('./src/routes/diagnosis.routes'));
+    app.use('/api/v1/documents', require('./src/routes/document.routes'));
 
     // Error Handler
     app.use((err, req, res, next) => {
