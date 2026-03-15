@@ -9,7 +9,7 @@ class EnterpriseService {
     const transaction = await sequelize.transaction();
     try {
       // 1. Create the User account for the enterprise owner
-      const defaultPassword = 'Welcome123!';
+      const defaultPassword = '123456';
       const hashedPassword = await User.hashPassword(defaultPassword);
 
       const user = await User.create({

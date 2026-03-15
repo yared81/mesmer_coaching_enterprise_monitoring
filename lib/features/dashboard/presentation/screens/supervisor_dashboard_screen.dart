@@ -210,15 +210,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                     icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
                     onPressed: () => _showNotificationsSheet(context),
                   ),
-                  GestureDetector(
-                    onTap: () => _showProfileMenu(context, ref),
-                    child: const CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.white24,
-                      child: Icon(Icons.person_outline_rounded, size: 20, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                 ],
               ),
 

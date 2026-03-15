@@ -16,11 +16,12 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
         title: const Text('Growth Hub'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_outline),
+            icon: const Icon(Icons.notifications_none_rounded),
             onPressed: () {
-              // Navigation to Profile will be added later
+              // Notifications logic
             },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: statsAsync.when(
