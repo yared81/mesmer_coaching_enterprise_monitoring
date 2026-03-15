@@ -12,11 +12,11 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
 
   factory DiagnosisTemplateModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisTemplateModel(
-      id: json['id'],
-      title: json['title'],
-      version: json['version'],
-      isActive: json['is_active'] ?? false,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      version: (json['version'] as num?)?.toInt() ?? 1,
+      isActive: json['is_active'] is bool ? json['is_active'] as bool : (json['is_active'] == true || json['is_active'] == 1),
+      updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
       categories: json['categories'] != null 
           ? (json['categories'] as List).map((c) => DiagnosisCategoryModel.fromJson(c)).toList()
           : [],
@@ -36,9 +36,9 @@ class DiagnosisCategoryModel extends DiagnosisCategoryEntity {
 
   factory DiagnosisCategoryModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisCategoryModel(
-      id: json['id'],
-      name: json['name'],
-      sortOrder: json['sort_order'],
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
       questions: json['questions'] != null
           ? (json['questions'] as List).map((q) => DiagnosisQuestionModel.fromJson(q)).toList()
           : [],
@@ -56,9 +56,9 @@ class DiagnosisQuestionModel extends DiagnosisQuestionEntity {
 
   factory DiagnosisQuestionModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisQuestionModel(
-      id: json['id'],
-      text: json['text'],
-      sortOrder: json['sort_order'],
+      id: json['id']?.toString() ?? '',
+      text: json['text']?.toString() ?? '',
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
       choices: json['choices'] != null
           ? (json['choices'] as List).map((c) => DiagnosisChoiceModel.fromJson(c)).toList()
           : [],
@@ -76,10 +76,10 @@ class DiagnosisChoiceModel extends DiagnosisChoiceEntity {
 
   factory DiagnosisChoiceModel.fromJson(Map<String, dynamic> json) {
     return DiagnosisChoiceModel(
-      id: json['id'],
-      text: json['text'],
-      points: json['points'],
-      sortOrder: json['sort_order'],
+      id: json['id']?.toString() ?? '',
+      text: json['text']?.toString() ?? '',
+      points: (json['points'] as num?)?.toInt() ?? 0,
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
   }
 }

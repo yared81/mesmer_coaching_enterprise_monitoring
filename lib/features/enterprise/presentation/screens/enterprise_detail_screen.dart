@@ -298,7 +298,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Complete an assessment in the Sessions tab to see performance charts.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[400], fontSize: 13),
