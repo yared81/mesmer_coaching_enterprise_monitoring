@@ -8,6 +8,7 @@ router.use(protect);
 
 // Template Routes
 router.get('/template/latest', diagnosisController.getLatestTemplate);
+router.get('/templates/:id', diagnosisController.getTemplateById);
 
 // Supervisor/Admin Only Routes
 router.get('/templates', authorize('supervisor', 'admin'), diagnosisController.listTemplates);

@@ -7,6 +7,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/domain/e
 import 'package:mesmer_coaching_enterprise_monitoring/features/coaching/presentation/providers/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/data/models/diagnosis_report_model.dart';
 import '../providers/diagnosis_provider.dart';
+import '../../domain/entities/diagnosis_template_entity.dart';
 import '../widgets/question_card.dart';
 import 'diagnosis_summary_screen.dart';
 

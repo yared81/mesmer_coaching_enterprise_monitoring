@@ -27,6 +27,31 @@ class DiagnosisController {
   };
 
   /**
+   * @route GET /api/v1/diagnosis/templates/:id
+   * @access Coach, Supervisor, Admin
+   */
+  getTemplateById = async (req, res, next) => {
+    try {
+      const institutionId = req.user.institution_id || req.user.institutionId;
+      const template = await diagnosisService.getTemplateById(req.params.id, institutionId);
+      
+      if (!template) {
+        return res.status(404).json({
+          success: false,
+          message: 'Template not found or unauthorized'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: template
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * @route GET /api/v1/diagnosis/templates
    * @access Supervisor, Admin
    */
