@@ -469,6 +469,44 @@ class DiagnosisService {
       ]
     });
   }
+
+  /**
+   * Get performance metrics for an enterprise over time
+   */
+  async getEnterprisePerformance(enterpriseId) {
+    const { CoachingSession, DiagnosisReport } = require('../models');
+
+    const reports = await DiagnosisReport.findAll({
+      include: [{
+        model: CoachingSession,
+        where: { enterprise_id: enterpriseId },
+        attributes: ['id', 'scheduled_date', 'title']
+      }],
+      order: [[CoachingSession, 'scheduled_date', 'ASC']]
+    });
+
+    if (reports.length === 0) return null;
+
+    // Latest result for the bar chart
+    const latestReport = reports[reports.length - 1];
+
+    // Trends for the line chart
+    const trends = reports.map(r => ({
+      date: r.CoachingSession.scheduled_date,
+      score: r.total_score,
+      sessionTitle: r.CoachingSession.title
+    }));
+
+    return {
+      current: {
+        totalScore: latestReport.total_score,
+        healthPercentage: latestReport.health_percentage,
+        categoryScores: latestReport.category_scores,
+        updatedAt: latestReport.updated_at
+      },
+      trends
+    };
+  }
 }
 
 module.exports = new DiagnosisService();

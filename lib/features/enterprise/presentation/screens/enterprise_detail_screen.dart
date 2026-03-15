@@ -211,7 +211,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         body: TabBarView(
           controller: _tabController,
           children: [
-            _buildOverviewTab(enterprise),
+            _buildOverviewTab(enterprise, ref),
             _buildTimelineTab(),
             _buildTasksTab(),
           ],
@@ -222,7 +222,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   // ─── TAB 1: Overview ──────────────────────────────────────────────────────
 
-  Widget _buildOverviewTab(EnterpriseEntity enterprise) {
+  Widget _buildOverviewTab(EnterpriseEntity enterprise, WidgetRef ref) {
+    final performanceAsync = ref.watch(enterprisePerformanceProvider(enterprise.id));
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -240,147 +242,219 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             ],
           ),
           const SizedBox(height: 20),
-          // Bar Chart for Category Scores (Premium Design)
-          const _SectionLabel('Assessment Performance'),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-            decoration: _cardDecor(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Core Areas (Out of 10.0)',
-                  style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
-                ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  height: 220,
-                  child: BarChart(
-                    BarChartData(
-                      alignment: BarChartAlignment.spaceAround,
-                      maxY: 10,
-                      minY: 0,
-                      barTouchData: BarTouchData(
-                        enabled: true,
-                        touchTooltipData: BarTouchTooltipData(
-                          tooltipPadding: const EdgeInsets.all(8),
-                          tooltipMargin: 8,
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            return BarTooltipItem(
-                              rod.toY.toStringAsFixed(1),
-                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            );
-                          },
-                        ),
-                      ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 32,
-                            getTitlesWidget: (value, meta) {
-                              const titles = ['FIN', 'MKT', 'OPS', 'HR', 'STR'];
-                              final index = value.toInt();
-                              if (index < 0 || index >= titles.length) return const SizedBox.shrink();
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  titles[index],
-                                  style: const TextStyle(color: Color(0xFF616161), fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                              );
-                            },
+
+          performanceAsync.when(
+            data: (perf) {
+              if (perf == null) {
+                return _buildEmptyPerformanceState();
+              }
+
+              final current = perf['current'];
+              final trends = (perf['trends'] as List);
+              final categoryMap = (current['categoryScores'] as Map<String, dynamic>);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Bar Chart for Category Scores
+                  const _SectionLabel('Assessment Performance'),
+                  const SizedBox(height: 12),
+                  _buildBarChartCard(categoryMap),
+                  const SizedBox(height: 20),
+
+                  // Performance Trend Chart
+                  const _SectionLabel('Performance Trend'),
+                  const SizedBox(height: 12),
+                  _buildTrendChartCard(trends),
+                ],
+              );
+            },
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (err, _) => Center(child: Text('Error loading performance: $err')),
+          ),
+          const SizedBox(height: 48),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyPerformanceState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      width: double.infinity,
+      decoration: _cardDecor(),
+      child: Column(
+        children: [
+          Icon(Icons.analytics_outlined, size: 48, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          const Text(
+            'No Assessment Data',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Complete an assessment in the Sessions tab to see performance charts.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBarChartCard(Map<String, dynamic> categoryMap) {
+    final List<String> catNames = categoryMap.keys.toList();
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: _cardDecor(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Core Areas (Out of 5.0)',
+            style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 220,
+            child: BarChart(
+              BarChartData(
+                alignment: BarChartAlignment.spaceAround,
+                maxY: 5,
+                minY: 0,
+                barTouchData: BarTouchData(enabled: true),
+                titlesData: FlTitlesData(
+                  show: true,
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 32,
+                      getTitlesWidget: (value, meta) {
+                        final index = value.toInt();
+                        if (index < 0 || index >= catNames.length) return const SizedBox.shrink();
+                        final name = catNames[index];
+                        final shortName = name.length > 3 ? name.substring(0, 3).toUpperCase() : name.toUpperCase();
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            shortName,
+                            style: const TextStyle(color: Color(0xFF616161), fontSize: 10, fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: 1,
-                            reservedSize: 28,
-                            getTitlesWidget: (value, meta) {
-                              if (value == 0) return const SizedBox.shrink();
-                              return Text(
-                                value.toInt().toString(),
-                                style: TextStyle(color: Colors.grey[400], fontSize: 11),
-                              );
-                            },
-                          ),
-                        ),
-                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      ),
-                      gridData: FlGridData(
-                        show: true,
-                        drawVerticalLine: false,
-                        horizontalInterval: 1,
-                        getDrawingHorizontalLine: (value) {
-                          return FlLine(color: Colors.grey[200]!, strokeWidth: 1);
-                        },
-                      ),
-                      borderData: FlBorderData(show: false),
-                      barGroups: [
-                        _makeBarData(0, 3.2),
-                        _makeBarData(1, 2.8),
-                        _makeBarData(2, 3.8),
-                        _makeBarData(3, 2.4),
-                        _makeBarData(4, 3.0),
-                      ],
+                        );
+                      },
                     ),
                   ),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 28,
+                      getTitlesWidget: (value, meta) => Text(
+                        value.toInt().toString(),
+                        style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                      ),
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: [
-                    _LegendBadge('FIN', 'Finance', 3.2),
-                    _LegendBadge('MKT', 'Marketing', 2.8),
-                    _LegendBadge('OPS', 'Operations', 3.8),
-                    _LegendBadge('HR', 'Human Res.', 2.4),
-                    _LegendBadge('STR', 'Strategy', 3.0),
-                  ],
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 1,
+                  getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey[100]!, strokeWidth: 1),
                 ),
-              ],
+                borderData: FlBorderData(show: false),
+                barGroups: List.generate(catNames.length, (i) {
+                  final score = (categoryMap[catNames[i]]['average_score'] as num).toDouble();
+                  return _makeBarData(i, score);
+                }),
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-          // Individual trend chart
-          const _SectionLabel('Performance Trend'),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(20),
-            height: 180,
-            decoration: _cardDecor(),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: List.generate(catNames.length, (i) {
+              final name = catNames[i];
+              final score = (categoryMap[name]['average_score'] as num).toDouble();
+              final shortName = name.length > 3 ? name.substring(0, 3).toUpperCase() : name.toUpperCase();
+              return _LegendBadge(shortName, name, score);
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrendChartCard(List<dynamic> trends) {
+    if (trends.isEmpty) return const SizedBox.shrink();
+
+    final List<FlSpot> spots = List.generate(trends.length, (i) {
+      final score = (trends[i]['score'] as num).toDouble();
+      return FlSpot(i.toDouble(), score);
+    });
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: _cardDecor(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Overall Health Progress (Max 5.0)',
+            style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 160,
             child: LineChart(
               LineChartData(
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
+                maxY: 5.5,
+                minY: 0,
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 24,
                       getTitlesWidget: (v, m) {
-                        const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
                         final i = v.toInt();
-                        if (i < 0 || i >= months.length) return const SizedBox.shrink();
-                        return SideTitleWidget(meta: m, child: Text(months[i], style: const TextStyle(fontSize: 10, color: Colors.grey)));
+                        if (i < 0 || i >= trends.length) return const SizedBox.shrink();
+                        final date = DateTime.parse(trends[i]['date']);
+                        return SideTitleWidget(
+                          meta: m,
+                          child: Text(DateFormat('MMM dd').format(date), style: const TextStyle(fontSize: 9, color: Colors.grey)),
+                        );
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 20,
+                      getTitlesWidget: (v, m) => Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    ),
+                  ),
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: const [FlSpot(0, 25), FlSpot(1, 30), FlSpot(2, 28), FlSpot(3, 35), FlSpot(4, 40), FlSpot(5, 45)],
+                    spots: spots,
                     isCurved: true,
                     gradient: LinearGradient(colors: [_healthColor.withOpacity(0.5), _healthColor]),
                     barWidth: 3,
-                    dotData: const FlDotData(show: false),
+                    dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
@@ -394,10 +468,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               ),
             ),
           ),
-          const SizedBox(height: 48),
         ],
       ),
     );
+  }
   }
 
   // ─── TAB 2: Sessions Timeline ──────────────────────────────────────────────
@@ -778,9 +852,16 @@ BarChartGroupData _makeBarData(int x, double y) {
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
         ),
+        toY: y,
+        width: 18,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF3D5AFE), Color(0xFF536DFE)],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        ),
         backDrawRodData: BackgroundBarChartRodData(
           show: true,
-          toY: 10,
+          toY: 5,
           color: Colors.grey[100],
         ),
       ),

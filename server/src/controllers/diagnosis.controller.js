@@ -137,8 +137,9 @@ class DiagnosisController {
   };
 
   /**
-   * @route GET /api/v1/diagnosis/reports/session/:sessionId
-   * @access Coach, Supervisor, Admin
+   * @router.post('/reports', diagnosisController.submitReport);
+router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
+router.get('/enterprise/:enterpriseId/performance', diagnosisController.getEnterprisePerformance);
    */
   getReportBySession = async (req, res, next) => {
     try {
@@ -148,6 +149,24 @@ class DiagnosisController {
       res.status(200).json({
         success: true,
         data: report
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * @route GET /api/v1/diagnosis/enterprise/:enterpriseId/performance
+   * @access Coach, Supervisor, Admin
+   */
+  getEnterprisePerformance = async (req, res, next) => {
+    try {
+      const { enterpriseId } = req.params;
+      const performance = await diagnosisService.getEnterprisePerformance(enterpriseId);
+      
+      res.status(200).json({
+        success: true,
+        data: performance
       });
     } catch (error) {
       next(error);

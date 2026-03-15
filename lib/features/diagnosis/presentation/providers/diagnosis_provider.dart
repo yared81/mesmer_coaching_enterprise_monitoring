@@ -56,6 +56,15 @@ final existingDiagnosisReportProvider = FutureProvider.family<Map<String, dynami
   );
 });
 
+final enterprisePerformanceProvider = FutureProvider.family<Map<String, dynamic>?, String>((ref, enterpriseId) async {
+  final repository = ref.watch(diagnosisRepositoryProvider);
+  final result = await repository.getEnterprisePerformance(enterpriseId);
+  return result.fold(
+    (Failure failure) => throw failure.message,
+    (data) => data,
+  );
+});
+
 /// State Management for the active Diagnosis session
 class DiagnosisResponseState {
   final Map<String, String> responses; // questionId -> choiceId

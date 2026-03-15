@@ -30,4 +30,7 @@ abstract class DiagnosisRepository {
     String templateId,
     Map<String, String> responses, // questionId -> choiceId
   );
+
+  /// Fetches performance data for an enterprise
+  Future<Either<Failure, Map<String, dynamic>?>> getEnterprisePerformance(String enterpriseId);
 }

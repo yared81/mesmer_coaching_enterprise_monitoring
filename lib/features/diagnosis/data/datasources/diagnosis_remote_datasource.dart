@@ -15,6 +15,7 @@ abstract class DiagnosisRemoteDataSource {
     Map<String, String> responses,
   );
   Future<void> deleteTemplate(String id);
+  Future<Map<String, dynamic>?> getEnterprisePerformance(String enterpriseId);
 }
 
 class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
@@ -113,6 +114,19 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
     final response = await dio.delete('diagnosis/templates/$id');
     if (response.data['success'] != true) {
       throw Exception(response.data['message'] ?? 'Failed to delete template');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getEnterprisePerformance(String enterpriseId) async {
+    try {
+      final response = await dio.get('diagnosis/enterprise/$enterpriseId/performance');
+      if (response.data['success'] == true) {
+        return response.data['data'];
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 }
