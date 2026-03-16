@@ -1,21 +1,50 @@
 # 1. Clone & Enter
-git clone <repo-url> && cd mesmer_coaching_enterprise_monitoring
+git clone <repo-url>
+cd mesmer_coaching_enterprise_monitoring
 
 # 2. Database Creation (PostgreSQL)
-#   a. sudo -i -u postgres psql
-#   b. CREATE DATABASE mesmer_db;
-#   c. CREATE USER mesmer_user WITH PASSWORD 'your_pass';
-#   d. GRANT ALL PRIVILEGES ON DATABASE mesmer_db TO mesmer_user;
+
+**Linux / macOS:**
+```bash
+sudo -i -u postgres psql
+CREATE DATABASE mesmer_db;
+CREATE USER mesmer_user WITH PASSWORD 'your_pass';
+GRANT ALL PRIVILEGES ON DATABASE mesmer_db TO mesmer_user;
+```
+
+**Windows (via psql or pgAdmin):**
+Open `psql` shell (or pgAdmin) and run:
+```sql
+CREATE DATABASE mesmer_db;
+CREATE USER mesmer_user WITH PASSWORD 'your_pass';
+GRANT ALL PRIVILEGES ON DATABASE mesmer_db TO mesmer_user;
+```
 
 # 3. Schema Initialization
+```bash
 psql -h localhost -U mesmer_user -d mesmer_db -f docs/setup.sql
+```
+*(Windows users may need to specify the full path to `psql.exe` if not in PATH)*
 
 # 4. Flutter Setup
+```bash
 flutter pub get
-cp .env.example .env
-# Edit .env: set API_BASE_URL and DB credentials
+```
 
-# 4. Run
+**Linux / macOS:**
+```bash
+cp .env.example .env
+```
+
+**Windows (PowerShell):**
+```powershell
+Copy-Item .env.example .env
+```
+
+*Edit `.env`: set API_BASE_URL and DB credentials*
+
+# 5. Run the Application
+```bash
 flutter run --dart-define-from-file=.env
 ```
 
