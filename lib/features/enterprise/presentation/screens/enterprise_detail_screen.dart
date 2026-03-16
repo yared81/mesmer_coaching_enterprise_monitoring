@@ -231,10 +231,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   Widget _buildOverviewTab(EnterpriseEntity enterprise, WidgetRef ref) {
     final performanceAsync = ref.watch(enterprisePerformanceProvider(enterprise.id));
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(enterprisePerformanceProvider(enterprise.id));
+        ref.invalidate(enterpriseSessionsProvider(enterprise.id));
+        await ref.read(enterprisePerformanceProvider(enterprise.id).future);
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator in SingleChildScrollView
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Business Info Card
           _InfoCard(
@@ -267,10 +274,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 );
               }
 
-              final current = perf['current'];
+              final current = perf['current'] as Map<String, dynamic>?;
+              final categoryScores = (current?['categoryScores'] ?? current?['category_scores']) as Map<String, dynamic>?;
               final trendData = (perf['trends'] as List?) ?? [];
-              final diagnosisData = (current?['categoryScores'] as Map<String, dynamic>?) != null
-                  ? {'category_scores': current?['categoryScores']}
+              final diagnosisData = categoryScores != null
+                  ? {'category_scores': categoryScores}
                   : null;
 
               return Column(
@@ -302,8 +310,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           const SizedBox(height: 48),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildEmptyPerformanceState({String? message}) {
     return Container(
@@ -369,10 +378,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final cleanName = _cleanCategoryName(catNames[group.x]);
+                      final name = catNames[group.x];
+                      final cleanName = _cleanCategoryName(name);
+                      final score = rod.toY.toStringAsFixed(1);
                       return BarTooltipItem(
-                        '$cleanName\n${rod.toY.toStringAsFixed(1)} / 5.0',
-                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                        '${cleanName.toUpperCase()}\n$score / 5.0',
+                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
                       );
                     },
                   ),
@@ -382,17 +393,20 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
+                      reservedSize: 60, // Increased for rotated labels
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
                         if (index < 0 || index >= catNames.length) return const SizedBox.shrink();
                         final cleanName = _cleanCategoryName(catNames[index]);
-                        final abbr = _abbreviate(cleanName);
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                        // Show first 8 chars or abbr
+                        final label = cleanName.length > 10 ? _abbreviate(cleanName) : cleanName;
+                        return SideTitleWidget(
+                          meta: meta,
+                          space: 12,
+                          angle: -0.6, // More rotation for clarity
                           child: Text(
-                            abbr,
-                            style: const TextStyle(color: Color(0xFF616161), fontSize: 10, fontWeight: FontWeight.bold),
+                            label.toUpperCase(),
+                            style: const TextStyle(color: Color(0xFF616161), fontSize: 9, fontWeight: FontWeight.bold),
                           ),
                         );
                       },
@@ -405,9 +419,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       reservedSize: 28,
                       getTitlesWidget: (value, meta) {
                         if (value > 5 || value < 0) return const SizedBox.shrink();
-                        return Text(
-                          value.toInt().toString(),
-                          style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            value.toInt().toString(),
+                            style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                          ),
                         );
                       },
                     ),
@@ -516,15 +533,14 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     final firstDate = parsedDates.reduce((a, b) => a.isBefore(b) ? a : b);
 
     final List<FlSpot> spots = List.generate(trends.length, (i) {
-      final dayOffset = parsedDates[i].difference(firstDate).inDays.toDouble();
+      // Use hours to avoid everything being on "Day 0" if dates are close
+      final hourOffset = parsedDates[i].difference(firstDate).inHours.toDouble();
       final score = NumUtils.toDouble(trends[i]?['score']);
-      return FlSpot(dayOffset, score);
+      return FlSpot(hourOffset, score);
     });
 
-    // Compute the max X for chart bounds
     final maxX = spots.map((s) => s.x).reduce((a, b) => a > b ? a : b);
-    // Use at least 1 day range to avoid zero-width
-    final xRange = maxX > 0 ? maxX : 1.0;
+    final xRange = maxX > 0 ? maxX : 24.0; // At least 24 hours range
 
     // Deduplicate X-axis date labels
     final Set<String> shownDates = {};
@@ -572,15 +588,16 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       showTitles: true,
                       reservedSize: 24,
                       getTitlesWidget: (v, m) {
-                        // Find nearest spot to this X value
-                        final matchIdx = spots.indexWhere((s) => s.x == v);
+                        // Find nearest spot to this X value with a small margin for double precision
+                        final matchIdx = spots.indexWhere((s) => (s.x - v).abs() < 0.5);
                         if (matchIdx < 0) return const SizedBox.shrink();
                         final label = DateFormat('MMM dd').format(parsedDates[matchIdx]);
                         if (shownDates.contains(label)) return const SizedBox.shrink();
                         shownDates.add(label);
                         return SideTitleWidget(
                           meta: m,
-                          child: Text(label, style: const TextStyle(fontSize: 9, color: Colors.grey)),
+                          space: 4,
+                          child: Text(label, style: const TextStyle(fontSize: 9, color: Colors.grey, fontWeight: FontWeight.bold)),
                         );
                       },
                     ),
@@ -592,7 +609,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       reservedSize: 20,
                       getTitlesWidget: (v, m) {
                         if (v < 0 || v > 5) return const SizedBox.shrink();
-                        return Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey));
+                        return SideTitleWidget(
+                          meta: m,
+                          child: Text(v.toInt().toString(), style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                        );
                       },
                     ),
                   ),
@@ -1105,19 +1125,16 @@ class _InfoRow extends StatelessWidget {
 BarChartGroupData _makeBarData(int x, double y) {
   return BarChartGroupData(
     x: x,
+    showingTooltipIndicators: [0], // Show values on top
     barRods: [
       BarChartRodData(
         toY: y,
-        width: 18,
+        width: 22,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
         gradient: const LinearGradient(
           colors: [Color(0xFF3D5AFE), Color(0xFF536DFE)],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
-        ),
-        backDrawRodData: BackgroundBarChartRodData(
-          show: true,
-          toY: 5,
-          color: Colors.grey[100],
         ),
       ),
     ],

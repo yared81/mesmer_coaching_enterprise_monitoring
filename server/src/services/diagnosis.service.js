@@ -547,10 +547,10 @@ class DiagnosisService {
 
     return {
       current: {
-        totalScore: latestReport.total_score,
-        healthPercentage: latestReport.health_percentage,
-        categoryScores: latestReport.category_scores,
-        updatedAt: latestReport.updated_at
+        totalScore: latestReport.totalScore || latestReport.total_score,
+        healthPercentage: latestReport.healthPercentage || latestReport.health_percentage,
+        categoryScores: latestReport.categoryScores || latestReport.category_scores,
+        updatedAt: latestReport.updatedAt || latestReport.updated_at
       },
       trends
     };
