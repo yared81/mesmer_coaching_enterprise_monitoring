@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+console.log('--- DATABASE CONFIG LOADED ---');
 require('dotenv').config();
 
 const sequelize = new Sequelize(
@@ -30,6 +31,23 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL Connected via Sequelize');
     
+    // Fix for enum conflict: cast error between session_status and enum_coaching_sessions_status
+    try {
+      const [statusCols] = await sequelize.query(`SELECT udt_name FROM information_schema.columns WHERE table_name = 'coaching_sessions' AND column_name = 'status'`);
+      if (statusCols.length > 0 && statusCols[0].udt_name !== 'enum_coaching_sessions_status') {
+        await sequelize.query('ALTER TABLE coaching_sessions ALTER COLUMN status DROP DEFAULT');
+        await sequelize.query('ALTER TABLE coaching_sessions RENAME COLUMN status TO status_old');
+      }
+
+      const [typeCols] = await sequelize.query(`SELECT udt_name FROM information_schema.columns WHERE table_name = 'coaching_sessions' AND column_name = 'session_type'`);
+      if (typeCols.length > 0 && typeCols[0].udt_name !== 'enum_coaching_sessions_session_type') {
+        await sequelize.query('ALTER TABLE coaching_sessions ALTER COLUMN session_type DROP DEFAULT');
+        await sequelize.query('ALTER TABLE coaching_sessions RENAME COLUMN session_type TO session_type_old');
+      }
+    } catch (e) {
+      // Quietly handle migration info
+    }
+
     // Sync models (Safe sync with alter to handle new columns)
     await sequelize.sync({ alter: true });
     console.log('🔄 Database Schema Synchronized (Alter Mode)');
