@@ -37,6 +37,8 @@ class EnterpriseController {
         filters.coach_id = userId;
       } else if (role === 'supervisor') {
         filters.institution_id = institutionId;
+      } else if (role === 'enterprise') {
+        filters.user_id = userId;
       }
       // Admins see everything (no filter added)
 

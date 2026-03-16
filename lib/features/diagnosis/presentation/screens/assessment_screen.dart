@@ -116,8 +116,10 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                                 SliverList(
                                   delegate: SliverChildBuilderDelegate(
                                     (context, index) {
+                                      final questionNumber = index + 1;
                                       return QuestionCard(
                                         sessionId: widget.sessionId,
+                                        questionNumber: questionNumber,
                                         question: category.questions[index],
                                         readOnly: isReadOnly,
                                       );

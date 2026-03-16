@@ -110,10 +110,10 @@ class CoachDashboardScreen extends ConsumerWidget {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _QuickActionCard(
-                                  title: 'New Task',
-                                  icon: Icons.playlist_add_rounded,
-                                  color: const Color(0xFF00B09B),
-                                  onTap: () {},
+                                  title: 'Open Chat',
+                                  icon: Icons.chat_bubble_outline_rounded,
+                                  color: const Color(0xFF0EA5E9),
+                                  onTap: () => context.go(AppRoutes.chat),
                                 ),
                               ),
                             ],
@@ -178,6 +178,10 @@ class CoachDashboardScreen extends ConsumerWidget {
         IconButton(
           icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
           onPressed: () => _showNotificationsSheet(context, ref),
+        ),
+        IconButton(
+          icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white),
+          onPressed: () => context.go(AppRoutes.chat),
         ),
         const SizedBox(width: 8),
       ],

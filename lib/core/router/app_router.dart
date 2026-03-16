@@ -29,6 +29,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/present
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/presentation/screens/assessment_profile_builder_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/diagnosis/domain/entities/diagnosis_template_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/presentation/screens/chat_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/enterprise/presentation/screens/enterprise_profile_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -143,6 +145,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               final template = state.extra as DiagnosisTemplateEntity?;
               return AssessmentProfileBuilderScreen(existingProfile: template);
             },
+          ),
+          GoRoute(
+            path: AppRoutes.chat,
+            builder: (context, state) => const ChatScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.enterpriseProfile,
+            builder: (context, state) => const EnterpriseProfileScreen(),
           ),
         ],
       ),

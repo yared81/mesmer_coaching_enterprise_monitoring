@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import '../providers/enterprise_provider.dart';
 import '../../domain/entities/enterprise_dashboard_stats.dart';
 
@@ -21,6 +23,12 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
               // Notifications logic
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+            onPressed: () {
+              context.go(AppRoutes.chat);
+            },
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -32,7 +40,7 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(stats),
+              _buildHeader(context, stats),
               const SizedBox(height: 24),
               _buildRadarChart(stats),
               const SizedBox(height: 24),
@@ -46,13 +54,29 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(EnterpriseDashboardStats stats) {
+  Widget _buildHeader(BuildContext context, EnterpriseDashboardStats stats) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Welcome, ${stats.businessName}',
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                'Welcome, ${stats.businessName}',
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 12),
+            OutlinedButton.icon(
+              onPressed: () {
+                context.go(AppRoutes.enterpriseProfile);
+              },
+              icon: const Icon(Icons.account_circle_outlined, size: 18),
+              label: const Text('Profile'),
+            ),
+          ],
         ),
         Text(
           '${stats.sector} Sector • Growth Journey',

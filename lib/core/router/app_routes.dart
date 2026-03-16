@@ -33,6 +33,9 @@ abstract class AppRoutes {
 
   // Progress
   static const String progressDashboard = '/enterprises/:id/progress';
+  
+  // Enterprise self (enterprise role)
+  static const String enterpriseProfile = '/enterprise/profile';
 
   // Reports
   static const String supervisorReports = '/reports';
@@ -41,5 +44,6 @@ abstract class AppRoutes {
   // Templates
   static const String templateList = '/supervisor/templates';
   static const String templateBuilder = '/supervisor/templates/build';
+  static const String chat = '/chat';
 }
 

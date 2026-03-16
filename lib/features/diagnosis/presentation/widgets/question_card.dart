@@ -6,12 +6,14 @@ import '../providers/diagnosis_provider.dart';
 
 class QuestionCard extends ConsumerWidget {
   final String sessionId;
+  final int questionNumber;
   final DiagnosisQuestionEntity question;
   final bool readOnly;
 
   const QuestionCard({
     super.key,
     required this.sessionId,
+    required this.questionNumber,
     required this.question,
     this.readOnly = false,
   });
@@ -38,7 +40,7 @@ class QuestionCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              question.text,
+              '$questionNumber. ${question.text}',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,

@@ -3,6 +3,7 @@ import '../../domain/entities/enterprise_dashboard_stats.dart';
 
 class EnterpriseDashboardModel extends EnterpriseDashboardStats {
   EnterpriseDashboardModel({
+    required super.enterpriseId,
     required super.businessName,
     required super.sector,
     required super.radarScores,
@@ -18,6 +19,7 @@ class EnterpriseDashboardModel extends EnterpriseDashboardStats {
         .toList();
 
     return EnterpriseDashboardModel(
+      enterpriseId: enterprise['id'] ?? '',
       businessName: enterprise['businessName'] ?? '',
       sector: enterprise['sector'] ?? '',
       radarScores: scores,

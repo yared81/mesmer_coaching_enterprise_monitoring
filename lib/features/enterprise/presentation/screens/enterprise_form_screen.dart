@@ -29,7 +29,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _employeeCountController = TextEditingController();
   final TextEditingController _businessAgeController = TextEditingController();
-  final TextEditingController _baselineScoreController = TextEditingController();
   
   Sector _selectedSector = Sector.other;
   OwnerGender _selectedGender = OwnerGender.male;
@@ -45,7 +44,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
     _emailController.dispose();
     _employeeCountController.dispose();
     _businessAgeController.dispose();
-    _baselineScoreController.dispose();
     super.dispose();
   }
 
@@ -83,11 +81,10 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       'employee_count': int.tryParse(_employeeCountController.text) ?? 0,
       'location': _locationController.text,
       'phone': _phoneController.text,
-      'email': _emailController.text.isEmpty ? null : _emailController.text,
+      'email': _emailController.text.trim(),
       'business_age': int.tryParse(_businessAgeController.text) ?? 0,
       'owner_gender': _selectedGender.name,
       'premise_type': _selectedPremiseType.name,
-      'baseline_score': double.tryParse(_baselineScoreController.text) ?? 0.0,
     };
 
     final result = await ref.read(registerEnterpriseUseCaseProvider)(data);
@@ -190,7 +187,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           AppTextField(
             controller: _nameController,
             label: 'Business Name',
-            hint: 'e.g. Blue Nile Manufacturing',
             prefixIcon: const Icon(Icons.business),
             validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
           ),
@@ -200,8 +196,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
               Expanded(
                 child: AppTextField(
                   controller: _businessAgeController,
-                  label: 'Business Age (Years)',
-                  hint: 'e.g. 5',
+                  label: 'Established / Working years',
                   keyboardType: TextInputType.number,
                   prefixIcon: const Icon(Icons.calendar_today),
                 ),
@@ -211,7 +206,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
                 child: AppTextField(
                   controller: _employeeCountController,
                   label: 'Employee Count',
-                  hint: 'e.g. 10',
                   keyboardType: TextInputType.number,
                   prefixIcon: const Icon(Icons.people),
                 ),
@@ -263,13 +257,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          AppTextField(
-            controller: _baselineScoreController,
-            label: 'Baseline Score (0-5)',
-            hint: 'e.g. 3.5',
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            prefixIcon: const Icon(Icons.assessment),
-          ),
+          // Baseline score is not required for now (we derive health from submitted assessments)
         ],
       ),
     );
@@ -286,7 +274,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           AppTextField(
             controller: _ownerController,
             label: 'Owner Name',
-            hint: 'Full name',
             prefixIcon: const Icon(Icons.person),
             validator: (v) => v == null || v.isEmpty ? 'Owner name is required' : null,
           ),
@@ -308,7 +295,6 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           AppTextField(
             controller: _phoneController,
             label: 'Phone Number',
-            hint: '+251...',
             keyboardType: TextInputType.phone,
             prefixIcon: const Icon(Icons.phone),
             validator: (v) => v == null || v.isEmpty ? 'Phone is required' : null,
@@ -317,17 +303,21 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           AppTextField(
             controller: _locationController,
             label: 'Location',
-            hint: 'City, Region',
             prefixIcon: const Icon(Icons.location_on),
             validator: (v) => v == null || v.isEmpty ? 'Location is required' : null,
           ),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
             controller: _emailController,
-            label: 'Email (Optional)',
-            hint: 'email@example.com',
+            label: 'Email',
             keyboardType: TextInputType.emailAddress,
             prefixIcon: const Icon(Icons.email),
+            validator: (v) {
+              final value = v?.trim() ?? '';
+              if (value.isEmpty) return 'Email is required';
+              if (!value.contains('@')) return 'Enter a valid email';
+              return null;
+            },
           ),
         ],
       ),

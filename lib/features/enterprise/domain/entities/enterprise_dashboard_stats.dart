@@ -15,6 +15,7 @@ class RadarScore {
 }
 
 class EnterpriseDashboardStats {
+  final String enterpriseId;
   final String businessName;
   final String sector;
   final List<RadarScore> radarScores;
@@ -23,6 +24,7 @@ class EnterpriseDashboardStats {
   final String? lastSessionDate;
 
   EnterpriseDashboardStats({
+    required this.enterpriseId,
     required this.businessName,
     required this.sector,
     required this.radarScores,

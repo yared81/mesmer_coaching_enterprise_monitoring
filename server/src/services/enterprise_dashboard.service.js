@@ -20,7 +20,7 @@ class EnterpriseDashboardService {
       include: [
         {
           model: CoachingSession,
-          as: 'coachingSession',
+          as: 'session',
           where: { enterprise_id: enterprise.id },
           required: true
         }
@@ -67,7 +67,7 @@ class EnterpriseDashboardService {
         enterprise_id: enterprise.id,
         status: 'completed'
       },
-      order: [['session_date', 'DESC']]
+      order: [['scheduled_date', 'DESC']]
     });
 
     // 4. Counts
@@ -84,7 +84,7 @@ class EnterpriseDashboardService {
       radarScores: scores,
       latestRecommendation: latestSession ? latestSession.recommendations : 'No recommendations yet.',
       totalSessions: sessionCount,
-      lastSessionDate: latestSession ? latestSession.session_date : null
+      lastSessionDate: latestSession ? latestSession.scheduled_date : null
     };
   }
 }

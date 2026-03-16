@@ -46,6 +46,7 @@ class EnterpriseService {
       sector, 
       institution_id, 
       coach_id, 
+      user_id,
       page = 1, 
       limit = 10 
     } = filters;
@@ -78,6 +79,10 @@ class EnterpriseService {
 
     if (coach_id) {
       query.where.coach_id = coach_id;
+    }
+    
+    if (user_id) {
+      query.where.user_id = user_id;
     }
 
     const { count, rows } = await Enterprise.findAndCountAll(query);

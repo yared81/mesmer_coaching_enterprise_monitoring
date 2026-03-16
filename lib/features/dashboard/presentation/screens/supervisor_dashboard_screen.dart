@@ -225,6 +225,10 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                     icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
                     onPressed: () => _showNotificationsSheet(context, ref),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white),
+                    onPressed: () => context.go(AppRoutes.chat),
+                  ),
                   const SizedBox(width: 8),
                 ],
               ),
@@ -340,6 +344,15 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: _QuickActionButton(
+                              icon: Icons.chat_bubble_outline_rounded,
+                              label: 'Open Chat',
+                              color: const Color(0xFF0EA5E9),
+                              onTap: () => context.go(AppRoutes.chat),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _QuickActionButton(
                               icon: Icons.bar_chart_rounded,
                               label: 'Reports',
                               color: const Color(0xFF3D5AFE),
@@ -353,15 +366,6 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                               label: 'All Coaches',
                               color: const Color(0xFF00B09B),
                               onTap: () => context.go('/coaches'),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _QuickActionButton(
-                              icon: Icons.assignment_rounded,
-                              label: 'Profiles',
-                              color: const Color(0xFFE91E63), // Pink accent for Templates
-                              onTap: () => context.go(AppRoutes.templateList),
                             ),
                           ),
                         ],

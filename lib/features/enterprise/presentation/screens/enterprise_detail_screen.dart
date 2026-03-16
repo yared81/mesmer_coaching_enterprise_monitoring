@@ -16,6 +16,8 @@ import '../../../diagnosis/presentation/providers/diagnosis_provider.dart';
 import '../../../coaching/domain/entities/coaching_session_entity.dart';
 import '../../presentation/providers/enterprise_document_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/coach/presentation/providers/coach_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -44,21 +46,16 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     super.dispose();
   }
 
-  // Placeholder business health score (0–100)
-  int get _healthScore {
-    // Derive from the enterprise id hash for now
-    return 45 + (widget.enterpriseId.codeUnits.fold(0, (a, b) => a + b) % 50);
-  }
-
-  Color get _healthColor {
-    if (_healthScore >= 70) return Colors.green;
-    if (_healthScore >= 50) return Colors.orange;
+  // Health helpers now derived from real diagnosis data when available
+  Color _healthColorForPercentage(double percentage) {
+    if (percentage >= 80) return Colors.green;
+    if (percentage >= 50) return Colors.orange;
     return Colors.red;
   }
 
-  String get _healthLabel {
-    if (_healthScore >= 70) return 'Healthy';
-    if (_healthScore >= 50) return 'Moderate';
+  String _healthLabelForPercentage(double percentage) {
+    if (percentage >= 80) return 'Healthy';
+    if (percentage >= 50) return 'Moderate';
     return 'Critical';
   }
 
@@ -91,6 +88,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   }
 
   Widget _buildBody(BuildContext context, EnterpriseEntity enterprise) {
+    // We read performance here so the header can reflect the latest diagnosis health
+    final performanceAsync = ref.watch(enterprisePerformanceProvider(enterprise.id));
+    final currentUser = ref.watch(authProvider).user;
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       body: NestedScrollView(
@@ -107,7 +107,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) {
                   if (value == 'edit') {
-                    // Logic for edit
+                    if (currentUser?.role == UserRole.enterprise) {
+                      _showEnterpriseEditSheet(enterprise);
+                    }
+                  } else if (value == 'reassign') {
+                    _showReassignCoachSheet(context, ref, enterprise);
                   } else if (value == 'delete') {
                     // Logic for delete
                   }
@@ -117,10 +121,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     value: 'edit',
                     child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
                   ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
-                  ),
+                  if (currentUser?.role == UserRole.supervisor)
+                    const PopupMenuItem(
+                      value: 'reassign',
+                      child: Row(children: [Icon(Icons.swap_horiz_rounded, size: 18), SizedBox(width: 8), Text('Reassign')]),
+                    ),
+                  // Remove delete for coach; keep for admin only (if needed)
+                  if (currentUser?.role == UserRole.admin)
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
+                    ),
                 ],
               ),
             ],
@@ -169,25 +180,77 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 6,
-                          children: [
-                            _HealthBadge(score: _healthScore, label: _healthLabel),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(20),
+                        performanceAsync.when(
+                          data: (perf) {
+                            final current = perf?['current'] as Map<String, dynamic>?;
+                            final healthPctRaw = current?['healthPercentage'] ?? current?['health_percentage'];
+                            final healthPct = NumUtils.toDouble(healthPctRaw);
+
+                            if (healthPct <= 0) {
+                              return Wrap(
+                                spacing: 8,
+                                runSpacing: 6,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Text(
+                                      'No assessment yet',
+                                      style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  _EmployeesChip(enterprise: enterprise),
+                                ],
+                              );
+                            }
+
+                            final color = _healthColorForPercentage(healthPct);
+                            final label = _healthLabelForPercentage(healthPct);
+                            return Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                _HealthBadge(score: healthPct.toInt(), label: label, color: color),
+                                _EmployeesChip(enterprise: enterprise),
+                              ],
+                            );
+                          },
+                          loading: () => Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              Container(
+                                width: 80,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
                               ),
-                              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                                const Icon(Icons.people_outline, size: 13, color: Colors.white70),
-                                const SizedBox(width: 4),
-                                Text('${enterprise.employeeCount} employees',
-                                    style: const TextStyle(color: Colors.white, fontSize: 12)),
-                              ]),
-                            ),
-                          ],
+                              _EmployeesChip(enterprise: enterprise),
+                            ],
+                          ),
+                          error: (_, __) => Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  'Health unavailable',
+                                  style: TextStyle(color: Colors.white, fontSize: 12),
+                                ),
+                              ),
+                              _EmployeesChip(enterprise: enterprise),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -295,7 +358,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   const SizedBox(height: 16),
                   
                   // 3. Trend Line Chart
-                  _buildTrendChartCard(trendData),
+                  _buildTrendChartCard(trendData, current?['healthPercentage'] ?? current?['health_percentage']),
                 ],
               );
             },
@@ -356,6 +419,25 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   Widget _buildBarChartCard(Map<String, dynamic> categoryMap) {
     final List<String> catNames = categoryMap.keys.toList();
 
+    // Helper to extract the score regardless of which key is used
+    double _catScore(dynamic catData) {
+      if (catData == null) return 0.0;
+      final m = catData as Map<String, dynamic>;
+      // Try 'score' first (from DiagnosisReport.category_scores), then 'average_score'
+      final raw = m['score'] ?? m['average_score'] ?? 0;
+      return NumUtils.toDouble(raw).clamp(0.0, 5.0);
+    }
+
+    if (catNames.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(32),
+        decoration: _cardDecor(),
+        child: const Center(
+          child: Text('No category data available', style: TextStyle(color: Colors.grey)),
+        ),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       decoration: _cardDecor(),
@@ -363,7 +445,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Core Areas (Out of 5.0)',
+            'Assessment Performance — Score per Category (Max 5.0)',
             style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
@@ -374,20 +456,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 alignment: BarChartAlignment.spaceAround,
                 maxY: 5,
                 minY: 0,
-                barTouchData: BarTouchData(
-                  enabled: true,
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final name = catNames[group.x];
-                      final cleanName = _cleanCategoryName(name);
-                      final score = rod.toY.toStringAsFixed(1);
-                      return BarTooltipItem(
-                        '${cleanName.toUpperCase()}\n$score / 5.0',
-                        const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
-                      );
-                    },
-                  ),
-                ),
+                // Disable value bubbles / tooltips on top of bars for a cleaner view
+                barTouchData: BarTouchData(enabled: false),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
@@ -398,8 +468,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         final index = value.toInt();
                         if (index < 0 || index >= catNames.length) return const SizedBox.shrink();
                         final cleanName = _cleanCategoryName(catNames[index]);
-                        // Show first 8 chars or abbr
-                        final label = cleanName.length > 10 ? _abbreviate(cleanName) : cleanName;
+                        // Prefer short abbreviation on the axis to avoid overlap; full name is shown below
+                        final label = _abbreviate(cleanName);
                         return SideTitleWidget(
                           meta: meta,
                           space: 12,
@@ -441,23 +511,74 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(catNames.length, (i) {
                   final catData = categoryMap[catNames[i]];
-                  final score = NumUtils.toDouble(catData?['average_score']);
-                  return _makeBarData(i, score);
+                  final catMap = catData is Map<String, dynamic> ? catData : <String, dynamic>{};
+                  // Use 'score' key (DiagnosisReport format) or fallback to 'average_score'
+                  final score = NumUtils.toDouble(catMap['score'] ?? catMap['average_score']).clamp(0.0, 5.0);
+                  // Use same color logic as the legend below for visual consistency
+                  final Color barColor = score >= 4.0
+                      ? const Color(0xFF22C55E)
+                      : score >= 2.5
+                          ? const Color(0xFF3D5AFE)
+                          : const Color(0xFFEF4444);
+                  return _makeBarData(i, score, barColor);
                 }),
               ),
             ),
           ),
+          // ── Legend: full category name + score ──────────────
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          const Text(
+            'Category Breakdown',
+            style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 10),
+          Column(
             children: List.generate(catNames.length, (i) {
               final name = catNames[i];
               final cleanName = _cleanCategoryName(name);
               final catData = categoryMap[name];
-              final score = NumUtils.toDouble(catData?['average_score']);
-              final abbr = _abbreviate(cleanName);
-              return _LegendBadge(abbr, cleanName, score);
+              final catMap = catData is Map<String, dynamic> ? catData : <String, dynamic>{};
+              final score = NumUtils.toDouble(catMap['score'] ?? catMap['average_score']).clamp(0.0, 5.0);
+              final pct = score / 5.0;
+              final Color barColor = score >= 4.0
+                  ? const Color(0xFF22C55E)
+                  : score >= 2.5
+                      ? const Color(0xFF3D5AFE)
+                      : const Color(0xFFEF4444);
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            cleanName,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          '${score.toStringAsFixed(1)} / 5.0',
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: barColor),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: pct,
+                        minHeight: 6,
+                        backgroundColor: Colors.grey[100],
+                        color: barColor,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }),
           ),
         ],
@@ -525,22 +646,32 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
-  Widget _buildTrendChartCard(List<dynamic> trends) {
+  Widget _buildTrendChartCard(List<dynamic> trends, dynamic latestHealthPercentageRaw) {
     if (trends.isEmpty) return const SizedBox.shrink();
 
-    // Parse all dates and compute day-offset from earliest
+    // Parse all dates and compute hour-offset from earliest session
     final parsedDates = trends.map((t) => DateTime.parse(t['date'].toString())).toList();
     final firstDate = parsedDates.reduce((a, b) => a.isBefore(b) ? a : b);
 
     final List<FlSpot> spots = List.generate(trends.length, (i) {
-      // Use hours to avoid everything being on "Day 0" if dates are close
+      // Use hours to avoid everything being collapsed to Day 0 when sessions are close
       final hourOffset = parsedDates[i].difference(firstDate).inHours.toDouble();
       final score = NumUtils.toDouble(trends[i]?['score']);
       return FlSpot(hourOffset, score);
     });
 
     final maxX = spots.map((s) => s.x).reduce((a, b) => a > b ? a : b);
-    final xRange = maxX > 0 ? maxX : 24.0; // At least 24 hours range
+    final xRange = maxX > 0 ? maxX : 24.0;
+
+    // Compute improvement delta on 0–5 score scale
+    final firstScore = spots.first.y;
+    final lastScore = spots.last.y;
+    final delta = lastScore - firstScore;
+    final improved = delta >= 0;
+
+    // Use latest health percentage, if provided, to color the trend line
+    final latestHealthPct = NumUtils.toDouble(latestHealthPercentageRaw);
+    final baseColor = latestHealthPct > 0 ? _healthColorForPercentage(latestHealthPct) : (improved ? Colors.green : Colors.red);
 
     // Deduplicate X-axis date labels
     final Set<String> shownDates = {};
@@ -551,11 +682,35 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Overall Health Progress (Max 5.0)',
-            style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Health Score Trend',
+                style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: (improved ? Colors.green : Colors.red).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '${improved ? '▲' : '▼'} ${delta.abs().toStringAsFixed(1)} pts over ${trends.length} sessions',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: baseColor,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 4),
+          Text(
+            'Each dot = one completed session diagnosis (Max score: 5.0)',
+            style: TextStyle(color: Colors.grey[400], fontSize: 11),
+          ),
           SizedBox(
             height: 160,
             child: LineChart(
@@ -623,13 +778,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    gradient: LinearGradient(colors: [_healthColor.withOpacity(0.5), _healthColor]),
+                    gradient: LinearGradient(colors: [baseColor.withOpacity(0.5), baseColor]),
                     barWidth: 3,
                     dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
                       gradient: LinearGradient(
-                        colors: [_healthColor.withOpacity(0.2), Colors.transparent],
+                        colors: [baseColor.withOpacity(0.2), Colors.transparent],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -849,7 +1004,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         value: _tasks.isEmpty ? 0.0 : completed / _tasks.length,
                         strokeWidth: 6,
                         backgroundColor: Colors.grey[200],
-                        valueColor: AlwaysStoppedAnimation(_healthColor),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF3D5AFE)),
                       ),
                       Center(
                         child: Text(
@@ -976,8 +1131,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               decoration: _cardDecor(),
               child: ListTile(
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Opening ${doc.fileName}... (Download started)')),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => _EnterpriseDocumentViewerScreen(doc: doc),
+                    ),
                   );
                 },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -1028,6 +1185,154 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       },
     );
   }
+
+  void _showEnterpriseEditSheet(EnterpriseEntity enterprise) {
+    final nameController = TextEditingController(text: enterprise.businessName);
+    final ownerController = TextEditingController(text: enterprise.ownerName);
+    final phoneController = TextEditingController(text: enterprise.phone);
+    final locationController = TextEditingController(text: enterprise.location);
+    final employeeController = TextEditingController(text: enterprise.employeeCount.toString());
+    final yearsController = TextEditingController(text: (enterprise.businessAge ?? 0).toString());
+    Sector selectedSector = enterprise.sector;
+
+    final formKey = GlobalKey<FormState>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text('Edit Business Profile', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Business Name'),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: ownerController,
+                  decoration: const InputDecoration(labelText: 'Owner Name'),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 12),
+
+                DropdownButtonFormField<Sector>(
+                  value: selectedSector,
+                  decoration: const InputDecoration(labelText: 'Sector'),
+                  items: Sector.values
+                      .map((s) => DropdownMenuItem(
+                            value: s,
+                            child: Text(s.name[0].toUpperCase() + s.name.substring(1)),
+                          ))
+                      .toList(),
+                  onChanged: (v) => selectedSector = v ?? selectedSector,
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: employeeController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Employee Count'),
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: yearsController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Established / Working years'),
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(labelText: 'Phone'),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 12),
+
+                TextFormField(
+                  controller: locationController,
+                  decoration: const InputDecoration(labelText: 'Location'),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 18),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: () async {
+                      if (!formKey.currentState!.validate()) return;
+                      final data = <String, dynamic>{
+                        'business_name': nameController.text.trim(),
+                        'owner_name': ownerController.text.trim(),
+                        'sector': selectedSector.name,
+                        'employee_count': int.tryParse(employeeController.text.trim()) ?? enterprise.employeeCount,
+                        'business_age': int.tryParse(yearsController.text.trim()) ?? (enterprise.businessAge ?? 0),
+                        'phone': phoneController.text.trim(),
+                        'location': locationController.text.trim(),
+                      };
+                      final result = await ref.read(updateEnterpriseUseCaseProvider)(enterprise.id, data);
+                      if (!mounted) return;
+                      result.fold(
+                        (failure) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+                          );
+                        },
+                        (_) {
+                          ref.invalidate(enterpriseListProvider);
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Profile updated'), backgroundColor: Colors.green),
+                          );
+                        },
+                      );
+                    },
+                    child: const Text('Save changes', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      nameController.dispose();
+      ownerController.dispose();
+      phoneController.dispose();
+      locationController.dispose();
+      employeeController.dispose();
+      yearsController.dispose();
+    });
+  }
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1036,6 +1341,135 @@ class _Task {
   final String label;
   bool done;
   _Task(this.label, this.done);
+}
+
+class _EmployeesChip extends StatelessWidget {
+  final EnterpriseEntity enterprise;
+  const _EmployeesChip({required this.enterprise});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.people_outline, size: 13, color: Colors.white70),
+          const SizedBox(width: 4),
+          Text(
+            '${enterprise.employeeCount} employees',
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEntity enterprise) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) {
+      final coachesAsync = ref.watch(coachListProvider);
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(height: 12),
+              const Text('Reassign Enterprise', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              Text(
+                enterprise.businessName,
+                style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 12),
+              coachesAsync.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: CircularProgressIndicator(),
+                ),
+                error: (e, _) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Text('Failed to load coaches: $e', style: const TextStyle(color: Colors.red)),
+                ),
+                data: (coaches) {
+                  if (coaches.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Text('No coaches available', style: TextStyle(color: Colors.grey)),
+                    );
+                  }
+                  return Flexible(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: coaches.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (context, i) {
+                        final c = coaches[i];
+                        final isCurrent = c.id == enterprise.coachId;
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFF3D5AFE).withOpacity(0.12),
+                            child: Text(
+                              (c.name.isNotEmpty ? c.name[0] : 'C').toUpperCase(),
+                              style: const TextStyle(color: Color(0xFF3D5AFE), fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          title: Text(c.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          subtitle: Text(c.email, style: const TextStyle(fontSize: 12)),
+                          trailing: isCurrent
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Text('Current', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                )
+                              : const Icon(Icons.chevron_right_rounded),
+                          onTap: isCurrent
+                              ? null
+                              : () async {
+                                  final ok = await ref.read(enterpriseListProvider.notifier).assignEnterprise(enterprise.id, c.id);
+                                  if (context.mounted) {
+                                    Navigator.pop(ctx);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(ok ? 'Reassigned to ${c.name}' : 'Reassign failed'),
+                                        backgroundColor: ok ? Colors.green : Colors.red,
+                                      ),
+                                    );
+                                  }
+                                },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
 
 BoxDecoration _cardDecor() => BoxDecoration(
@@ -1047,18 +1481,27 @@ BoxDecoration _cardDecor() => BoxDecoration(
 class _HealthBadge extends StatelessWidget {
   final int score;
   final String label;
-  const _HealthBadge({required this.score, required this.label});
+  final Color? color;
+  const _HealthBadge({required this.score, required this.label, this.color});
 
   @override
   Widget build(BuildContext context) {
+    final effectiveColor = color ?? Colors.white;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.25),
+        color: effectiveColor.withOpacity(0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.4)),
+        border: Border.all(color: effectiveColor.withOpacity(0.5)),
       ),
-      child: Text('$score% · $label', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+      child: Text(
+        '$score% · $label',
+        style: TextStyle(
+          color: effectiveColor,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
     );
   }
 }
@@ -1122,17 +1565,18 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-BarChartGroupData _makeBarData(int x, double y) {
+BarChartGroupData _makeBarData(int x, double y, Color barColor) {
   return BarChartGroupData(
     x: x,
-    showingTooltipIndicators: [0], // Show values on top
+    // No always-on value labels (scores are shown in the breakdown list below)
+    showingTooltipIndicators: const [],
     barRods: [
       BarChartRodData(
         toY: y,
         width: 22,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF3D5AFE), Color(0xFF536DFE)],
+        gradient: LinearGradient(
+          colors: [barColor.withOpacity(0.7), barColor],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
         ),
@@ -1169,6 +1613,81 @@ class _LegendBadge extends StatelessWidget {
           const SizedBox(width: 4),
           Text(score.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
         ],
+      ),
+    );
+  }
+}
+
+class _EnterpriseDocumentViewerScreen extends StatelessWidget {
+  final dynamic doc;
+  const _EnterpriseDocumentViewerScreen({required this.doc});
+
+  String _resolveUrl(String fileUrl) {
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) return fileUrl;
+    // ApiConstants.baseUrl is like http://host:3000/api/v1/; strip the api path.
+    final base = ApiConstants.baseUrl.replaceFirst(RegExp(r'/api/v\\d+/?$'), '');
+    if (fileUrl.startsWith('/')) return '$base$fileUrl';
+    return '$base/$fileUrl';
+  }
+
+  bool _isImage(String url) {
+    final u = url.toLowerCase();
+    return u.endsWith('.png') || u.endsWith('.jpg') || u.endsWith('.jpeg') || u.endsWith('.webp') || u.endsWith('.gif');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final url = _resolveUrl(doc.fileUrl as String);
+    final isImage = _isImage(url);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(doc.fileName as String, overflow: TextOverflow.ellipsis),
+        backgroundColor: const Color(0xFF3D5AFE),
+        foregroundColor: Colors.white,
+      ),
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: isImage
+            ? InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4,
+                child: Center(
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('Could not load image preview.', style: TextStyle(color: Colors.white70)),
+                    ),
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return const Center(child: CircularProgressIndicator(color: Colors.white));
+                    },
+                  ),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Preview not available for this file type.',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text('File URL:', style: TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 6),
+                    SelectableText(url, style: const TextStyle(color: Colors.white)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Copy the link and open it in a browser.',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }

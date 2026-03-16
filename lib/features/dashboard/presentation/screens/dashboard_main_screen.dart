@@ -30,36 +30,30 @@ class DashboardMainScreen extends ConsumerWidget {
     final userRole = authState.user?.role;
     final location = GoRouterState.of(context).matchedLocation;
     
-    // Determine current index based on location
+    // Determine current index based on location and role
     int currentIndex = 0;
-    if (location.startsWith('/enterprises')) {
-      currentIndex = 1;
-    } else if (location.startsWith('/coaches')) {
-      currentIndex = 1;
-    } else if (location.startsWith('/sessions')) {
-      currentIndex = 2;
-    } else if (location.startsWith('/reports') || location.contains('reports')) {
-      currentIndex = 3;
-    } else if (location.startsWith('/settings')) {
-      currentIndex = (userRole == UserRole.supervisor) ? 4 : 4; // Settings is always last
-    }
-
+    
     if (userRole == UserRole.coach) {
-       if (location.startsWith('/enterprises')) currentIndex = 1;
-       else if (location.startsWith('/sessions')) currentIndex = 2;
-       else if (location.contains('reports')) currentIndex = 3;
-       else if (location.startsWith('/settings')) currentIndex = 4;
-       else currentIndex = 0;
+      if (location.startsWith('/enterprises')) currentIndex = 1;
+      else if (location.startsWith('/sessions')) currentIndex = 2;
+      else if (location.startsWith('/chat')) currentIndex = 0; // Chat is now accessed from Home
+      else if (location.contains('reports')) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.supervisor) {
-       if (location.startsWith('/coaches')) currentIndex = 1;
-       else if (location.startsWith('/enterprises')) currentIndex = 2;
-       else if (location.startsWith('/reports')) currentIndex = 3;
-       else if (location.startsWith('/settings')) currentIndex = 4;
-       else currentIndex = 0;
+      if (location.startsWith('/coaches')) currentIndex = 1;
+      else if (location.startsWith('/enterprises')) currentIndex = 2;
+      else if (location.startsWith('/chat')) currentIndex = 0; // Chat opened from home quick action
+      else if (location.startsWith('/reports')) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
+    } else if (userRole == UserRole.enterprise) {
+      if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
+      else if (location.startsWith('/chat')) currentIndex = 0; // Chat opened from home header
+      else if (location.startsWith('/settings')) currentIndex = 2;
+    } else {
+      if (location.startsWith('/settings')) currentIndex = 1;
     }
 
     // Dynamically build the screens and navigation items based on role
-    List<Widget> pages = [_getDashboardBody(userRole)];
     List<NavigationDestination> navItems = [
       const NavigationDestination(
         icon: Icon(Icons.home_outlined),
@@ -69,51 +63,49 @@ class DashboardMainScreen extends ConsumerWidget {
     ];
 
     if (userRole == UserRole.supervisor) {
-      pages.add(const CoachListScreen());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.group_outlined),
         selectedIcon: Icon(Icons.group_rounded, color: Colors.blue),
         label: 'Coaches',
       ));
       
-      pages.add(const SizedBox.shrink());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.storefront_outlined),
         selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
         label: 'Enterprises',
       ));
 
-      pages.add(const SizedBox.shrink());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
         label: 'Reports',
       ));
     } else if (userRole == UserRole.coach) {
-      // Coach Specific Pages
-      pages.add(const CoachEnterpriseListScreen());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.storefront_outlined),
         selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
         label: 'Enterprises',
       ));
 
-      pages.add(const CoachSessionListScreen());
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.calendar_month_outlined),
         selectedIcon: Icon(Icons.calendar_month_rounded, color: Colors.blue),
         label: 'Sessions',
       ));
 
-      pages.add(const Center(child: Text('My Reports Screen'))); // Simplified for now
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
         label: 'Reports',
       ));
+    } else if (userRole == UserRole.enterprise) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.analytics_outlined),
+        selectedIcon: Icon(Icons.analytics_rounded, color: Colors.blue),
+        label: 'Progress',
+      ));
     }
 
-    pages.add(const SettingsScreen());
     navItems.add(const NavigationDestination(
       icon: Icon(Icons.settings_outlined),
       selectedIcon: Icon(Icons.settings_rounded, color: Colors.blue),
@@ -136,17 +128,30 @@ class DashboardMainScreen extends ConsumerWidget {
           selectedIndex: currentIndex,
           onDestinationSelected: (index) {
             String targetPath = AppRoutes.dashboard;
+            
             if (userRole == UserRole.supervisor) {
-              if (index == 1) targetPath = '/coaches';
-              else if (index == 2) targetPath = AppRoutes.enterpriseList;
-              else if (index == 3) targetPath = AppRoutes.supervisorReports;
-              else if (index == 4) targetPath = '/settings';
+              switch (index) {
+                case 1: targetPath = '/coaches'; break;
+                case 2: targetPath = AppRoutes.enterpriseList; break;
+                case 3: targetPath = AppRoutes.supervisorReports; break;
+                case 4: targetPath = '/settings'; break;
+              }
             } else if (userRole == UserRole.coach) {
-              if (index == 1) targetPath = AppRoutes.enterpriseList;
-              else if (index == 2) targetPath = '/sessions';
-              else if (index == 3) targetPath = '/reports'; // Coach reports fallback
-              else if (index == 4) targetPath = '/settings';
+              switch (index) {
+                case 1: targetPath = AppRoutes.enterpriseList; break;
+                case 2: targetPath = '/sessions'; break;
+                case 3: targetPath = '/reports'; break;
+                case 4: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.enterprise) {
+              switch (index) {
+                case 1: targetPath = AppRoutes.enterpriseProfile; break;
+                case 2: targetPath = '/settings'; break;
+              }
+            } else {
+              if (index == 1) targetPath = '/settings';
             }
+            
             context.go(targetPath);
           },
           backgroundColor: Colors.white,
