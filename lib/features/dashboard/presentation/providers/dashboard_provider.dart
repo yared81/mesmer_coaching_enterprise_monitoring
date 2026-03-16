@@ -51,3 +51,12 @@ final coachStatsByIdProvider = FutureProvider.family<CoachStatsEntity, String>((
     (stats) => stats,
   );
 });
+
+final notificationsProvider = FutureProvider<List<dynamic>>((ref) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
+  final result = await repository.getNotifications();
+  return result.fold(
+    (failure) => throw failure.message,
+    (notifications) => notifications,
+  );
+});

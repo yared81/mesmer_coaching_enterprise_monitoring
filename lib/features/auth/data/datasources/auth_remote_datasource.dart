@@ -32,9 +32,17 @@ class AuthRemoteDatasource {
     return UserModel.fromJson(response.data['user']);
   }
 
+  Future<UserModel> updateProfile(String name, String email) async {
+    final response = await _dio.put(
+      'auth/profile',
+      data: {'name': name, 'email': email},
+    );
+    return UserModel.fromJson(response.data['data']);
+  }
+
   Future<void> forgotPassword(String email) async {
     await _dio.post(
-      ApiConstants.forgotPassword,
+      'auth/forgot-password',
       data: {'email': email},
     );
   }

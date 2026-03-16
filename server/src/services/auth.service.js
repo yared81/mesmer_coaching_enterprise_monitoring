@@ -77,6 +77,30 @@ class AuthService {
 
     return user;
   }
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(userId, { name, email }) {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if email is already taken by another user
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        throw new Error('Email already in use');
+      }
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+    return user;
+  }
 }
 
 module.exports = new AuthService();

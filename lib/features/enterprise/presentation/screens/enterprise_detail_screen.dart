@@ -251,8 +251,20 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
           performanceAsync.when(
             data: (perf) {
+              final sessionsAsync = ref.watch(enterpriseSessionsProvider(enterprise.id));
+              
               if (perf == null) {
-                return _buildEmptyPerformanceState();
+                return sessionsAsync.maybeWhen(
+                  data: (sessions) {
+                    if (sessions.any((s) => s.status == SessionStatus.completed)) {
+                      return _buildEmptyPerformanceState(
+                        message: 'Assessment results haven\'t been submitted for completed sessions yet.',
+                      );
+                    }
+                    return _buildEmptyPerformanceState();
+                  },
+                  orElse: () => _buildEmptyPerformanceState(),
+                );
               }
 
               final current = perf['current'];
@@ -293,7 +305,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
-  Widget _buildEmptyPerformanceState() {
+  Widget _buildEmptyPerformanceState({String? message}) {
     return Container(
       padding: const EdgeInsets.all(32),
       width: double.infinity,
@@ -308,7 +320,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            'Complete an assessment in the Sessions tab to see performance charts.',
+            message ?? 'Complete an assessment in the Sessions tab to see performance charts.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[400], fontSize: 13),
           ),
@@ -934,56 +946,45 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           );
         }
         
-        return GridView.builder(
+        return ListView.separated(
           padding: const EdgeInsets.all(20),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.8,
-          ),
           itemCount: docs.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, i) {
             final doc = docs[i];
             return Container(
               decoration: _cardDecor(),
-              clipBehavior: Clip.antiAlias,
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          color: Colors.grey[100],
-                          child: const Icon(Icons.insert_drive_file, size: 48, color: Colors.grey),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(doc.fileName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
-                            const SizedBox(height: 4),
-                            Text(doc.sessionTitle ?? 'General Upload', style: TextStyle(color: Colors.grey[600], fontSize: 10), maxLines: 1),
-                            const SizedBox(height: 4),
-                            Text(DateFormat('MMM dd, yyyy').format(doc.uploadedAt), style: TextStyle(color: Colors.grey[400], fontSize: 10)),
-                          ],
-                        ),
-                      ),
-                    ],
+              child: ListTile(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Opening ${doc.fileName}... (Download started)')),
+                  );
+                },
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3D5AFE).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: const Color(0xFF3D5AFE), borderRadius: BorderRadius.circular(4)),
-                      child: Text(doc.documentType.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                  child: const Icon(Icons.insert_drive_file_outlined, color: Color(0xFF3D5AFE)),
+                ),
+                title: Text(
+                  doc.fileName,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (doc.sessionTitle != null) 
+                      Text(doc.sessionTitle!, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    Text(
+                      DateFormat('MMM dd, yyyy').format(doc.uploadedAt),
+                      style: TextStyle(color: Colors.grey[400], fontSize: 11),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                trailing: const Icon(Icons.open_in_new_rounded, size: 20, color: Colors.grey),
               ),
             );
           },

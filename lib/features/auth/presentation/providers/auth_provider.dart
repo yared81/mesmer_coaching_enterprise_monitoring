@@ -96,6 +96,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (user) => AuthState.authenticated(user),
     );
   }
+
+  Future<void> updateProfile(String name, String email) async {
+    final result = await _ref.read(authRepositoryProvider).updateProfile(name, email);
+    result.fold(
+      (failure) {
+        // Optionally handle failure state or notify UI
+      },
+      (user) {
+        state = AuthState.authenticated(user);
+      },
+    );
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {

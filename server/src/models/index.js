@@ -10,6 +10,7 @@ const DiagnosisQuestion = require('./diagnosis_question.model');
 const DiagnosisChoice = require('./diagnosis_choice.model');
 const DiagnosisReport = require('./diagnosis_report.model');
 const DiagnosisResponse = require('./diagnosis_response.model');
+const Notification = require('./notification.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -126,6 +127,13 @@ DiagnosisResponse.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
 DiagnosisChoice.hasMany(DiagnosisResponse, { foreignKey: 'choice_id', as: 'responses', onDelete: 'CASCADE' });
 DiagnosisResponse.belongsTo(DiagnosisChoice, { foreignKey: 'choice_id' });
 
+// Notification Associations
+User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });
+Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+Institution.hasMany(Notification, { foreignKey: 'institution_id', as: 'notifications' });
+Notification.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });
+
 const db = {
   Institution,
   User,
@@ -138,6 +146,7 @@ const db = {
   DiagnosisReport,
   DiagnosisResponse,
   EnterpriseDocument,
+  Notification,
   sequelize
 };
 

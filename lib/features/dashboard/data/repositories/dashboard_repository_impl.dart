@@ -48,4 +48,14 @@ class DashboardRepositoryImpl implements DashboardRepository {
       return Left(Failure.fromException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<dynamic>>> getNotifications() async {
+    try {
+      final notifications = await remoteDataSource.getNotifications();
+      return Right(notifications);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
 }

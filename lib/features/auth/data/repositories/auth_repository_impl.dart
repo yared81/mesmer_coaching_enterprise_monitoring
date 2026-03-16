@@ -70,4 +70,14 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(Failure.fromException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateProfile(String name, String email) async {
+    try {
+      final userModel = await _remoteDatasource.updateProfile(name, email);
+      return Right(userModel.toEntity());
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
 }

@@ -7,4 +7,5 @@ abstract class DashboardRepository {
   Future<Either<Failure, SupervisorStatsEntity>> getSupervisorStats();
   Future<Either<Failure, CoachStatsEntity>> getCoachStats();
   Future<Either<Failure, CoachStatsEntity>> getCoachStatsById(String id);
+  Future<Either<Failure, List<dynamic>>> getNotifications();
 }

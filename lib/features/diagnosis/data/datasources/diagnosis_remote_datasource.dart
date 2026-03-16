@@ -125,8 +125,13 @@ class DiagnosisRemoteDataSourceImpl implements DiagnosisRemoteDataSource {
         return response.data['data'];
       }
       return null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return null; // Return null only if specifically not found/no reports
+      }
+      rethrow; // Re-throw other errors (500, connectivity) so UI shows Error state
     } catch (e) {
-      return null;
+      rethrow;
     }
   }
 }

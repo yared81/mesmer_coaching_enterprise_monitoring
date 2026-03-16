@@ -17,6 +17,12 @@ class ProfileScreen extends ConsumerWidget {
           'My Profile',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => _showEditProfileSheet(context, ref, user?.name ?? '', user?.email ?? ''),
+          ),
+        ],
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -74,35 +80,84 @@ class ProfileScreen extends ConsumerWidget {
             _buildProfileItem(
               icon: Icons.business_outlined,
               title: 'Institution',
-              value: 'Assigned Institution', // TODO: Fetch institution name
+              value: user?.institutionName ?? 'Assigned Institution',
             ),
             const SizedBox(height: 40),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  ref.read(authProvider.notifier).logout();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[50],
-                  foregroundColor: Colors.red[700],
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+            // Logout button removed as it's redundant (available in Settings)
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showEditProfileSheet(BuildContext context, WidgetRef ref, String currentName, String currentEmail) {
+    final nameController = TextEditingController(text: currentName);
+    final emailController = TextEditingController(text: currentEmail);
+    final formKey = GlobalKey<FormState>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 20,
+        ),
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Edit Profile',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
-                icon: const Icon(Icons.logout_rounded),
-                label: const Text(
-                  'Log Out',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                validator: (val) => val == null || val.isEmpty ? 'Name cannot be empty' : null,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
+                validator: (val) => val == null || val.isEmpty ? 'Email cannot be empty' : null,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (formKey.currentState!.validate()) {
+                      await ref.read(authProvider.notifier).updateProfile(
+                        nameController.text.trim(),
+                        emailController.text.trim(),
+                      );
+                      if (context.mounted) Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Save Changes'),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

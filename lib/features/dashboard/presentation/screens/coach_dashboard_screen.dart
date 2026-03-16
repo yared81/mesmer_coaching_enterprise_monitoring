@@ -177,10 +177,137 @@ class CoachDashboardScreen extends ConsumerWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-          onPressed: () {},
+          onPressed: () => _showNotificationsSheet(context, ref),
         ),
         const SizedBox(width: 8),
       ],
+    );
+  }
+
+  // ── Notifications Sheet ────────────────────────────────────────────────────
+  void _showNotificationsSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) {
+        final notificationsAsync = ref.watch(notificationsProvider);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Notifications', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  TextButton(onPressed: () => ref.refresh(notificationsProvider), child: const Text('Refresh')),
+                ],
+              ),
+              const SizedBox(height: 8),
+              notificationsAsync.when(
+                data: (notifications) {
+                  if (notifications.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Text('No new notifications', style: TextStyle(color: Colors.grey)),
+                    );
+                  }
+                  return Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final n = notifications[index];
+                        return _NotificationTile(
+                          icon: _getIconForType(n['type']),
+                          iconColor: _getIconColorForType(n['type']),
+                          title: n['title'] ?? '',
+                          subtitle: n['message'] ?? '',
+                          time: _formatTime(n['created_at']),
+                        );
+                      },
+                    ),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, _) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  IconData _getIconForType(String? type) {
+    switch (type) {
+      case 'success': return Icons.check_circle_rounded;
+      case 'alert': return Icons.warning_rounded;
+      default: return Icons.info_rounded;
+    }
+  }
+
+  Color _getIconColorForType(String? type) {
+    switch (type) {
+      case 'success': return Colors.green;
+      case 'alert': return Colors.orange;
+      default: return Colors.blue;
+    }
+  }
+
+  String _formatTime(String? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      final date = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final difference = now.difference(date);
+      if (difference.inMinutes < 60) return '${difference.inMinutes}m ago';
+      if (difference.inHours < 24) return '${difference.inHours}h ago';
+      return '${difference.inDays}d ago';
+    } catch (_) {
+      return '';
+    }
+  }
+}
+
+class _NotificationTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final String time;
+
+  const _NotificationTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.time,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: iconColor.withOpacity(0.1),
+        child: Icon(icon, color: iconColor, size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
+      trailing: Text(time, style: const TextStyle(fontSize: 11, color: Colors.grey)),
     );
   }
 }

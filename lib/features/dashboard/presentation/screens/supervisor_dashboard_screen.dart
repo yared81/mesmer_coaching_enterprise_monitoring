@@ -22,8 +22,10 @@ class SupervisorDashboardScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (ctx) {
-        return Padding(
+              builder: (ctx) {
+                final authState = ref.watch(authProvider);
+                final user = authState.user;
+                return Padding(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -52,13 +54,13 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Supervisor',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+              Text(
+                user?.name ?? 'Supervisor',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
               ),
-              const Text(
-                'supervisor@mesmer.com',
-                style: TextStyle(color: Colors.grey, fontSize: 13),
+              Text(
+                user?.email ?? 'supervisor@mesmer.com',
+                style: const TextStyle(color: Colors.grey, fontSize: 13),
               ),
               const SizedBox(height: 24),
               const Divider(),
@@ -73,36 +75,6 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 onTap: () => Navigator.pop(ctx),
               ),
               const SizedBox(height: 8),
-              _ProfileMenuTile(
-                icon: Icons.logout_rounded,
-                label: 'Logout',
-                color: Colors.red,
-                onTap: () async {
-                  Navigator.pop(ctx);
-                  final double check = await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Confirm Logout'),
-                      content: const Text('Are you sure you want to log out of your account?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, 0.0),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, 1.0),
-                          style: TextButton.styleFrom(foregroundColor: Colors.red),
-                          child: const Text('Logout'),
-                        ),
-                      ],
-                    ),
-                  ) ?? 0.0;
-                  
-                  if (check == 1.0) {
-                    ref.read(authProvider.notifier).logout();
-                  }
-                },
-              ),
             ],
           ),
         );
@@ -111,57 +83,100 @@ class SupervisorDashboardScreen extends ConsumerWidget {
   }
 
   // ── Notifications Sheet ────────────────────────────────────────────────────
-  void _showNotificationsSheet(BuildContext context) {
+  void _showNotificationsSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Notifications', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                TextButton(onPressed: () {}, child: const Text('Mark all read')),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _NotificationTile(
-              icon: Icons.check_circle_rounded,
-              iconColor: Colors.green,
-              title: 'New Enterprise Registered',
-              subtitle: 'Global Tech Solutions has joined.',
-              time: '2h ago',
-            ),
-            _NotificationTile(
-              icon: Icons.warning_rounded,
-              iconColor: Colors.orange,
-              title: 'Score Alert',
-              subtitle: 'Sunrise Bakery has dropped below 40%.',
-              time: '5h ago',
-            ),
-            _NotificationTile(
-              icon: Icons.info_rounded,
-              iconColor: Colors.blue,
-              title: 'System Maintenance',
-              subtitle: 'Scheduled tonight at 2:00 AM.',
-              time: '1d ago',
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
+      builder: (ctx) {
+        final notificationsAsync = ref.watch(notificationsProvider);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Notifications', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  TextButton(onPressed: () => ref.refresh(notificationsProvider), child: const Text('Refresh')),
+                ],
+              ),
+              const SizedBox(height: 8),
+              notificationsAsync.when(
+                data: (notifications) {
+                  if (notifications.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Text('No new notifications', style: TextStyle(color: Colors.grey)),
+                    );
+                  }
+                  return Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        final n = notifications[index];
+                        return _NotificationTile(
+                          icon: _getIconForType(n['type']),
+                          iconColor: _getIconColorForType(n['type']),
+                          title: n['title'],
+                          subtitle: n['message'],
+                          time: _formatTime(n['created_at']),
+                        );
+                      },
+                    ),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, _) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text('Error: $err', style: const TextStyle(color: Colors.red)),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  IconData _getIconForType(String? type) {
+    switch (type) {
+      case 'success': return Icons.check_circle_rounded;
+      case 'alert': return Icons.warning_rounded;
+      default: return Icons.info_rounded;
+    }
+  }
+
+  Color _getIconColorForType(String? type) {
+    switch (type) {
+      case 'success': return Colors.green;
+      case 'alert': return Colors.orange;
+      default: return Colors.blue;
+    }
+  }
+
+  String _formatTime(String? timestamp) {
+    if (timestamp == null) return '';
+    try {
+      final date = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final difference = now.difference(date);
+      if (difference.inMinutes < 60) return '${difference.inMinutes}m ago';
+      if (difference.inHours < 24) return '${difference.inHours}h ago';
+      return '${difference.inDays}d ago';
+    } catch (_) {
+      return '';
+    }
   }
 
   @override
@@ -208,7 +223,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                    onPressed: () => _showNotificationsSheet(context),
+                    onPressed: () => _showNotificationsSheet(context, ref),
                   ),
                   const SizedBox(width: 8),
                 ],

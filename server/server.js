@@ -47,6 +47,7 @@ const startServer = async () => {
     app.use('/api/v1/diagnosis', require('./src/routes/diagnosis.routes'));
     app.use('/api/v1/documents', require('./src/routes/document.routes'));
     app.use('/api/v1/enterprise-dashboard', require('./src/routes/enterprise_dashboard.routes'));
+    app.use('/api/v1/notifications', require('./src/routes/notification.routes'));
 
     // Error Handler
     app.use((err, req, res, next) => {

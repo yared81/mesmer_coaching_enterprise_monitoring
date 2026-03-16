@@ -1,8 +1,39 @@
-const { CoachingSession, Enterprise } = require('../models');
+const { CoachingSession, Enterprise, User } = require('../models');
+const notificationService = require('./notification.service');
 
 class SessionService {
   async createSession(sessionData) {
-    return await CoachingSession.create(sessionData);
+    const session = await CoachingSession.create(sessionData);
+    
+    // Trigger notification for the coach
+    try {
+      const enterprise = await Enterprise.findByPk(session.enterprise_id);
+      await notificationService.createNotification({
+        userId: session.coach_id,
+        title: 'New Session Scheduled',
+        message: `A new session "${session.title}" has been scheduled for ${enterprise.business_name}.`,
+        type: 'info',
+        institutionId: enterprise.institution_id
+      });
+
+      // Also notify supervisors of the institution
+      const supervisors = await User.findAll({ 
+        where: { institution_id: enterprise.institution_id, role: 'supervisor' } 
+      });
+      for (const supervisor of supervisors) {
+        await notificationService.createNotification({
+          userId: supervisor.id,
+          title: 'Session Scheduled',
+          message: `Coach scheduled a session "${session.title}" for ${enterprise.business_name}.`,
+          type: 'info',
+          institutionId: enterprise.institution_id
+        });
+      }
+    } catch (e) {
+      console.error('Failed to create session notification:', e);
+    }
+
+    return session;
   }
 
   async getCoachSessions(coachId) {

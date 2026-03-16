@@ -1,4 +1,4 @@
-const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, sequelize } = require('../models');
+const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, Notification, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class DashboardService {
@@ -50,11 +50,10 @@ class DashboardService {
         ],
         raw: true
       }),
-      Enterprise.findAll({
+      Notification.findAll({
         where: { institution_id: institutionId },
-        limit: 5,
-        order: [['registered_at', 'DESC']],
-        include: [{ model: User, as: 'coach', attributes: ['name'] }]
+        limit: 10,
+        order: [['created_at', 'DESC']]
       })
     ]);
 
@@ -87,11 +86,10 @@ class DashboardService {
         ],
         raw: true
       }),
-      Enterprise.findAll({
-        where: { coach_id: coachId },
-        limit: 5,
-        order: [['registered_at', 'DESC']],
-        include: [{ model: User, as: 'coach', attributes: ['name'] }]
+      Notification.findAll({
+        where: { user_id: coachId },
+        limit: 10,
+        order: [['created_at', 'DESC']]
       })
     ]);
 

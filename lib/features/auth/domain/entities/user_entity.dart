@@ -17,6 +17,7 @@ class UserEntity {
     required this.name,
     required this.role,
     required this.institutionId,
+    this.institutionName,
   });
 
   final String id;
@@ -24,6 +25,7 @@ class UserEntity {
   final String name;
   final UserRole role;
   final String institutionId;
+  final String? institutionName;
 
   // TODO: Add copyWith if needed
 }

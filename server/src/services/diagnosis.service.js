@@ -1,4 +1,5 @@
-const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, DiagnosisReport, DiagnosisResponse, sequelize } = require('../models');
+const { DiagnosisTemplate, DiagnosisCategory, DiagnosisQuestion, DiagnosisChoice, DiagnosisReport, DiagnosisResponse, CoachingSession, Enterprise, User, sequelize } = require('../models');
+const notificationService = require('./notification.service');
 
 class DiagnosisService {
   /**
@@ -460,6 +461,36 @@ class DiagnosisService {
         }, { transaction: t });
       }
 
+      const finalReport = await DiagnosisReport.findByPk(report.id, {
+        include: [
+          { 
+            model: CoachingSession, 
+            as: 'session',
+            include: [{ model: Enterprise, as: 'enterprise' }] 
+          }
+        ],
+        transaction: t
+      });
+
+      // Trigger notification for the supervisor
+      try {
+        const supervisors = await User.findAll({ 
+          where: { institution_id: finalReport.session.enterprise.institution_id, role: 'supervisor' } 
+        });
+        
+        for (const supervisor of supervisors) {
+          await notificationService.createNotification({
+            userId: supervisor.id,
+            title: 'Assessment Submitted',
+            message: `Coach submitted a report for ${finalReport.session.enterprise.business_name} with health score ${finalReport.total_score}/5.`,
+            type: 'success',
+            institutionId: finalReport.session.enterprise.institution_id
+          });
+        }
+      } catch (e) {
+        console.error('Failed to create diagnosis notification:', e);
+      }
+
       return report;
     });
   }
@@ -483,16 +514,24 @@ class DiagnosisService {
    * Get performance metrics for an enterprise over time
    */
   async getEnterprisePerformance(enterpriseId) {
-    const { CoachingSession, DiagnosisReport } = require('../models');
-
+    console.log(`[DEBUG] Fetching performance for enterprise: "${enterpriseId}" (Type: ${typeof enterpriseId})`);
+    
+    // We use the top-level models imported at the start of the file
     const reports = await DiagnosisReport.findAll({
       include: [{
         model: CoachingSession,
+        as: 'session',
         where: { enterprise_id: enterpriseId },
         attributes: ['id', 'scheduled_date', 'title']
       }],
-      order: [[CoachingSession, 'scheduled_date', 'ASC']]
+      order: [[{ model: CoachingSession, as: 'session' }, 'scheduled_date', 'ASC']],
+      logging: (sql) => console.log(`[DEBUG] SQL Query: ${sql}`)
     });
+
+    console.log(`[DEBUG] Found ${reports.length} reports for enterprise ${enterpriseId}`);
+    if (reports.length > 0) {
+      console.log(`[DEBUG] Latest report total score: ${reports[reports.length-1].total_score}`);
+    }
 
     if (reports.length === 0) return null;
 
@@ -501,9 +540,9 @@ class DiagnosisService {
 
     // Trends for the line chart
     const trends = reports.map(r => ({
-      date: r.CoachingSession.scheduled_date,
+      date: r.session.scheduled_date,
       score: r.total_score,
-      sessionTitle: r.CoachingSession.title
+      sessionTitle: r.session.title
     }));
 
     return {
