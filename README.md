@@ -102,10 +102,10 @@ feature/
 | Phase | Goal | Status |
 |---|---|---|
 | **1. Foundation** | Architecture, Core Infra, & 74-File Skeleton | ✅ COMPLETE |
-| **2. Auth & Security** | JWT flows, Roles & Protected Guards | 🔲 UPCOMING |
-| **3. Onboarding** | Multi-stepped Enterprise Registration | 🔲 TODO |
-| **4. Diagnosis** | Assessment Tool, Scoring & Result Summary | 🔲 TODO |
-| **5. Coaching** | Session Tracking, Tasks & R2 Evidence Upload | 🔲 TODO |
+| **2. Auth & Security** | JWT flows, Roles & Protected Guards | ✅ COMPLETE |
+| **3. Onboarding** | Multi-stepped Enterprise Registration | ✅ COMPLETE|
+| **4. Diagnosis** | Assessment Tool, Scoring & Result Summary | ✅ COMPLETE |
+| **5. Coaching** | Session Tracking, Tasks & R2 Evidence Upload | In progress |
 | **6. Progress** | Data Visualization (Baseline vs Current Improvement) | 🔲 TODO |
 | **7. Oversight** | Supervisor Reports & Program Analytics | 🔲 TODO |
 | **8. Final Polish** | Brand consistency, Animations & Demo Prep | 🔲 TODO |

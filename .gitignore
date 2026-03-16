@@ -43,6 +43,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Local/dev scripts 
+server/scripts/
+
 # ── Code generation output ────────────────────────────────────
 *.g.dart
 *.freezed.dart

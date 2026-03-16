@@ -168,14 +168,25 @@ class _SessionCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.business_rounded, size: 14, color: Colors.grey),
                       const SizedBox(width: 6),
-                      Text(session.enterpriseName ?? 'Enterprise ID: ${session.enterpriseId.substring(0, 8)}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 180),
+                        child: Text(
+                          session.enterpriseName ?? 'Enterprise ID: ${session.enterpriseId.substring(0, 8)}',
+                          style: const TextStyle(color: Colors.grey, fontSize: 12),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   Row(
                     children: [
                       const Icon(Icons.calendar_month, size: 14, color: Colors.grey),
                       const SizedBox(width: 6),
-                      Text(DateFormat('MMM dd, yyy').format(session.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        DateFormat('MMM dd, yyyy').format(session.scheduledDate),
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     ],
                   ),
                 ],
