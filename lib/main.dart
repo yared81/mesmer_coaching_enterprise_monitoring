@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/storage/hive_storage.dart';
-import 'features/auth/presentation/providers/auth_provider.dart';
+import 'features/auth/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -37,8 +37,9 @@ class SessionService {
   }
 
   async getCoachSessions(coachId) {
+    // TEMPORARY: return all sessions for demo visibility, not just the logged-in coach's.
+    // In future we can re-enable filtering by coach_id to enforce per-coach visibility.
     return await CoachingSession.findAll({
-      where: { coach_id: coachId },
       include: [
         { model: Enterprise, as: 'enterprise', attributes: ['business_name'] }
       ],
