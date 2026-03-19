@@ -180,9 +180,15 @@ class _DashboardHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(authProvider).user?.role;
-    if (role == UserRole.admin) return AdminDashboardScreen();
+    if (role == UserRole.admin || role == UserRole.superAdmin) return AdminDashboardScreen();
     if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
-    return CoachDashboardScreen();
+    if (role == UserRole.coach) return CoachDashboardScreen();
+    
+    return const Scaffold(
+      body: Center(
+        child: Text('Security Error: Invalid Role Configuration.\nPlease contact support.', textAlign: TextAlign.center),
+      ),
+    );
   }
 }

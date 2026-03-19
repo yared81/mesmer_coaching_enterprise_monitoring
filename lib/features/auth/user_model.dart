@@ -37,7 +37,8 @@ class UserModel {
     if (role == 'supervisor') return UserRole.supervisor;
     if (role == 'coach') return UserRole.coach;
     if (role == 'enterprise_user') return UserRole.enterprise;
-    return UserRole.coach; // Default
+    
+    throw Exception('CRITICAL SECURITY ERROR: Unrecognized user role "$role" detected from API. Authentication safely aborted.');
   }
 
   UserEntity toEntity() => UserEntity(
