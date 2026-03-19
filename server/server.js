@@ -41,6 +41,7 @@ const startServer = async () => {
     // Routes
     app.use('/api/v1/auth', require('./src/routes/auth.routes'));
     app.use('/api/v1/enterprises', require('./src/routes/enterprise.routes'));
+    app.use('/api/v1/iaps', require('./src/routes/iap.routes'));
     app.use('/api/v1/dashboard', require('./src/routes/dashboard.routes'));
     app.use('/api/v1/coaches', require('./src/routes/coach.routes'));
     app.use('/api/v1/sessions', require('./src/routes/session.routes'));

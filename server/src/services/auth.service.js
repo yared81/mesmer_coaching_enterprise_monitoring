@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Institution = require('../models/institution.model');
+const Enterprise = require('../models/enterprise.model');
 
 class AuthService {
   /**
@@ -9,7 +10,10 @@ class AuthService {
   async login(email, password) {
     const user = await User.findOne({
       where: { email, is_active: true },
-      include: [{ model: Institution, as: 'institution' }]
+      include: [
+        { model: Institution, as: 'institution' },
+        { model: Enterprise, as: 'enterpriseAccount' }
+      ]
     });
 
     if (!user) {
@@ -30,7 +34,8 @@ class AuthService {
         name: user.name,
         role: user.role,
         institution_id: user.institution_id,
-        institution: user.institution ? user.institution.name : null
+        institution: user.institution ? user.institution.name : null,
+        enterprise_id: user.enterpriseAccount ? user.enterpriseAccount.id : null
       },
       accessToken,
       refreshToken
@@ -47,6 +52,7 @@ class AuthService {
         userId: user.id, 
         role: user.role, 
         institution_id: user.institution_id,
+        enterprise_id: user.enterpriseAccount ? user.enterpriseAccount.id : null,
         tokenVersion: user.token_version 
       },
       process.env.JWT_ACCESS_SECRET,

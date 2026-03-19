@@ -41,4 +41,18 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { protect, authorize };
+const restrictToOwnEnterprise = (req, res, next) => {
+  if (req.user.role === 'enterprise_user') {
+    const requestedId = req.params.enterpriseId || req.body.enterprise_id || req.query.enterprise_id;
+    if (requestedId && requestedId !== req.user.enterprise_id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized: Enterprise Users can only access their own data'
+      });
+    }
+  }
+  next();
+};
+
+module.exports = { protect, authorize, restrictToOwnEnterprise };
+
