@@ -7,6 +7,7 @@ class UserModel {
   final UserRole role;
   final String institutionId;
   final String? institutionName;
+  final String? enterpriseId;
 
   const UserModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserModel {
     required this.role,
     required this.institutionId,
     this.institutionName,
+    this.enterpriseId,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -25,14 +27,16 @@ class UserModel {
       role: _parseRole(json['role']),
       institutionId: json['institution_id'] as String,
       institutionName: json['institution'] as String?,
+      enterpriseId: json['enterprise_id'] as String?,
     );
   }
 
   static UserRole _parseRole(dynamic role) {
+    if (role == 'super_admin') return UserRole.superAdmin;
     if (role == 'admin') return UserRole.admin;
     if (role == 'supervisor') return UserRole.supervisor;
     if (role == 'coach') return UserRole.coach;
-    if (role == 'enterprise') return UserRole.enterprise;
+    if (role == 'enterprise_user') return UserRole.enterprise;
     return UserRole.coach; // Default
   }
 
@@ -43,5 +47,6 @@ class UserModel {
         role: role,
         institutionId: institutionId,
         institutionName: institutionName,
+        enterpriseId: enterpriseId,
       );
 }

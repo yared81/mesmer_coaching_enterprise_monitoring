@@ -51,6 +51,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.dashboard;
       }
 
+      // 3. Guard: Lock Enterprise Users to authorized paths only
+      if (authState.status == AuthStatus.authenticated && authState.user?.role == UserRole.enterprise) {
+        final allowedPaths = [
+          AppRoutes.dashboard,
+          AppRoutes.profile,
+          AppRoutes.changePassword,
+          '/settings',
+          AppRoutes.chat,
+        ];
+        if (!allowedPaths.contains(state.matchedLocation)) {
+          return AppRoutes.dashboard;
+        }
+      }
+
       return null;
     },
     routes: [

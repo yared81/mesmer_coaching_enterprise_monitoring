@@ -5,9 +5,10 @@ import 'package:json_annotation/json_annotation.dart';
 
 enum UserRole {
   @JsonValue('admin') admin,
+  @JsonValue('super_admin') superAdmin,
   @JsonValue('supervisor') supervisor,
   @JsonValue('coach') coach,
-  @JsonValue('enterprise') enterprise
+  @JsonValue('enterprise_user') enterprise
 }
 
 class UserEntity {
@@ -18,6 +19,7 @@ class UserEntity {
     required this.role,
     required this.institutionId,
     this.institutionName,
+    this.enterpriseId,
   });
 
   final String id;
@@ -26,6 +28,7 @@ class UserEntity {
   final UserRole role;
   final String institutionId;
   final String? institutionName;
+  final String? enterpriseId;
 
   // TODO: Add copyWith if needed
 }
