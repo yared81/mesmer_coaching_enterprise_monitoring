@@ -1,6 +1,8 @@
 enum Sector { agriculture, manufacturing, trade, services, construction, other }
 enum OwnerGender { male, female, other }
 enum PremiseType { rented, owned, home_based, other }
+enum RecordKeepingSystem { none, paper, digital, professional }
+enum EnterpriseStatus { active, pilot, stalled, graduated, dropped }
 
 class EnterpriseEntity {
   const EnterpriseEntity({
@@ -19,6 +21,14 @@ class EnterpriseEntity {
     this.ownerGender,
     this.premiseType,
     this.baselineScore,
+    this.baselineEmployees = 0,
+    this.baselineRevenue = 0.0,
+    this.recordKeepingSystem,
+    this.challenges,
+    this.loanAmount = 0.0,
+    this.consentStatus = false,
+    this.consentDate,
+    this.status = EnterpriseStatus.active,
   });
 
   final String id;
@@ -33,6 +43,14 @@ class EnterpriseEntity {
   final OwnerGender? ownerGender;
   final PremiseType? premiseType;
   final double? baselineScore;
+  final int baselineEmployees;
+  final double baselineRevenue;
+  final RecordKeepingSystem? recordKeepingSystem;
+  final String? challenges;
+  final double loanAmount;
+  final bool consentStatus;
+  final DateTime? consentDate;
+  final EnterpriseStatus status;
   final String coachId;
   final String institutionId;
   final DateTime registeredAt;
@@ -50,6 +68,14 @@ class EnterpriseEntity {
     OwnerGender? ownerGender,
     PremiseType? premiseType,
     double? baselineScore,
+    int? baselineEmployees,
+    double? baselineRevenue,
+    RecordKeepingSystem? recordKeepingSystem,
+    String? challenges,
+    double? loanAmount,
+    bool? consentStatus,
+    DateTime? consentDate,
+    EnterpriseStatus? status,
     String? coachId,
     String? institutionId,
     DateTime? registeredAt,
@@ -67,6 +93,14 @@ class EnterpriseEntity {
       ownerGender: ownerGender ?? this.ownerGender,
       premiseType: premiseType ?? this.premiseType,
       baselineScore: baselineScore ?? this.baselineScore,
+      baselineEmployees: baselineEmployees ?? this.baselineEmployees,
+      baselineRevenue: baselineRevenue ?? this.baselineRevenue,
+      recordKeepingSystem: recordKeepingSystem ?? this.recordKeepingSystem,
+      challenges: challenges ?? this.challenges,
+      loanAmount: loanAmount ?? this.loanAmount,
+      consentStatus: consentStatus ?? this.consentStatus,
+      consentDate: consentDate ?? this.consentDate,
+      status: status ?? this.status,
       coachId: coachId ?? this.coachId,
       institutionId: institutionId ?? this.institutionId,
       registeredAt: registeredAt ?? this.registeredAt,

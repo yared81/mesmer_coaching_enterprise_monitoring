@@ -29,13 +29,21 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _employeeCountController = TextEditingController();
   final TextEditingController _businessAgeController = TextEditingController();
+  final TextEditingController _revenueController = TextEditingController();
+  final TextEditingController _challengesController = TextEditingController();
+  final TextEditingController _loanAmountController = TextEditingController();
   
   Sector _selectedSector = Sector.other;
   OwnerGender _selectedGender = OwnerGender.male;
   PremiseType _selectedPremiseType = PremiseType.rented;
+  RecordKeepingSystem _selectedRecordKeeping = RecordKeepingSystem.none;
+  bool _hasConsented = false;
 
   @override
   void dispose() {
+    _revenueController.dispose();
+    _challengesController.dispose();
+    _loanAmountController.dispose();
     _pageController.dispose();
     _nameController.dispose();
     _ownerController.dispose();
@@ -48,7 +56,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   }
 
   void _nextStep() {
-    if (_currentStep < 1) {
+    if (_currentStep < 2) {
       setState(() => _currentStep++);
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -85,7 +93,22 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       'business_age': int.tryParse(_businessAgeController.text) ?? 0,
       'owner_gender': _selectedGender.name,
       'premise_type': _selectedPremiseType.name,
+      'baseline_revenue': double.tryParse(_revenueController.text) ?? 0.0,
+      'loan_amount': double.tryParse(_loanAmountController.text) ?? 0.0,
+      'challenges': _challengesController.text,
+      'record_keeping_system': _selectedRecordKeeping.name,
+      'consent_status': _hasConsented,
+      'consent_date': _hasConsented ? DateTime.now().toIso8601String() : null,
+      'baseline_employees': int.tryParse(_employeeCountController.text) ?? 0,
     };
+
+    if (!_hasConsented) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must capture owner consent to proceed.'), backgroundColor: Colors.red),
+      );
+      return;
+    }
 
     final result = await ref.read(registerEnterpriseUseCaseProvider)(data);
 
@@ -128,6 +151,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
                 children: [
                   _buildStep1(),
                   _buildStep2(),
+                  _buildStep3(),
                 ],
               ),
             ),
@@ -146,6 +170,8 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           _buildStepCircle(0, 'Business Info'),
           Expanded(child: Container(height: 2, color: _currentStep > 0 ? AppColors.primary : Colors.grey[300])),
           _buildStepCircle(1, 'Owner & Layout'),
+          Expanded(child: Container(height: 2, color: _currentStep > 1 ? AppColors.primary : Colors.grey[300])),
+          _buildStepCircle(2, 'Baseline & Consent'),
         ],
       ),
     );
@@ -324,6 +350,79 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
     );
   }
 
+  Widget _buildStep3() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Baseline & Consent', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary)),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            controller: _revenueController,
+            label: 'Baseline Revenue (ETB)',
+            keyboardType: TextInputType.number,
+            prefixIcon: const Icon(Icons.attach_money),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            controller: _loanAmountController,
+            label: 'Total Loan Disbursed (if any)',
+            keyboardType: TextInputType.number,
+            prefixIcon: const Icon(Icons.account_balance),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          const Text('Record Keeping System', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<RecordKeepingSystem>(
+                value: _selectedRecordKeeping,
+                isExpanded: true,
+                items: RecordKeepingSystem.values.map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Text(t.name.replaceAll('_', ' ').split(' ').map((e) => e[0].toUpperCase() + e.substring(1)).join(' ')),
+                )).toList(),
+                onChanged: (v) => setState(() => _selectedRecordKeeping = v!),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppTextField(
+            controller: _challengesController,
+            label: 'Primary Challenges (Optional)',
+            prefixIcon: const Icon(Icons.warning_amber),
+            maxLines: 3,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+            ),
+            child: CheckboxListTile(
+              title: const Text('Digital Consent Captured', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('I confirm the enterprise owner has consented to participate in the program and share data.', style: TextStyle(fontSize: 12)),
+              value: _hasConsented,
+              onChanged: (val) => setState(() => _hasConsented = val ?? false),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+              activeColor: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBottomNav() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -353,7 +452,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
             flex: 2, // Give more room to the primary action button
             child: PrimaryButton(
               onPressed: _isLoading ? null : _nextStep,
-              label: _currentStep == 1 ? 'Complete Registration' : 'Next Step',
+              label: _currentStep == 2 ? 'Complete Registration' : 'Next Step',
               isLoading: _isLoading,
             ),
           ),

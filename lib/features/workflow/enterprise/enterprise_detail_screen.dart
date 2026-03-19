@@ -16,8 +16,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosi
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
 import 'enterprise_document_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_tracker_tab.dart';
+
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -270,7 +271,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               tabs: const [
                 Tab(icon: Icon(Icons.explore_outlined), text: 'OVERVIEW'),
                 Tab(icon: Icon(Icons.history_outlined), text: 'SESSIONS'),
-                Tab(icon: Icon(Icons.checklist_rtl_outlined), text: 'TASKS'),
+                Tab(icon: Icon(Icons.assignment_turned_in_outlined), text: 'ACTION PLAN'),
                 Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
               ],
             ),
@@ -281,7 +282,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           children: [
             _buildOverviewTab(enterprise, ref),
             _buildTimelineTab(),
-            _buildTasksTab(),
+            IapTrackerTab(enterpriseId: enterprise.id),
             _buildDocumentsTab(ref),
           ],
         ),
