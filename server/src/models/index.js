@@ -170,4 +170,48 @@ const db = {
   sequelize
 };
 
+// Global Audit Hooks for MERL Compliance
+sequelize.addHook('afterUpdate', async (instance, options) => {
+  if (options.transaction) return;
+  const tableName = instance.constructor.tableName || instance.constructor.name;
+  if (['audit_logs', 'notifications'].includes(tableName)) return;
+
+  try {
+    const previous = instance.previous();
+    const current = instance.get();
+    const userId = options.userId || 'system_automated';
+
+    await AuditLog.create({
+      user_id: userId,
+      action_type: 'UPDATE',
+      table_name: tableName,
+      old_data: previous,
+      new_data: current
+    });
+  } catch (error) {
+    console.error('Audit Log Hook Error (afterUpdate):', error);
+  }
+});
+
+sequelize.addHook('afterDestroy', async (instance, options) => {
+  if (options.transaction) return;
+  const tableName = instance.constructor.tableName || instance.constructor.name;
+  if (['audit_logs', 'notifications'].includes(tableName)) return;
+
+  try {
+    const previous = instance.get();
+    const userId = options.userId || 'system_automated';
+
+    await AuditLog.create({
+      user_id: userId,
+      action_type: 'DELETE',
+      table_name: tableName,
+      old_data: previous,
+      new_data: null
+    });
+  } catch (error) {
+    console.error('Audit Log Hook Error (afterDestroy):', error);
+  }
+});
+
 module.exports = db;

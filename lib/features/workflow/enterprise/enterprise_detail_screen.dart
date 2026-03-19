@@ -1197,6 +1197,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     Sector selectedSector = enterprise.sector;
 
     final formKey = GlobalKey<FormState>();
+    final isEnterpriseOwner = ref.read(authProvider).user?.role == UserRole.enterprise;
 
     showModalBottomSheet(
       context: context,
@@ -1228,16 +1229,23 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
                 const SizedBox(height: 12),
                 const Text('Edit Business Profile', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                if (isEnterpriseOwner) ...[
+                  const SizedBox(height: 8),
+                  const Text('For compliance, baseline data cannot be altered. Contact your coach to request changes.', 
+                    style: TextStyle(color: Colors.orange, fontSize: 13, fontStyle: FontStyle.italic)),
+                ],
                 const SizedBox(height: 16),
 
                 TextFormField(
                   controller: nameController,
+                  enabled: !isEnterpriseOwner,
                   decoration: const InputDecoration(labelText: 'Business Name'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: ownerController,
+                  enabled: !isEnterpriseOwner,
                   decoration: const InputDecoration(labelText: 'Owner Name'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),
@@ -1249,15 +1257,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   items: Sector.values
                       .map((s) => DropdownMenuItem(
                             value: s,
+                            enabled: !isEnterpriseOwner,
                             child: Text(s.name[0].toUpperCase() + s.name.substring(1)),
                           ))
                       .toList(),
-                  onChanged: (v) => selectedSector = v ?? selectedSector,
+                  onChanged: isEnterpriseOwner ? null : (v) => selectedSector = v ?? selectedSector,
                 ),
                 const SizedBox(height: 12),
 
                 TextFormField(
                   controller: employeeController,
+                  enabled: !isEnterpriseOwner,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Employee Count'),
                 ),
@@ -1265,6 +1275,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
                 TextFormField(
                   controller: yearsController,
+                  enabled: !isEnterpriseOwner,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(labelText: 'Established / Working years'),
                 ),
@@ -1272,6 +1283,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
                 TextFormField(
                   controller: phoneController,
+                  // Phone is always editable for contact purposes
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(labelText: 'Phone'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
@@ -1280,6 +1292,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
                 TextFormField(
                   controller: locationController,
+                  enabled: !isEnterpriseOwner,
                   decoration: const InputDecoration(labelText: 'Location'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                 ),

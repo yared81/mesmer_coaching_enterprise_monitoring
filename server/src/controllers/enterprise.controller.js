@@ -6,6 +6,17 @@ class EnterpriseController {
    */
   register = async (req, res, next) => {
     try {
+      // Pilot Mode Gatekeeper
+      if (process.env.IS_PILOT_MODE === 'true') {
+        const count = await enterpriseService.countEnterprises();
+        if (count >= 5) {
+          return res.status(403).json({
+            success: false,
+            message: 'Pilot mode is active: Maximum of 5 test enterprises reached. Registration is locked.'
+          });
+        }
+      }
+
       // req.user is populated by auth middleware
       const { userId, institutionId } = req.user;
       
@@ -72,7 +83,7 @@ class EnterpriseController {
    */
   update = async (req, res, next) => {
     try {
-      const enterprise = await enterpriseService.updateEnterprise(req.params.id, req.body);
+      const enterprise = await enterpriseService.updateEnterprise(req.params.id, req.body, req.user.userId);
       res.status(200).json({
         success: true,
         data: enterprise

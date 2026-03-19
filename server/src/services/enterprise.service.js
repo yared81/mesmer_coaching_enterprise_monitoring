@@ -38,6 +38,13 @@ class EnterpriseService {
   }
 
   /**
+   * Count the total number of enterprises for pilot mode capability
+   */
+  async countEnterprises() {
+    return await Enterprise.count();
+  }
+
+  /**
    * Get list of enterprises with filters and search
    */
   async getEnterprises(filters = {}) {
@@ -116,13 +123,13 @@ class EnterpriseService {
   /**
    * Update an enterprise
    */
-  async updateEnterprise(id, data) {
+  async updateEnterprise(id, data, userId = null) {
     const enterprise = await Enterprise.findByPk(id);
     if (!enterprise) {
       throw new Error('Enterprise not found');
     }
 
-    await enterprise.update(data);
+    await enterprise.update(data, { userId });
     return this.getEnterpriseById(id);
   }
 }
