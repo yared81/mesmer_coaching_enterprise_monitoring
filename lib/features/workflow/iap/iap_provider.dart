@@ -1,15 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/network/dio_client.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
 import 'iap_entity.dart';
 import 'iap_model.dart';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/error/failure.dart';
 import 'package:dio/dio.dart';
 
 // --- Data Source ---
 class IapRemoteDataSource {
-  final DioClient _client;
+  final Dio _client;
   IapRemoteDataSource(this._client);
 
   Future<List<IapModel>> getEnterpriseIaps(String enterpriseId) async {
@@ -31,7 +30,7 @@ class IapRemoteDataSource {
 
 // --- Providers ---
 final iapDataSourceProvider = Provider<IapRemoteDataSource>((ref) {
-  return IapRemoteDataSource(ref.watch(dioClientProvider));
+  return IapRemoteDataSource(ref.watch(dioProvider));
 });
 
 final enterpriseIapsProvider = FutureProvider.family<List<IapEntity>, String>((ref, enterpriseId) async {

@@ -18,6 +18,7 @@ import 'enterprise_document_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_tracker_tab.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
 
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {

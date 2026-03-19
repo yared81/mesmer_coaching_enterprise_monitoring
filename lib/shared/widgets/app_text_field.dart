@@ -12,6 +12,7 @@ class AppTextField extends StatelessWidget {
     this.keyboardType,
     this.prefixIcon,
     this.suffixIcon,
+    this.maxLines = 1,
   });
 
   final String label;
@@ -22,6 +23,7 @@ class AppTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class AppTextField extends StatelessWidget {
           validator: validator,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          maxLines: maxLines,
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: prefixIcon,
