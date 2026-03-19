@@ -55,6 +55,42 @@ const Enterprise = sequelize.define('Enterprise', {
     allowNull: true,
     defaultValue: 0.0
   },
+  baseline_employees: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  baseline_revenue: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00
+  },
+  record_keeping_system: {
+    type: DataTypes.ENUM('none', 'paper', 'digital', 'professional'),
+    allowNull: true
+  },
+  challenges: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  loan_amount: {
+    type: DataTypes.DECIMAL(15, 2),
+    defaultValue: 0.00
+  },
+  consent_status: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  consent_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  status: {
+    type: DataTypes.ENUM('active', 'pilot', 'stalled', 'graduated', 'dropped'),
+    defaultValue: 'active'
+  },
+  last_activity_date: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
   coach_id: {
     type: DataTypes.UUID,
     allowNull: false,

@@ -11,6 +11,9 @@ const DiagnosisChoice = require('./diagnosis_choice.model');
 const DiagnosisReport = require('./diagnosis_report.model');
 const DiagnosisResponse = require('./diagnosis_response.model');
 const Notification = require('./notification.model');
+const IndividualActionPlan = require('./iap.model');
+const IapTask = require('./iap_task.model');
+const AuditLog = require('./audit_log.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -134,6 +137,20 @@ Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 Institution.hasMany(Notification, { foreignKey: 'institution_id', as: 'notifications' });
 Notification.belongsTo(Institution, { foreignKey: 'institution_id', as: 'institution' });
 
+// IAP Associations
+Enterprise.hasMany(IndividualActionPlan, { foreignKey: 'enterprise_id', as: 'actionPlans' });
+IndividualActionPlan.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
+
+User.hasMany(IndividualActionPlan, { foreignKey: 'coach_id', as: 'authoredPlans' });
+IndividualActionPlan.belongsTo(User, { foreignKey: 'coach_id', as: 'coach' });
+
+IndividualActionPlan.hasMany(IapTask, { foreignKey: 'iap_id', as: 'tasks', onDelete: 'CASCADE' });
+IapTask.belongsTo(IndividualActionPlan, { foreignKey: 'iap_id', as: 'plan' });
+
+// Audit Log Associations
+User.hasMany(AuditLog, { foreignKey: 'user_id', as: 'auditLogs' });
+AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
 const db = {
   Institution,
   User,
@@ -147,6 +164,9 @@ const db = {
   DiagnosisResponse,
   EnterpriseDocument,
   Notification,
+  IndividualActionPlan,
+  IapTask,
+  AuditLog,
   sequelize
 };
 
