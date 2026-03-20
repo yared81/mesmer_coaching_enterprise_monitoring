@@ -3,6 +3,31 @@ const notificationService = require('./notification.service');
 
 class SessionService {
   async createSession(sessionData) {
+    const { enterprise_id, session_number, followup_type } = sessionData;
+
+    // 1. Enforce 8-Session Sequence for Coaching types
+    if (session_number) {
+      if (session_number < 1 || session_number > 8) {
+        throw new Error('Session number must be between 1 and 8');
+      }
+
+      const lastSession = await CoachingSession.findOne({
+        where: { enterprise_id },
+        order: [['session_number', 'DESC']]
+      });
+
+      const expectedNumber = lastSession ? lastSession.session_number + 1 : 1;
+      
+      if (session_number !== expectedNumber) {
+        throw new Error(`Invalid session sequence. Expected Session #${expectedNumber}, but got #${session_number}`);
+      }
+
+      // If there was a previous session, ensure it's completed before starting next
+      if (lastSession && lastSession.status !== 'completed') {
+        throw new Error(`Cannot schedule Session #${session_number} until Session #${lastSession.session_number} is completed.`);
+      }
+    }
+
     const session = await CoachingSession.create(sessionData);
     
     // Trigger notification for the coach
@@ -61,6 +86,19 @@ class SessionService {
 
     if (!session) {
       throw new Error('Session not found or unauthorized');
+    }
+
+    // 2. Enforce Metric Capture for Physical Completion
+    if (updateData.status === 'completed' && (updateData.followup_type || session.followup_type) === 'physical') {
+      const revenue = updateData.revenue_growth_percent !== undefined ? updateData.revenue_growth_percent : session.revenue_growth_percent;
+      const employees = updateData.current_employees !== undefined ? updateData.current_employees : session.current_employees;
+
+      if (!revenue && revenue !== 0) {
+        throw new Error('Revenue growth percent is required to complete a physical session');
+      }
+      if (!employees && employees !== 0) {
+        throw new Error('Current employee count is required to complete a physical session');
+      }
     }
 
     return await session.update(updateData);
