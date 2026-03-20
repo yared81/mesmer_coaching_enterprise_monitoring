@@ -1,0 +1,12 @@
+const express = require('express');
+const router = express.Router();
+const qcAuditController = require('../controllers/qc_audit.controller');
+const { protect, authorize } = require('../middleware/auth.middleware');
+
+router.use(protect);
+
+// Only specific roles should be able to do this, mostly data_verifier or admin
+router.get('/pending', authorize('data_verifier', 'admin', 'program_manager'), qcAuditController.getPendingAudits);
+router.put('/:id/review', authorize('data_verifier', 'admin', 'program_manager'), qcAuditController.reviewAudit);
+
+module.exports = router;

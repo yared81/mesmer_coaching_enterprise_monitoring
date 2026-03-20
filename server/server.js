@@ -51,6 +51,7 @@ const startServer = async () => {
     app.use('/api/v1/notifications', require('./src/routes/notification.routes'));
     app.use('/api/v1/phone-followups', require('./src/routes/phone_followup.routes'));
     app.use('/api/v1/trainings', require('./src/routes/training.routes'));
+    app.use('/api/v1/qc-audits', require('./src/routes/qc_audit.routes'));
 
     // Error Handler
     app.use((err, req, res, next) => {
