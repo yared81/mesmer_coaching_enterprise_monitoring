@@ -1,4 +1,4 @@
-const { Enterprise, User, Institution, sequelize } = require('../models');
+const { Enterprise, User, Institution, QcAudit, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class EnterpriseService {
@@ -30,6 +30,21 @@ class EnterpriseService {
       }, { transaction });
 
       await transaction.commit();
+
+      // MERL Phase 3: QC Random Sampling Algorithm (15% chance)
+      if (Math.random() < 0.15) {
+        try {
+          await QcAudit.create({
+            target_type: 'baseline',
+            target_id: enterprise.id,
+            is_random_sample: true,
+            status: 'pending'
+          });
+        } catch (err) {
+          console.error('Failed to create QC Audit sampling for baseline enterprise:', err);
+        }
+      }
+
       return enterprise;
     } catch (error) {
       await transaction.rollback();
