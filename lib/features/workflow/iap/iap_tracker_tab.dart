@@ -64,7 +64,7 @@ class IapTrackerTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildTracker(BuildContext context, WidgetRef ref, IapEntity iap) {
+  Widget _buildTracker(BuildContext context, WidgetRef widgetRef, IapEntity iap) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: iap.tasks.length + 1,
@@ -80,7 +80,7 @@ class IapTrackerTab extends ConsumerWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => _showAddTaskDialog(context, ref, iap.id),
+                  onPressed: () => _showAddTaskDialog(context, widgetRef, iap.id),
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Add Task'),
                   style: ElevatedButton.styleFrom(

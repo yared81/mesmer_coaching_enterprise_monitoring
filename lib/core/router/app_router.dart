@@ -132,6 +132,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return CoachDetailScreen(coachId: id);
             },
           ),
+          GoRoute(
+            path: '/enterprises/detail/:id',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return EnterpriseDetailScreen(enterpriseId: id);
