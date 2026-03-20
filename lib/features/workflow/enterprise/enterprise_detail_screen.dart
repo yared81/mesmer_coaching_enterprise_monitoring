@@ -19,7 +19,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart'
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_tracker_tab.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
-
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_entity.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -805,211 +805,283 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   Widget _buildTimelineTab() {
     final sessionsAsync = ref.watch(enterpriseSessionsProvider(widget.enterpriseId));
-    final currentUser = ref.watch(authProvider).user;
+    final phoneLogsAsync = ref.watch(enterprisePhoneFollowupsProvider(widget.enterpriseId));
     
     return sessionsAsync.when(
-      data: (sessions) {
-        // Sort newest first
-        final sorted = [...sessions]
-          ..sort((a, b) => b.scheduledDate.compareTo(a.scheduledDate));
+      data: (sessions) => phoneLogsAsync.when(
+        data: (phoneLogs) {
+          // Combine and sort (sessions use scheduledDate, logs use date)
+          final combined = <dynamic>[...sessions, ...phoneLogs]..sort((a, b) {
+            final dateA = (a is CoachingSessionEntity) ? a.scheduledDate : (a as PhoneFollowupEntity).date;
+            final dateB = (b is CoachingSessionEntity) ? b.scheduledDate : (b as PhoneFollowupEntity).date;
+            return dateB.compareTo(dateA);
+          });
 
-        return Column(
+          return Column(
+            children: [
+              // ── New Session button bar (always visible at top) ──
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: () async {
+                          await showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                            ),
+                            builder: (_) => AddSessionFromEnterpriseSheet(
+                              enterpriseId: widget.enterpriseId,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          context.push(AppRoutes.phoneLogCreate.replaceAll(':id', widget.enterpriseId));
+                        },
+                        icon: const Icon(Icons.phone_in_talk_rounded),
+                        label: const Text('Log Phone Call', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              // ── Combined list ──
+              Expanded(
+                child: combined.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.calendar_today_outlined, size: 64, color: Colors.grey[300]),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No sessions yet',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tap "New Session" above to record the first coaching session.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(20),
+                      itemCount: combined.length,
+                      itemBuilder: (_, i) {
+                        final item = combined[i];
+                        if (item is CoachingSessionEntity) {
+                          final isCompleted = item.status == SessionStatus.completed;
+                          final dotColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
+                          final accentColor = isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A);
+                          
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildTimelinePin(i == combined.length - 1, dotColor),
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildSessionCard(item, accentColor)),
+                            ],
+                          );
+                        } else {
+                          final log = item as PhoneFollowupEntity;
+                          const accentColor = Colors.orange;
+                          const dotColor = Colors.orange;
+                          
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildTimelinePin(i == combined.length - 1, dotColor),
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildPhoneLogCard(log, accentColor)),
+                            ],
+                          );
+                        }
+                      },
+                    ),
+              ),
+            ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('Error: $err')),
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
+    );
+  }
+
+  Widget _buildTimelinePin(bool isLast, Color color) {
+    return Column(
+      children: [
+        Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 6)],
+          ),
+        ),
+        if (!isLast)
+          Container(width: 2, height: 70, decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [color, Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+          )),
+      ],
+    );
+  }
+
+  Widget _buildSessionCard(CoachingSessionEntity s, Color accentColor) {
+    final isCompleted = s.status == SessionStatus.completed;
+    return InkWell(
+      onTap: () => context.push('/sessions/detail', extra: s),
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: accentColor.withOpacity(0.15)),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── New Session button bar (always visible at top) ──
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            Row(
+              children: [
+                Icon(Icons.calendar_today_rounded, size: 12, color: accentColor),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(s.title, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isCompleted ? 'Done' : 'Draft',
+                    style: TextStyle(color: accentColor, fontSize: 9, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
+              style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
+              maxLines: 2, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => context.push(AppRoutes.diagnosis, extra: s.id),
+                  icon: const Icon(Icons.assessment_outlined, size: 16),
+                  label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: accentColor,
+                    side: BorderSide(color: accentColor),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneLogCard(PhoneFollowupEntity log, Color accentColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accentColor.withOpacity(0.15)),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.phone_in_talk_rounded, size: 12, color: accentColor),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text('Phone: ${log.purpose}', style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis),
+              ),
+              const SizedBox(width: 6),
+              Text(DateFormat('MMM dd').format(log.date), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          if (log.issueAddressed?.isNotEmpty == true)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(log.issueAddressed!, style: const TextStyle(color: Color(0xFF424242), fontSize: 13)),
+            ),
+          if (log.adviceGiven?.isNotEmpty == true)
+            Text('Advice: ${log.adviceGiven}', style: TextStyle(color: Colors.grey[600], fontSize: 12, fontStyle: FontStyle.italic)),
+          if (log.nextAction?.isNotEmpty == true)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
               child: Row(
                 children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () async {
-                        await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.white,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                          ),
-                          builder: (_) => AddSessionFromEnterpriseSheet(
-                            enterpriseId: widget.enterpriseId,
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        context.push(AppRoutes.phoneLogCreate.replaceAll(':id', widget.enterpriseId));
-                      },
-                      icon: const Icon(Icons.phone_in_talk_rounded),
-                      label: const Text('Log Phone Call', style: TextStyle(fontWeight: FontWeight.bold)),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    ),
-                  ),
+                  const Icon(Icons.next_plan_outlined, size: 12, color: Colors.blue),
+                  const SizedBox(width: 4),
+                  Expanded(child: Text('Next: ${log.nextAction}', style: const TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold))),
                 ],
               ),
             ),
-            const Divider(height: 1),
-            // ── Session list ──
-            Expanded(
-              child: sorted.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.calendar_today_outlined, size: 64, color: Colors.grey[300]),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'No sessions yet',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tap "New Session" above to record the first coaching session.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: sorted.length,
-                    itemBuilder: (_, i) {
-                      final s = sorted[i];
-                      final isCompleted = s.status == SessionStatus.completed;
-                      final dotColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
-                      final accentColor = isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A);
-                      
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              Container(
-                                width: 14,
-                                height: 14,
-                                decoration: BoxDecoration(
-                                  color: dotColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
-                                  boxShadow: [BoxShadow(color: dotColor.withOpacity(0.4), blurRadius: 6)],
-                                ),
-                              ),
-                              if (i < sorted.length - 1)
-                                Container(width: 2, height: 70, decoration: BoxDecoration(
-                                  gradient: LinearGradient(colors: [dotColor, Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                                )),
-                            ],
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                context.push('/sessions/detail', extra: s);
-                              },
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: accentColor.withOpacity(0.15)),
-                                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.calendar_today_rounded, size: 12, color: accentColor),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(s.title, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
-                                            overflow: TextOverflow.ellipsis),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: accentColor.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            isCompleted ? 'Done' : 'Draft',
-                                            style: TextStyle(color: accentColor, fontSize: 9, fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
-                                      style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
-                                      maxLines: 2, overflow: TextOverflow.ellipsis),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        OutlinedButton.icon(
-                                          onPressed: () {
-                                            context.push(AppRoutes.diagnosis, extra: s.id);
-                                          },
-                                          icon: const Icon(Icons.assessment_outlined, size: 16),
-                                          label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
-                                          style: OutlinedButton.styleFrom(
-                                            foregroundColor: accentColor,
-                                            side: BorderSide(color: accentColor),
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-            ),
-          ],
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
+        ],
+      ),
     );
   }
 
   // ─── TAB 3: Tasks & Recommendations ──────────────────────────────────────
 
   Widget _buildTasksTab() {
-    // Local copy for the builder scope if needed, or just use the member variable
     final completed = _tasks.where((t) => t.done).length;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Progress summary
           Container(
             padding: const EdgeInsets.all(16),
             decoration: _cardDecor(),
@@ -1122,7 +1194,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   // ─── TAB 4: Documents & Evidence ──────────────────────────────────────────
 
   Widget _buildDocumentsTab(WidgetRef ref) {
-    // Correctly using ref passed from build
     final docsAsync = ref.watch(enterpriseDocumentsProvider(widget.enterpriseId));
     
     return docsAsync.when(
@@ -1189,21 +1260,18 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, st) {
-        // If it's a 404 or any error, but logically it could just be empty, show "No documents"
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
-              const SizedBox(height: 16),
-              const Text('No documents uploaded yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
-              const SizedBox(height: 8),
-              Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
-            ],
-          ),
-        );
-      },
+      error: (e, st) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
+            const SizedBox(height: 16),
+            const Text('No documents uploaded yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+            const SizedBox(height: 8),
+            Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1303,7 +1371,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
                 TextFormField(
                   controller: phoneController,
-                  // Phone is always editable for contact purposes
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(labelText: 'Phone'),
                   validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
