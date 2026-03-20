@@ -20,6 +20,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   String? _selectedEnterpriseId;
   String? _selectedTemplateId;
   DateTime _selectedDate = DateTime.now();
+  int _sessionNumber = 1;
+  FollowupType _followupType = FollowupType.physical;
 
   @override
   void dispose() {
@@ -40,7 +42,9 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       templateId: _selectedTemplateId,
       coachId: user.id,
       scheduledDate: _selectedDate,
-      status: SessionStatus.scheduled, // Initially just scheduled/created
+      status: SessionStatus.scheduled, 
+      sessionNumber: _sessionNumber,
+      followupType: _followupType,
       notes: '',
       problemsIdentified: '',
       recommendations: '',
@@ -160,6 +164,48 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 error: (err, _) => Text('Error loading profiles: $err'),
               ),
               const SizedBox(height: 24),
+
+              const Text('Session Type', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTypeCard(
+                      'Physical Visit', 
+                      Icons.location_on_outlined, 
+                      _followupType == FollowupType.physical,
+                      () => setState(() => _followupType = FollowupType.physical),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildTypeCard(
+                      'Phone Call', 
+                      Icons.phone_outlined, 
+                      _followupType == FollowupType.phone,
+                      () => setState(() => _followupType = FollowupType.phone),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              const Text('Session Number (Graduation Track)', style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                value: _sessionNumber,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+                items: List.generate(8, (i) => i + 1).map((n) => DropdownMenuItem(
+                  value: n,
+                  child: Text('Session #$n'),
+                )).toList(),
+                onChanged: (val) => setState(() => _sessionNumber = val ?? 1),
+              ),
+              const SizedBox(height: 24),
               
               const Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
@@ -201,6 +247,30 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeCard(String label, IconData icon, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey),
+            const SizedBox(height: 8),
+            Text(label, style: TextStyle(
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
+            )),
+          ],
         ),
       ),
     );

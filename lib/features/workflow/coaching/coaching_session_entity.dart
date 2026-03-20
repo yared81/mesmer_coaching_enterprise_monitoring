@@ -2,6 +2,8 @@
 // Each enterprise can have multiple sessions over time
 
 enum SessionStatus { scheduled, completed, cancelled }
+enum FollowupType { physical, phone }
+enum QcStatus { pending, approved, flagged }
 
 class CoachingSessionEntity {
   const CoachingSessionEntity({
@@ -11,6 +13,12 @@ class CoachingSessionEntity {
     required this.coachId,
     required this.scheduledDate,
     required this.status,
+    this.sessionNumber,
+    this.followupType = FollowupType.physical,
+    this.revenueGrowthPercent = 0.0,
+    this.currentEmployees = 0,
+    this.jobsCreated = 0,
+    this.qcStatus = QcStatus.pending,
     this.templateId,
     this.enterpriseName,
     this.problemsIdentified,
@@ -25,6 +33,12 @@ class CoachingSessionEntity {
   final String coachId;
   final DateTime scheduledDate;
   final SessionStatus status;
+  final int? sessionNumber;
+  final FollowupType followupType;
+  final double revenueGrowthPercent;
+  final int currentEmployees;
+  final int jobsCreated;
+  final QcStatus qcStatus;
   final String? templateId;
   final String? problemsIdentified;
   final String? recommendations;

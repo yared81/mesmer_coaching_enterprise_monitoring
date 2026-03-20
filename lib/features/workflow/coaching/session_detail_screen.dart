@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_entity.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -23,6 +25,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _problemsController;
   late TextEditingController _recommendationsController;
   late TextEditingController _notesController;
+  late TextEditingController _revenueController;
+  late TextEditingController _employeesController;
   bool _isSaving = false;
   bool _isUploading = false;
   final ImagePicker _picker = ImagePicker();
@@ -33,6 +37,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     _problemsController = TextEditingController(text: widget.session.problemsIdentified);
     _recommendationsController = TextEditingController(text: widget.session.recommendations);
     _notesController = TextEditingController(text: widget.session.notes);
+    _revenueController = TextEditingController(text: widget.session.revenueGrowthPercent.toString());
+    _employeesController = TextEditingController(text: widget.session.currentEmployees.toString());
   }
 
   @override
@@ -40,6 +46,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     _problemsController.dispose();
     _recommendationsController.dispose();
     _notesController.dispose();
+    _revenueController.dispose();
+    _employeesController.dispose();
     super.dispose();
   }
 
@@ -53,6 +61,12 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       coachId: widget.session.coachId,
       scheduledDate: widget.session.scheduledDate,
       status: isFinalizing ? SessionStatus.completed : widget.session.status,
+      sessionNumber: widget.session.sessionNumber,
+      followupType: widget.session.followupType,
+      revenueGrowthPercent: double.tryParse(_revenueController.text) ?? 0.0,
+      currentEmployees: int.tryParse(_employeesController.text) ?? 0,
+      jobsCreated: widget.session.jobsCreated, // Typically calculated or manual, keep for now
+      qcStatus: widget.session.qcStatus,
       problemsIdentified: _problemsController.text,
       recommendations: _recommendationsController.text,
       notes: _notesController.text,
@@ -202,7 +216,35 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             _buildNoteField('Recommendations', _recommendationsController, readOnly: isReadOnly),
             const SizedBox(height: 20),
             _buildNoteField('General Notes', _notesController, maxLines: 5, readOnly: isReadOnly),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+
+            // Growth Metrics Section (New Phase 3)
+            if (widget.session.followupType == FollowupType.physical) ...[
+              const Text('Growth Metrics (Mandatory)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  children: [
+                    _buildMetricField('Revenue Growth %', _revenueController, Icons.trending_up, isReadOnly),
+                    const SizedBox(height: 16),
+                    _buildMetricField('Current Employee Count', _employeesController, Icons.people_outline, isReadOnly),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+
+            // Action Plan Integration (New Phase 3)
+            const Text('Action Plan Tasks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const SizedBox(height: 16),
+            _buildActionPlanSection(),
+            const SizedBox(height: 32),
             
             // Attachments Section
             const Text('Attachments & Evidence', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -301,6 +343,17 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                       );
                       return;
                     }
+                    // Check growth metrics for physical sessions
+                    if (widget.session.followupType == FollowupType.physical) {
+                      if (_revenueController.text.isEmpty || _employeesController.text.isEmpty) {
+                        CustomToaster.show(
+                          context: context,
+                          message: 'Please provide revenue and employee metrics before finalizing.',
+                          isError: true,
+                        );
+                        return;
+                      }
+                    }
                     _saveNotes(isFinalizing: true);
                   },
                   style: ElevatedButton.styleFrom(
@@ -381,6 +434,65 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       },
       loading: () => const LinearProgressIndicator(),
       error: (e, st) => const Text('No attachments yet.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+    );
+  }
+
+  Widget _buildMetricField(String label, TextEditingController controller, IconData icon, bool readOnly) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.blueGrey)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          enabled: !readOnly,
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: const Color(0xFF3D5AFE), size: 20),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionPlanSection() {
+    final iapsAsync = ref.watch(enterpriseIapsProvider(widget.session.enterpriseId));
+    
+    return iapsAsync.when(
+      data: (iaps) {
+        if (iaps.isEmpty) return const Text('No active action plan found.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic));
+        final tasks = iaps.first.tasks;
+        if (tasks.isEmpty) return const Text('No tasks created yet.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic));
+        
+        return Column(
+          children: tasks.map((task) => Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), border.all(color: Colors.grey[200]!)),
+            child: ListTile(
+              dense: true,
+              leading: Checkbox(
+                value: task.status == IapTaskStatus.completed,
+                onChanged: widget.session.status == SessionStatus.completed ? null : (val) {
+                  // In a real app, update task status via provider
+                  CustomToaster.show(context: context, message: 'Task status updated locally (Demo)');
+                },
+              ),
+              title: Text(task.description, style: TextStyle(
+                fontSize: 13, 
+                decoration: task.status == IapTaskStatus.completed ? TextDecoration.lineThrough : null
+              )),
+              subtitle: Text('Due: ${DateFormat('MMM dd').format(task.deadline)}', style: const TextStyle(fontSize: 11)),
+            ),
+          )).toList(),
+        );
+      },
+      loading: () => const LinearProgressIndicator(),
+      error: (e, _) => const Text('Failed to load tasks.'),
     );
   }
 }
