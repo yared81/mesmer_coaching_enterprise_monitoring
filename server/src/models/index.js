@@ -15,6 +15,8 @@ const IndividualActionPlan = require('./iap.model');
 const IapTask = require('./iap_task.model');
 const AuditLog = require('./audit_log.model');
 const PhoneFollowupLog = require('./phone_followup.model');
+const Training = require('./training.model');
+const TrainingAttendance = require('./training_attendance.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -153,11 +155,23 @@ User.hasMany(AuditLog, { foreignKey: 'user_id', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // Phone Follow-up Associations
-Enterprise.hasMany(PhoneFollowupLog, { foreignKey: 'enterprise_id', as: 'phoneLogs' });
+Enterprise.hasMany(PhoneFollowupLog,
+  Training,
+  TrainingAttendance, { foreignKey: 'enterprise_id', as: 'phoneLogs' });
 PhoneFollowupLog.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
 User.hasMany(PhoneFollowupLog, { foreignKey: 'coach_id', as: 'phoneLogs' });
 PhoneFollowupLog.belongsTo(User, { foreignKey: 'coach_id', as: 'coach' });
+
+// Training Associations
+User.hasMany(Training, { foreignKey: 'trainer_id', as: 'trainings' });
+Training.belongsTo(User, { foreignKey: 'trainer_id', as: 'trainer' });
+
+Training.hasMany(TrainingAttendance, { foreignKey: 'training_id', as: 'attendees', onDelete: 'CASCADE' });
+TrainingAttendance.belongsTo(Training, { foreignKey: 'training_id', as: 'training' });
+
+Enterprise.hasMany(TrainingAttendance, { foreignKey: 'enterprise_id', as: 'trainingAttendances' });
+TrainingAttendance.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
 const db = {
   Institution,
