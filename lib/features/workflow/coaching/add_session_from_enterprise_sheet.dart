@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
@@ -23,6 +24,8 @@ class _AddSessionFromEnterpriseSheetState
   final _titleController = TextEditingController();
   String? _selectedTemplateId;
   DateTime _selectedDate = DateTime.now();
+  int _sessionNumber = 1;
+  FollowupType _followupType = FollowupType.physical;
   bool _isSubmitting = false;
 
   @override
@@ -57,6 +60,8 @@ class _AddSessionFromEnterpriseSheetState
       coachId: user.id,
       scheduledDate: _selectedDate,
       status: SessionStatus.scheduled,
+      sessionNumber: _sessionNumber,
+      followupType: _followupType,
       notes: '',
       problemsIdentified: '',
       recommendations: '',
@@ -67,16 +72,14 @@ class _AddSessionFromEnterpriseSheetState
       // Invalidate the enterprise's session cache so timeline refreshes
       ref.invalidate(enterpriseSessionsProvider(widget.enterpriseId));
       ref.invalidate(coachingSessionsProvider);
-      if (mounted) Navigator.pop(context, true);
+      if (mounted) {
+        CustomToaster.show(context: context, message: 'Session created successfully');
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       if (mounted) {
         setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create session: $e'),
-            backgroundColor: Colors.red[700],
-          ),
-        );
+        CustomToaster.show(context: context, message: 'Failed to create session: $e', isError: true);
       }
     }
   }
@@ -177,6 +180,48 @@ class _AddSessionFromEnterpriseSheetState
               ),
               const SizedBox(height: 16),
 
+              const Text('Session Type', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildTypeCard(
+                      'Physical', 
+                      Icons.location_on_outlined, 
+                      _followupType == FollowupType.physical,
+                      () => setState(() => _followupType = FollowupType.physical),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildTypeCard(
+                      'Phone', 
+                      Icons.phone_outlined, 
+                      _followupType == FollowupType.phone,
+                      () => setState(() => _followupType = FollowupType.phone),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              const Text('Session Number', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                value: _sessionNumber,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                ),
+                items: List.generate(8, (i) => i + 1).map((n) => DropdownMenuItem(
+                  value: n,
+                  child: Text('Session #$n'),
+                )).toList(),
+                onChanged: (val) => setState(() => _sessionNumber = val ?? 1),
+              ),
+              const SizedBox(height: 16),
+
               // Date picker
               InkWell(
                 onTap: _pickDate,
@@ -234,6 +279,31 @@ class _AddSessionFromEnterpriseSheetState
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeCard(String label, IconData icon, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey, size: 20),
+            const SizedBox(height: 4),
+            Text(label, style: TextStyle(
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
+            )),
+          ],
         ),
       ),
     );

@@ -39,10 +39,10 @@ class AdminStatsModel extends AdminStatsEntity {
         .toList();
     
     return AdminStatsModel(
-      totalInstitutions: stats['totalInstitutions'] as int,
-      totalCoaches: stats['totalCoaches'] as int,
-      totalEnterprises: stats['totalEnterprises'] as int,
-      activePrograms: stats['activePrograms'] as int,
+      totalInstitutions: NumUtils.toInt(stats['totalInstitutions']),
+      totalCoaches: NumUtils.toInt(stats['totalCoaches']),
+      totalEnterprises: NumUtils.toInt(stats['totalEnterprises']),
+      activePrograms: NumUtils.toInt(stats['activePrograms']),
       recentEnterprises: recent,
     );
   }

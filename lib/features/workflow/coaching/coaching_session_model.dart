@@ -1,3 +1,4 @@
+import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
 import 'coaching_session_entity.dart';
 
 class CoachingSessionModel extends CoachingSessionEntity {
@@ -29,13 +30,13 @@ class CoachingSessionModel extends CoachingSessionEntity {
       coachId: json['coach_id'] as String,
       scheduledDate: DateTime.parse(json['scheduled_date'] as String),
       status: SessionStatus.values.byName(json['status'] as String),
-      sessionNumber: json['session_number'] as int?,
+      sessionNumber: NumUtils.toInt(json['session_number']),
       followupType: json['followup_type'] != null 
           ? FollowupType.values.byName(json['followup_type'] as String)
           : FollowupType.physical,
-      revenueGrowthPercent: (json['revenue_growth_percent'] ?? 0).toDouble(),
-      currentEmployees: (json['current_employees'] ?? 0) as int,
-      jobsCreated: (json['jobs_created'] ?? 0) as int,
+      revenueGrowthPercent: NumUtils.toDouble(json['revenue_growth_percent']),
+      currentEmployees: NumUtils.toInt(json['current_employees']),
+      jobsCreated: NumUtils.toInt(json['jobs_created']),
       qcStatus: json['qc_status'] != null 
           ? QcStatus.values.byName(json['qc_status'] as String)
           : QcStatus.pending,

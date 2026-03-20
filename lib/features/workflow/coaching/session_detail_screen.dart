@@ -93,11 +93,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Failed to save session. Please try again.'),
-            backgroundColor: Colors.red[700],
-          ),
+        CustomToaster.show(
+          context: context,
+          message: 'Failed to save session. Please try again.',
+          isError: true,
         );
       }
     }
@@ -472,7 +471,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           children: tasks.map((task) => Card(
             elevation: 0,
             margin: const EdgeInsets.only(bottom: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10), border.all(color: Colors.grey[200]!)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), 
+              side: BorderSide(color: Colors.grey[200]!),
+            ),
             child: ListTile(
               dense: true,
               leading: Checkbox(

@@ -4,6 +4,7 @@ import 'iap_provider.dart';
 import 'iap_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
 import 'package:intl/intl.dart';
 
 class IapTrackerTab extends ConsumerWidget {
@@ -46,8 +47,9 @@ class IapTrackerTab extends ConsumerWidget {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('IAP Builder opening...')),
+              CustomToaster.show(
+                context: context,
+                message: 'IAP Builder is under construction, please use the enterprise setup.',
               );
             },
             icon: const Icon(Icons.add),
@@ -78,11 +80,7 @@ class IapTrackerTab extends ConsumerWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Task Form opening...')),
-                    );
-                  },
+                  onPressed: () => _showAddTaskDialog(context, ref, iap.id),
                   icon: const Icon(Icons.add, size: 16),
                   label: const Text('Add Task'),
                   style: ElevatedButton.styleFrom(
@@ -144,6 +142,52 @@ class IapTrackerTab extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showAddTaskDialog(BuildContext context, WidgetRef ref, String iapId) {
+    final descriptionController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Action Task', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: 'Task Description'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              if (descriptionController.text.isEmpty) return;
+              try {
+                final ds = ref.read(iapDataSourceProvider);
+                await ds.addTask(iapId, {
+                  'description': descriptionController.text,
+                  'deadline': DateTime.now().add(const Duration(days: 14)).toIso8601String(),
+                  'status': 'pending',
+                });
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ref.invalidate(enterpriseIapsProvider(enterpriseId));
+                  CustomToaster.show(context: context, message: 'Task added successfully');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  CustomToaster.show(context: context, message: 'Failed to add task: $e', isError: true);
+                }
+              }
+            },
+            child: const Text('Add Task'),
+          ),
+        ],
+      ),
     );
   }
 }
