@@ -1,0 +1,53 @@
+import 'package:dio/dio.dart';
+import 'package:dartz/dartz.dart';
+import '../../../core/error/failures.dart';
+import 'qc_audit_entity.dart';
+import 'qc_audit_model.dart';
+
+class QcRemoteDataSource {
+  final Dio _dio;
+  const QcRemoteDataSource(this._dio);
+
+  Future<List<QcAuditModel>> getPendingAudits() async {
+    final response = await _dio.get('/qc-audits/pending');
+    final List data = response.data['data'];
+    return data.map((json) => QcAuditModel.fromJson(json)).toList();
+  }
+
+  Future<void> reviewAudit(String id, QcAuditStatus status, String? comments) async {
+    await _dio.put('/qc-audits/$id/review', data: {
+      'status': status.name,
+      'auditor_comments': comments,
+    });
+  }
+}
+
+abstract class QcRepository {
+  Future<Either<Failure, List<QcAuditEntity>>> getPendingAudits();
+  Future<Either<Failure, void>> reviewAudit(String id, QcAuditStatus status, String? comments);
+}
+
+class QcRepositoryImpl implements QcRepository {
+  final QcRemoteDataSource remoteDataSource;
+  const QcRepositoryImpl(this.remoteDataSource);
+
+  @override
+  Future<Either<Failure, List<QcAuditEntity>>> getPendingAudits() async {
+    try {
+      final audits = await remoteDataSource.getPendingAudits();
+      return Right(audits);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.response?.data['message'] ?? 'Fetch failed'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> reviewAudit(String id, QcAuditStatus status, String? comments) async {
+    try {
+      await remoteDataSource.reviewAudit(id, status, comments);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.response?.data['message'] ?? 'Review failed'));
+    }
+  }
+}

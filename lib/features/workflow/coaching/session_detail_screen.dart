@@ -233,7 +233,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             const SizedBox(height: 16),
 
             // Supervisor QC Feedback Section
-            if (widget.session.qcStatus == QcStatus.flagged || (widget.session.qcFeedback?.isNotEmpty ?? false)) ...[
+            if (widget.session.qcStatus == QcStatus.flagged || 
+                widget.session.qcStatus == QcStatus.audited_fail || 
+                (widget.session.qcFeedback?.isNotEmpty ?? false)) ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),

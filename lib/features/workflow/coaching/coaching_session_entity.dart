@@ -3,7 +3,7 @@
 
 enum SessionStatus { scheduled, completed, cancelled }
 enum FollowupType { physical, phone }
-enum QcStatus { pending, approved, flagged }
+enum QcStatus { pending, approved, flagged, audited_pass, audited_fail }
 
 class CoachingSessionEntity {
   const CoachingSessionEntity({

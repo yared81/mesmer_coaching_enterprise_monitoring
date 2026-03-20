@@ -8,6 +8,9 @@ enum UserRole {
   @JsonValue('super_admin') superAdmin,
   @JsonValue('supervisor') supervisor,
   @JsonValue('coach') coach,
+  @JsonValue('data_verifier') dataVerifier,
+  @JsonValue('me_officer') meOfficer,
+  @JsonValue('program_manager') programManager,
   @JsonValue('enterprise_user') enterprise
 }
 

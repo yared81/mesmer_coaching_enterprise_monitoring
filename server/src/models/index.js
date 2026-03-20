@@ -156,9 +156,7 @@ User.hasMany(AuditLog, { foreignKey: 'user_id', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 // Phone Follow-up Associations
-Enterprise.hasMany(PhoneFollowupLog,
-  Training,
-  TrainingAttendance, { foreignKey: 'enterprise_id', as: 'phoneLogs' });
+Enterprise.hasMany(PhoneFollowupLog, { foreignKey: 'enterprise_id', as: 'phoneLogs' });
 PhoneFollowupLog.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
 User.hasMany(PhoneFollowupLog, { foreignKey: 'coach_id', as: 'phoneLogs' });
