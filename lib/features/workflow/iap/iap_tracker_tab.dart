@@ -21,7 +21,7 @@ class IapTrackerTab extends ConsumerWidget {
           return _buildEmptyState(context);
         }
         final activeIap = iaps.first;
-        return _buildTracker(context, activeIap);
+        return _buildTracker(context, ref, activeIap);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Center(child: Text('Error loading IAP: $err')),
@@ -64,7 +64,7 @@ class IapTrackerTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildTracker(BuildContext context, IapEntity iap) {
+  Widget _buildTracker(BuildContext context, WidgetRef ref, IapEntity iap) {
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: iap.tasks.length + 1,
