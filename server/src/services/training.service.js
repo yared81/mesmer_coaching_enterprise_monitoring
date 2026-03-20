@@ -35,5 +35,17 @@ class TrainingService {
     if (!record) throw new Error('Attendance record not found');
     return await record.update({ attended, feedback_score });
   }
+
+  async bulkUpdateAttendance(trainingId, attendanceList) {
+    for (const item of attendanceList) {
+      const { enterprise_id, attended, feedback_score } = item;
+      // upsert: update if exists (training_id + enterprise_id), elsewhere create
+      const [record] = await TrainingAttendance.findOrCreate({
+        where: { training_id: trainingId, enterprise_id: enterprise_id }
+      });
+      await record.update({ attended, feedback_score });
+    }
+    return true;
+  }
 }
 module.exports = new TrainingService();

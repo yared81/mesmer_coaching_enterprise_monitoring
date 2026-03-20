@@ -1,5 +1,6 @@
 
 const trainingService = require('../services/training.service');
+const smsService = require('../services/sms.service');
 
 class TrainingController {
   createTraining = async (req, res, next) => {
@@ -37,6 +38,20 @@ class TrainingController {
     try {
       const att = await trainingService.markAttendance(req.params.attendanceId, req.body.attended, req.body.feedback_score);
       res.status(200).json({ success: true, data: att });
+    } catch (error) { next(error); }
+  };
+
+  bulkUpdateAttendance = async (req, res, next) => {
+    try {
+      await trainingService.bulkUpdateAttendance(req.params.id, req.body.attendances);
+      res.status(200).json({ success: true, message: 'Attendance sync complete' });
+    } catch (error) { next(error); }
+  };
+
+  sendReminders = async (req, res, next) => {
+    try {
+      const results = await smsService.sendTrainingReminders(req.params.id);
+      res.status(200).json({ success: true, count: results.length, data: results });
     } catch (error) { next(error); }
   };
 }

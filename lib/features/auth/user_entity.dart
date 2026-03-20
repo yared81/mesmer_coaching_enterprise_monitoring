@@ -11,6 +11,7 @@ enum UserRole {
   @JsonValue('data_verifier') dataVerifier,
   @JsonValue('me_officer') meOfficer,
   @JsonValue('program_manager') programManager,
+  @JsonValue('trainer') trainer,
   @JsonValue('enterprise_user') enterprise
 }
 

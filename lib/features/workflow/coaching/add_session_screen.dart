@@ -21,7 +21,9 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   String? _selectedEnterpriseId;
   String? _selectedTemplateId;
   DateTime _selectedDate = DateTime.now();
-  int _sessionNumber = 1;
+  // Session number is automatically determined — not manually set by user
+  int _nextSessionNumber = 1;
+  bool _isLoadingSessionNumber = false;
   FollowupType _followupType = FollowupType.physical;
   bool _isSubmitting = false;
 
@@ -29,6 +31,51 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   void dispose() {
     _titleController.dispose();
     super.dispose();
+  }
+
+  /// When the user selects an enterprise, this fetches the existing sessions
+  /// to determine the correct next session number automatically.
+  Future<void> _onEnterpriseSelected(String? enterpriseId) async {
+    if (enterpriseId == null) return;
+    setState(() {
+      _selectedEnterpriseId = enterpriseId;
+      _isLoadingSessionNumber = true;
+    });
+
+    try {
+      final repository = ref.read(coachingRepositoryProvider);
+      final result = await repository.getEnterpriseSessions(enterpriseId);
+      result.fold(
+        (failure) {
+          // On error, default to session 1
+          setState(() {
+            _nextSessionNumber = 1;
+            _isLoadingSessionNumber = false;
+          });
+        },
+        (sessions) {
+          // Find the highest existing session number and add 1
+          final completedNumbers = sessions
+              .where((s) => s.sessionNumber != null)
+              .map((s) => s.sessionNumber!)
+              .toList();
+
+          final next = completedNumbers.isEmpty
+              ? 1
+              : (completedNumbers.reduce((a, b) => a > b ? a : b) + 1);
+
+          setState(() {
+            _nextSessionNumber = next.clamp(1, 8);
+            _isLoadingSessionNumber = false;
+          });
+        },
+      );
+    } catch (_) {
+      setState(() {
+        _nextSessionNumber = 1;
+        _isLoadingSessionNumber = false;
+      });
+    }
   }
 
   Future<void> _submit() async {
@@ -39,6 +86,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
 
     setState(() => _isSubmitting = true);
 
+    // GPS: fetch with a 5-second timeout to prevent UI hanging
     double? lat;
     double? lng;
     try {
@@ -48,25 +96,33 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
         if (permission == LocationPermission.denied) {
           permission = await Geolocator.requestPermission();
         }
-        if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
-          Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+        if (permission == LocationPermission.whileInUse ||
+            permission == LocationPermission.always) {
+          final position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.medium,
+            timeLimit: const Duration(seconds: 5),
+          ).timeout(
+            const Duration(seconds: 8),
+            onTimeout: () => throw Exception('GPS timeout'),
+          );
           lat = position.latitude;
           lng = position.longitude;
         }
       }
     } catch (e) {
-      print("Location error: $e");
+      // Location is optional — session can still be created without GPS
+      debugPrint('Location skipped: $e');
     }
 
     final session = CoachingSessionEntity(
-      id: '', // Backend generates UUID
+      id: '',
       title: _titleController.text.trim(),
       enterpriseId: _selectedEnterpriseId!,
       templateId: _selectedTemplateId,
       coachId: user.id,
       scheduledDate: _selectedDate,
-      status: SessionStatus.scheduled, 
-      sessionNumber: _sessionNumber,
+      status: SessionStatus.scheduled,
+      sessionNumber: _nextSessionNumber,
       followupType: _followupType,
       notes: '',
       problemsIdentified: '',
@@ -77,13 +133,14 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
 
     try {
       await ref.read(coachingSessionsProvider.notifier).createSession(session);
-      
-      // Force the enterprise's session list to refresh its cache
       ref.invalidate(enterpriseSessionsProvider(_selectedEnterpriseId!));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Session created successfully'), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Session created successfully'),
+            backgroundColor: Colors.green,
+          ),
         );
         Navigator.pop(context);
       }
@@ -92,7 +149,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
         setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to create session: $e'), 
+            content: Text('Failed to create session: $e'),
             backgroundColor: Colors.red[700],
           ),
         );
@@ -156,11 +213,13 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                     fillColor: Colors.grey[50],
                   ),
                   hint: const Text('Select Enterprise'),
-                  items: list.map((e) => DropdownMenuItem(
-                    value: e.id,
-                    child: Text(e.businessName),
-                  )).toList(),
-                  onChanged: (val) => setState(() => _selectedEnterpriseId = val),
+                  items: list
+                      .map((e) => DropdownMenuItem(
+                            value: e.id,
+                            child: Text(e.businessName),
+                          ))
+                      .toList(),
+                  onChanged: _onEnterpriseSelected,
                   validator: (val) => val == null ? 'Please select an enterprise' : null,
                 ),
                 loading: () => const LinearProgressIndicator(),
@@ -179,10 +238,12 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                     fillColor: Colors.grey[50],
                   ),
                   hint: const Text('Select Assessment Tool'),
-                  items: list.map((t) => DropdownMenuItem(
-                    value: t.id,
-                    child: Text(t.title),
-                  )).toList(),
+                  items: list
+                      .map((t) => DropdownMenuItem(
+                            value: t.id,
+                            child: Text(t.title),
+                          ))
+                      .toList(),
                   onChanged: (val) => setState(() => _selectedTemplateId = val),
                   validator: (val) => val == null ? 'Please select a profile' : null,
                 ),
@@ -197,8 +258,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 children: [
                   Expanded(
                     child: _buildTypeCard(
-                      'Physical Visit', 
-                      Icons.location_on_outlined, 
+                      'Physical Visit',
+                      Icons.location_on_outlined,
                       _followupType == FollowupType.physical,
                       () => setState(() => _followupType = FollowupType.physical),
                     ),
@@ -206,8 +267,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _buildTypeCard(
-                      'Phone Call', 
-                      Icons.phone_outlined, 
+                      'Phone Call',
+                      Icons.phone_outlined,
                       _followupType == FollowupType.phone,
                       () => setState(() => _followupType = FollowupType.phone),
                     ),
@@ -216,23 +277,52 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
               ),
               const SizedBox(height: 24),
 
-              const Text('Session Number (Graduation Track)', style: TextStyle(fontWeight: FontWeight.bold)),
+              // ── Auto-Determined Session Number ──────────────────────────────
+              const Text('Session Number (Auto-Determined)', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              DropdownButtonFormField<int>(
-                value: _sessionNumber,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  filled: true,
-                  fillColor: Colors.grey[50],
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3D5AFE).withOpacity(0.05),
+                  border: Border.all(color: const Color(0xFF3D5AFE).withOpacity(0.4)),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                items: List.generate(8, (i) => i + 1).map((n) => DropdownMenuItem(
-                  value: n,
-                  child: Text('Session #$n'),
-                )).toList(),
-                onChanged: (val) => setState(() => _sessionNumber = val ?? 1),
+                child: _isLoadingSessionNumber
+                    ? const Row(
+                        children: [
+                          SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                          SizedBox(width: 12),
+                          Text('Checking existing sessions...', style: TextStyle(color: Colors.grey)),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          const Icon(Icons.playlist_add_check_rounded, color: Color(0xFF3D5AFE)),
+                          const SizedBox(width: 12),
+                          Text(
+                            _selectedEnterpriseId == null
+                                ? 'Select an enterprise first'
+                                : 'Session #$_nextSessionNumber of 8',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: Color(0xFF3D5AFE),
+                            ),
+                          ),
+                        ],
+                      ),
               ),
+              if (_nextSessionNumber > 8)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text(
+                    '⚠️ This enterprise has already completed all 8 coaching sessions.',
+                    style: TextStyle(color: Colors.orange, fontSize: 12),
+                  ),
+                ),
               const SizedBox(height: 24),
-              
+
               const Text('Date', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               InkWell(
@@ -248,29 +338,38 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(DateFormat('MMM dd, yyyy').format(_selectedDate), 
-                           style: const TextStyle(fontSize: 16)),
+                      Text(
+                        DateFormat('MMM dd, yyyy').format(_selectedDate),
+                        style: const TextStyle(fontSize: 16),
+                      ),
                       const Icon(Icons.calendar_month, color: Colors.grey),
                     ],
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _isSubmitting ? null : _submit,
+                  onPressed: (_isSubmitting || _nextSessionNumber > 8) ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3D5AFE),
+                    disabledBackgroundColor: Colors.grey[300],
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _isSubmitting
-                      ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Create Session', 
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : const Text(
+                          'Create Session',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
                 ),
               ),
             ],
@@ -288,20 +387,25 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!,
+            width: 2,
+          ),
         ),
         child: Column(
           children: [
             Icon(icon, color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey),
             const SizedBox(height: 8),
-            Text(label, style: TextStyle(
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
-            )),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

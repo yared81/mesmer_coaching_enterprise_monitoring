@@ -20,6 +20,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constan
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_tracker_tab.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipment/equipment_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipment/equipment_entity.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -39,7 +41,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -285,6 +287,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 Tab(icon: Icon(Icons.history_outlined), text: 'SESSIONS'),
                 Tab(icon: Icon(Icons.assignment_turned_in_outlined), text: 'ACTION PLAN'),
                 Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
+                Tab(icon: Icon(Icons.inventory_2_outlined), text: 'EQUIPMENT'),
               ],
             ),
           ),
@@ -296,6 +299,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             _buildTimelineTab(),
             IapTrackerTab(enterpriseId: enterprise.id),
             _buildDocumentsTab(ref),
+            _buildEquipmentTab(enterprise.id),
           ],
         ),
       ),
@@ -1286,6 +1290,43 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
+  Widget _buildEquipmentTab(String enterpriseId) {
+    final assetsAsync = ref.watch(enterpriseEquipmentProvider(enterpriseId));
+
+    return assetsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
+      data: (assets) => Column(
+        children: [
+          if (assets.isEmpty)
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[300]),
+                    const SizedBox(height: 16),
+                    const Text('No equipment recorded', style: TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(20),
+                itemCount: assets.length,
+                itemBuilder: (context, index) {
+                  final asset = assets[index];
+                  return _AssetCard(asset: asset);
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   void _showEnterpriseEditSheet(EnterpriseEntity enterprise) {
     final nameController = TextEditingController(text: enterprise.businessName);
     final ownerController = TextEditingController(text: enterprise.ownerName);
@@ -1804,3 +1845,80 @@ class _EnterpriseDocumentViewerScreen extends StatelessWidget {
     );
   }
 }
+
+class _AssetCard extends StatelessWidget {
+  final EquipmentEntity asset;
+  const _AssetCard({required this.asset});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _getStatusColor(asset.status).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.devices_other, color: _getStatusColor(asset.status), size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(asset.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 4),
+                Text('S/N: ${asset.serialNumber ?? 'N/A'}', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                if (asset.notes != null && asset.notes!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(asset.notes!, style: TextStyle(color: Colors.grey[400], fontSize: 12, fontStyle: FontStyle.italic)),
+                  ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                DateFormat('MMM dd, yyyy').format(asset.receivedDate),
+                style: TextStyle(color: Colors.grey[400], fontSize: 11),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(asset.status).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  asset.status.name.toUpperCase(),
+                  style: TextStyle(color: _getStatusColor(asset.status), fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(EquipmentStatus status) {
+    switch (status) {
+      case EquipmentStatus.functional: return Colors.green;
+      case EquipmentStatus.broken: return Colors.orange;
+      case EquipmentStatus.lost: return Colors.red;
+      case EquipmentStatus.returned: return Colors.blue;
+    }
+  }
+}
+

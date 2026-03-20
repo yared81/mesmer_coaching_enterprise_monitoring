@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/core_providers.dart';
+import '../../../core/errors/failure.dart';
 import 'qc_audit_entity.dart';
 import 'qc_repository.dart';
 

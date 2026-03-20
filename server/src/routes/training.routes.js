@@ -14,6 +14,9 @@ router.route('/:id')
   .get(trainingController.getTrainingById)
   .post(trainingController.addAttendee);
 
+router.post('/:id/attendance', trainingController.bulkUpdateAttendance);
+router.post('/:id/remind', trainingController.sendReminders);
+
 router.route('/attendance/:attendanceId')
   .put(trainingController.markAttendance);
 

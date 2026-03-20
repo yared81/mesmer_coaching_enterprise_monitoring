@@ -39,6 +39,7 @@ class UserModel {
     if (role == 'data_verifier') return UserRole.dataVerifier;
     if (role == 'me_officer') return UserRole.meOfficer;
     if (role == 'program_manager') return UserRole.programManager;
+    if (role == 'trainer') return UserRole.trainer;
     if (role == 'enterprise_user') return UserRole.enterprise;
     
     throw Exception('CRITICAL SECURITY ERROR: Unrecognized user role "$role" detected from API. Authentication safely aborted.');

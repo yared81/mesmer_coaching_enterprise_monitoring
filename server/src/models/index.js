@@ -17,6 +17,7 @@ const AuditLog = require('./audit_log.model');
 const PhoneFollowupLog = require('./phone_followup.model');
 const Training = require('./training.model');
 const TrainingAttendance = require('./training_attendance.model');
+const Equipment = require('./equipment.model');
 const QcAudit = require('./qc_audit.model');
 
 // Institution <-> User (1:N)
@@ -176,6 +177,10 @@ TrainingAttendance.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'ent
 User.hasMany(QcAudit, { foreignKey: 'verifier_id', as: 'qcAudits' });
 QcAudit.belongsTo(User, { foreignKey: 'verifier_id', as: 'verifier' });
 
+// Equipment Associations
+Enterprise.hasMany(Equipment, { foreignKey: 'enterprise_id', as: 'equipment' });
+Equipment.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
+
 const db = {
   Institution,
   User,
@@ -196,6 +201,7 @@ const db = {
   Training,
   TrainingAttendance,
   QcAudit,
+  Equipment,
   sequelize
 };
 

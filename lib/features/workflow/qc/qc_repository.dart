@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
-import '../../../core/error/failures.dart';
+import '../../../core/errors/failure.dart';
 import 'qc_audit_entity.dart';
 import 'qc_audit_model.dart';
 
@@ -37,7 +37,7 @@ class QcRepositoryImpl implements QcRepository {
       final audits = await remoteDataSource.getPendingAudits();
       return Right(audits);
     } on DioException catch (e) {
-      return Left(ServerFailure(e.response?.data['message'] ?? 'Fetch failed'));
+      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Fetch failed'));
     }
   }
 
@@ -47,7 +47,7 @@ class QcRepositoryImpl implements QcRepository {
       await remoteDataSource.reviewAudit(id, status, comments);
       return const Right(null);
     } on DioException catch (e) {
-      return Left(ServerFailure(e.response?.data['message'] ?? 'Review failed'));
+      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Review failed'));
     }
   }
 }

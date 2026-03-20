@@ -62,6 +62,7 @@ const startServer = async () => {
     app.use('/api/v1/trainings', require('./src/routes/training.routes'));
     app.use('/api/v1/qc-audits', require('./src/routes/qc_audit.routes'));
     app.use('/api/v1/graduation', require('./src/routes/graduation.routes'));
+    app.use('/api/v1/equipment', require('./src/routes/equipment.routes'));
 
     // Error Handler
     app.use((err, req, res, next) => {
