@@ -1,4 +1,5 @@
-const { Enterprise, User, Institution, QcAudit, sequelize } = require('../models');
+const { Enterprise, User, Institution, QcAudit, CoachingSession, sequelize } = require('../models');
+const crypto = require('crypto');
 const { Op } = require('sequelize');
 
 class EnterpriseService {
@@ -152,6 +153,48 @@ class EnterpriseService {
 
     await enterprise.update(data, { userId });
     return this.getEnterpriseById(id);
+  }
+  /**
+   * Triangulate and Graduate an enterprise
+   */
+  async graduateEnterprise(id, approverId) {
+    const enterprise = await Enterprise.findByPk(id);
+    if (!enterprise) throw new Error('Enterprise not found');
+
+    if (enterprise.status === 'graduated') {
+      throw new Error('Enterprise is already graduated');
+    }
+
+    // Triangulation Check 1: Must have 8 completed sessions
+    const sessions = await CoachingSession.findAll({ where: { enterprise_id: id, status: 'completed' }});
+    if (sessions.length < 8) {
+      throw new Error(`Triangulation Failed: Enterprise only has ${sessions.length}/8 completed sessions.`);
+    }
+
+    // Triangulation Check 2: Outstanding QC Audits cannot exist
+    const pendingAudits = await QcAudit.count({
+      where: { target_id: [id, ...sessions.map(s => s.id)], status: 'pending' }
+    });
+    if (pendingAudits > 0) {
+      throw new Error('Triangulation Failed: There are pending QC Verification checks for this enterprise.');
+    }
+
+    // Generate Verification Code (e.g., MES-2026-X8F9)
+    const randomHex = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const verificationCode = `MES-${new Date().getFullYear()}-${randomHex}`;
+
+    // Update Status
+    await enterprise.update({
+      status: 'graduated',
+      // Store the certificate/verification data inside note or a future dedicated column
+    });
+
+    return {
+      message: 'Graduation Triangulation Passed successfully.',
+      enterpriseId: enterprise.id,
+      verificationCode: verificationCode,
+      approvedBy: approverId
+    };
   }
 }
 
