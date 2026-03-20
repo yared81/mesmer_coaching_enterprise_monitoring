@@ -14,6 +14,7 @@ const Notification = require('./notification.model');
 const IndividualActionPlan = require('./iap.model');
 const IapTask = require('./iap_task.model');
 const AuditLog = require('./audit_log.model');
+const PhoneFollowupLog = require('./phone_followup.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -151,6 +152,13 @@ IapTask.belongsTo(IndividualActionPlan, { foreignKey: 'iap_id', as: 'plan' });
 User.hasMany(AuditLog, { foreignKey: 'user_id', as: 'auditLogs' });
 AuditLog.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
+// Phone Follow-up Associations
+Enterprise.hasMany(PhoneFollowupLog, { foreignKey: 'enterprise_id', as: 'phoneLogs' });
+PhoneFollowupLog.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
+
+User.hasMany(PhoneFollowupLog, { foreignKey: 'coach_id', as: 'phoneLogs' });
+PhoneFollowupLog.belongsTo(User, { foreignKey: 'coach_id', as: 'coach' });
+
 const db = {
   Institution,
   User,
@@ -167,6 +175,7 @@ const db = {
   IndividualActionPlan,
   IapTask,
   AuditLog,
+  PhoneFollowupLog,
   sequelize
 };
 

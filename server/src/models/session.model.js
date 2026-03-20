@@ -39,6 +39,30 @@ const CoachingSession = sequelize.define('CoachingSession', {
     type: DataTypes.ENUM('assessment', 'coaching', 'review'),
     defaultValue: 'coaching'
   },
+  followup_type: {
+    type: DataTypes.ENUM('physical', 'phone'),
+    defaultValue: 'physical'
+  },
+  session_number: {
+    type: DataTypes.INTEGER,
+    allowNull: true // 1-8 for core visits
+  },
+  revenue_growth_percent: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0.00
+  },
+  current_employees: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  jobs_created: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  qc_status: {
+    type: DataTypes.ENUM('pending', 'approved', 'flagged'),
+    defaultValue: 'pending'
+  },
   problems_identified: {
     type: DataTypes.TEXT
   },
