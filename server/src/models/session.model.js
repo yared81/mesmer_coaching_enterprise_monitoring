@@ -63,6 +63,18 @@ const CoachingSession = sequelize.define('CoachingSession', {
     type: DataTypes.ENUM('pending', 'approved', 'flagged'),
     defaultValue: 'pending'
   },
+  qc_feedback: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true
+  },
   problems_identified: {
     type: DataTypes.TEXT
   },

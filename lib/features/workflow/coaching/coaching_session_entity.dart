@@ -19,6 +19,9 @@ class CoachingSessionEntity {
     this.currentEmployees = 0,
     this.jobsCreated = 0,
     this.qcStatus = QcStatus.pending,
+    this.qcFeedback,
+    this.latitude,
+    this.longitude,
     this.templateId,
     this.enterpriseName,
     this.problemsIdentified,
@@ -39,6 +42,9 @@ class CoachingSessionEntity {
   final int currentEmployees;
   final int jobsCreated;
   final QcStatus qcStatus;
+  final String? qcFeedback;
+  final double? latitude;
+  final double? longitude;
   final String? templateId;
   final String? problemsIdentified;
   final String? recommendations;

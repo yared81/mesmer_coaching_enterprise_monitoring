@@ -6,6 +6,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 /// A lighter session creation sheet that pre-selects the enterprise.
 /// Designed to be shown as a modal bottom sheet from the EnterpriseDetailScreen.
@@ -52,6 +53,26 @@ class _AddSessionFromEnterpriseSheetState
 
     setState(() => _isSubmitting = true);
 
+    double? lat;
+    double? lng;
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (serviceEnabled) {
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+          Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+          lat = position.latitude;
+          lng = position.longitude;
+        }
+      }
+    } catch (e) {
+      // Ignore location errors, just proceed without GPS metadata
+      print("Location error: $e");
+    }
+
     final session = CoachingSessionEntity(
       id: '',
       title: _titleController.text.trim(),
@@ -65,6 +86,8 @@ class _AddSessionFromEnterpriseSheetState
       notes: '',
       problemsIdentified: '',
       recommendations: '',
+      latitude: lat,
+      longitude: lng,
     );
 
     try {

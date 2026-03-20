@@ -6,6 +6,7 @@ import 'coaching_provider.dart';
 import 'coaching_session_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
+import 'package:geolocator/geolocator.dart';
 
 class AddSessionScreen extends ConsumerStatefulWidget {
   const AddSessionScreen({super.key});
@@ -22,6 +23,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
   DateTime _selectedDate = DateTime.now();
   int _sessionNumber = 1;
   FollowupType _followupType = FollowupType.physical;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -34,6 +36,27 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
 
     final user = ref.read(authProvider).user;
     if (user == null) return;
+
+    setState(() => _isSubmitting = true);
+
+    double? lat;
+    double? lng;
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (serviceEnabled) {
+        LocationPermission permission = await Geolocator.checkPermission();
+        if (permission == LocationPermission.denied) {
+          permission = await Geolocator.requestPermission();
+        }
+        if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
+          Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+          lat = position.latitude;
+          lng = position.longitude;
+        }
+      }
+    } catch (e) {
+      print("Location error: $e");
+    }
 
     final session = CoachingSessionEntity(
       id: '', // Backend generates UUID
@@ -48,6 +71,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       notes: '',
       problemsIdentified: '',
       recommendations: '',
+      latitude: lat,
+      longitude: lng,
     );
 
     try {
@@ -64,6 +89,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       }
     } catch (e) {
       if (mounted) {
+        setState(() => _isSubmitting = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to create session: $e'), 
@@ -236,13 +262,15 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _submit,
+                  onPressed: _isSubmitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3D5AFE),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Create Session', 
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: _isSubmitting
+                      ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Text('Create Session', 
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
             ],

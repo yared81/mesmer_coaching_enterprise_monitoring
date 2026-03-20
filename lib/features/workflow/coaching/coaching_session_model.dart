@@ -40,6 +40,9 @@ class CoachingSessionModel extends CoachingSessionEntity {
       qcStatus: json['qc_status'] != null 
           ? QcStatus.values.byName(json['qc_status'] as String)
           : QcStatus.pending,
+      qcFeedback: json['qc_feedback'] as String?,
+      latitude: NumUtils.toDouble(json['latitude']),
+      longitude: NumUtils.toDouble(json['longitude']),
       templateId: json['template_id'] as String?,
       enterpriseName: json['enterprise'] != null ? json['enterprise']['business_name'] as String? : null,
       problemsIdentified: json['problems_identified'] as String?,
@@ -58,6 +61,9 @@ class CoachingSessionModel extends CoachingSessionEntity {
       'status': status.name,
       'followup_type': followupType.name,
       'qc_status': qcStatus.name,
+      'qc_feedback': qcFeedback,
+      'latitude': latitude,
+      'longitude': longitude,
       'session_number': sessionNumber,
       'revenue_growth_percent': revenueGrowthPercent,
       'current_employees': currentEmployees,

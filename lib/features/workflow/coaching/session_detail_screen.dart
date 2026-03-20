@@ -204,8 +204,39 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 32),
-            
+            const SizedBox(height: 24),
+
+            // Supervisor QC Feedback Section
+            if (widget.session.qcStatus == QcStatus.flagged || (widget.session.qcFeedback?.isNotEmpty ?? false)) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFFCA5A5), width: 1.5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626), size: 24),
+                        const SizedBox(width: 8),
+                        const Text('Supervisor Feedback - Action Required', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFFDC2626))),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.session.qcFeedback ?? 'Session flagged by supervisor. Please review and update.',
+                      style: const TextStyle(fontSize: 14, color: Color(0xFF991B1B)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+
             // Editable Notes Section
             const Text('Observations & Notes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 16),
