@@ -30,6 +30,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosi
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_template_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/communication/chat_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_log_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_profile_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -131,11 +132,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return CoachDetailScreen(coachId: id);
             },
           ),
-          GoRoute(
-            path: '/enterprises/detail/:id',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return EnterpriseDetailScreen(enterpriseId: id);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.phoneLogCreate,
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return PhoneFollowupLogScreen(enterpriseId: id);
             },
           ),
           GoRoute(

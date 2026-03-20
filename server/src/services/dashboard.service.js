@@ -1,4 +1,4 @@
-const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, Notification, sequelize } = require('../models');
+const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, Notification, PhoneFollowupLog, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class DashboardService {
@@ -90,8 +90,39 @@ class DashboardService {
         where: { user_id: coachId },
         limit: 10,
         order: [['created_at', 'DESC']]
+      }),
+      CoachingSession.findAll({
+        where: { coach_id: coachId },
+        limit: 5,
+        order: [['scheduled_date', 'DESC']],
+        include: [{ model: Enterprise, as: 'enterprise', attributes: ['business_name'] }]
+      }),
+      PhoneFollowupLog.findAll({
+        where: { coach_id: coachId },
+        limit: 5,
+        order: [['date', 'DESC']],
+        include: [{ model: Enterprise, as: 'enterprise', attributes: ['business_name'] }]
       })
     ]);
+
+    // Merge sessions and phone logs into interactions
+    const interactions = [
+      ...recentSessions.map(s => ({
+        id: s.id,
+        type: 'session',
+        title: s.enterprise?.business_name || 'Session',
+        description: s.title,
+        timestamp: s.scheduled_date,
+        status: s.status
+      })),
+      ...recentPhoneLogs.map(p => ({
+        id: p.id,
+        type: 'phone_call',
+        title: p.enterprise?.business_name || 'Phone Call',
+        description: p.purpose,
+        timestamp: p.date
+      }))
+    ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
 
     return {
       stats: {
@@ -100,7 +131,8 @@ class DashboardService {
         pendingTasks: 0, 
         avgAssessmentScore: avgReport ? parseFloat(parseFloat(avgReport.avgHealth || 0).toFixed(1)) : 0
       },
-      recentActivity
+      recentActivity,
+      recentInteractions: interactions
     };
   }
 }

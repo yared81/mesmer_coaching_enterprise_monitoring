@@ -78,11 +78,16 @@ class CoachStatsModel extends CoachStatsEntity {
     required super.pendingTasks,
     required super.avgAssessmentScore,
     required super.recentActivity,
+    required super.recentInteractions,
   });
 
   factory CoachStatsModel.fromJson(Map<String, dynamic> json) {
     final stats = json['stats'] as Map<String, dynamic>;
     final recent = (json['recentActivity'] as List)
+        .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+
+    final interactions = (json['recentInteractions'] as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
         .toList();
 
@@ -92,6 +97,7 @@ class CoachStatsModel extends CoachStatsEntity {
       pendingTasks: NumUtils.toInt(stats['pendingTasks']),
       avgAssessmentScore: NumUtils.toDouble(stats['avgAssessmentScore']),
       recentActivity: recent,
+      recentInteractions: interactions,
     );
   }
 }

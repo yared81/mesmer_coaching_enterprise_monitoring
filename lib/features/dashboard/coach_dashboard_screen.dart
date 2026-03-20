@@ -124,7 +124,36 @@ class CoachDashboardScreen extends ConsumerWidget {
 
                     const SizedBox(height: 32),
 
-                    // ── Section: Recent Activity ────────────────────────────
+                    // ── Section: Interaction Feed ───────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Interaction Feed',
+                            style: TextStyle(
+                              fontSize: 18, 
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          ActivityFeedWidget(
+                            activities: stats.recentInteractions,
+                            onActivityTap: (activity) {
+                              if (activity.type == 'session') {
+                                // Navigate to session detail if possible
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // ── Section: Recent Activity (System) ───────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: ActivityFeedWidget(

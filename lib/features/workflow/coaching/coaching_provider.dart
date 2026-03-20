@@ -4,6 +4,7 @@ import 'coaching_remote_datasource.dart';
 import 'coaching_repository_impl.dart';
 import 'coaching_repository.dart';
 import 'coaching_session_entity.dart';
+import 'phone_followup_entity.dart';
 
 final coachingRemoteDataSourceProvider = Provider<CoachingRemoteDataSource>((ref) {
   return CoachingRemoteDataSource(ref.watch(dioProvider));
@@ -74,3 +75,44 @@ final coachingSessionProvider = FutureProvider.family<CoachingSessionEntity?, St
     (sessions) => sessions.firstWhere((s) => s.id == sessionId),
   );
 });
+
+// --- Phone Follow-up Providers ---
+
+final phoneFollowupListProvider = StateNotifierProvider<PhoneFollowupListNotifier, AsyncValue<List<PhoneFollowupEntity>>>((ref) {
+  return PhoneFollowupListNotifier(ref.watch(coachingRepositoryProvider));
+});
+
+class PhoneFollowupListNotifier extends StateNotifier<AsyncValue<List<PhoneFollowupEntity>>> {
+  PhoneFollowupListNotifier(this._repository) : super(const AsyncValue.loading()) {
+    getLogs();
+  }
+
+  final CoachingRepository _repository;
+
+  Future<void> getLogs() async {
+    state = const AsyncValue.loading();
+    final result = await _repository.getCoachPhoneFollowups();
+    result.fold(
+      (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
+      (logs) => state = AsyncValue.data(logs),
+    );
+  }
+
+  Future<void> createLog(PhoneFollowupEntity log) async {
+    final result = await _repository.createPhoneFollowup(log);
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (_) => getLogs(), // Refresh list on success
+    );
+  }
+}
+
+final enterprisePhoneFollowupsProvider = FutureProvider.family<List<PhoneFollowupEntity>, String>((ref, id) async {
+  final repository = ref.watch(coachingRepositoryProvider);
+  final result = await repository.getEnterprisePhoneFollowups(id);
+  return result.fold(
+    (failure) => throw failure.message,
+    (logs) => logs,
+  );
+});
+

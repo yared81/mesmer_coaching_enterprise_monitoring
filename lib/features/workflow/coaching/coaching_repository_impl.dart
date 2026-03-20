@@ -4,6 +4,8 @@ import 'coaching_session_entity.dart';
 import 'coaching_repository.dart';
 import 'coaching_remote_datasource.dart';
 import 'coaching_session_model.dart';
+import 'phone_followup_entity.dart';
+import 'phone_followup_model.dart';
 
 class CoachingRepositoryImpl implements CoachingRepository {
   final CoachingRemoteDataSource remoteDataSource;
@@ -82,6 +84,46 @@ class CoachingRepositoryImpl implements CoachingRepository {
         notes: session.notes,
       );
       final result = await remoteDataSource.updateSession(model);
+      return Right(result);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PhoneFollowupEntity>> createPhoneFollowup(PhoneFollowupEntity log) async {
+    try {
+      final model = PhoneFollowupModel(
+        id: log.id,
+        enterpriseId: log.enterpriseId,
+        coachId: log.coachId,
+        date: log.date,
+        purpose: log.purpose,
+        issueAddressed: log.issueAddressed,
+        adviceGiven: log.adviceGiven,
+        nextAction: log.nextAction,
+      );
+      final result = await remoteDataSource.createPhoneFollowup(model);
+      return Right(result);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PhoneFollowupEntity>>> getCoachPhoneFollowups() async {
+    try {
+      final result = await remoteDataSource.getCoachPhoneFollowups();
+      return Right(result);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<PhoneFollowupEntity>>> getEnterprisePhoneFollowups(String enterpriseId) async {
+    try {
+      final result = await remoteDataSource.getEnterprisePhoneFollowups(enterpriseId);
       return Right(result);
     } catch (e) {
       return Left(Failure.fromException(e));

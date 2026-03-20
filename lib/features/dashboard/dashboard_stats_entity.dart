@@ -50,6 +50,7 @@ class CoachStatsEntity {
   final int pendingTasks;
   final double avgAssessmentScore;
   final List<ActivityEntity> recentActivity;
+  final List<ActivityEntity> recentInteractions;
 
   CoachStatsEntity({
     required this.totalEnterprises,
@@ -57,5 +58,6 @@ class CoachStatsEntity {
     required this.pendingTasks,
     required this.avgAssessmentScore,
     required this.recentActivity,
+    required this.recentInteractions,
   });
 }

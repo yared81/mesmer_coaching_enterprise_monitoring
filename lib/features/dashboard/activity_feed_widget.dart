@@ -81,14 +81,12 @@ class ActivityFeedWidget extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: _getBgColor(activity.type),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            activity.type == 'enterprise' 
-                              ? Icons.storefront_rounded 
-                              : Icons.assessment_rounded,
-                            color: Colors.blue[700],
+                            _getIcon(activity.type),
+                            color: _getIconColor(activity.type),
                             size: 20,
                           ),
                         ),
@@ -131,9 +129,39 @@ class ActivityFeedWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 12),
+  const SizedBox(height: 12),
         ],
       ),
     );
+  }
+
+  IconData _getIcon(String? type) {
+    switch (type) {
+      case 'enterprise': return Icons.storefront_rounded;
+      case 'session': return Icons.event_note_rounded;
+      case 'phone_call': return Icons.phone_in_talk_rounded;
+      case 'assessment': return Icons.assessment_rounded;
+      default: return Icons.notifications_rounded;
+    }
+  }
+
+  Color _getIconColor(String? type) {
+    switch (type) {
+      case 'enterprise': return Colors.blue[700]!;
+      case 'session': return const Color(0xFF3D5AFE);
+      case 'phone_call': return Colors.green[700]!;
+      case 'assessment': return Colors.orange[700]!;
+      default: return Colors.grey[700]!;
+    }
+  }
+
+  Color _getBgColor(String? type) {
+    switch (type) {
+      case 'enterprise': return Colors.blue[50]!;
+      case 'session': return const Color(0xFF3D5AFE).withOpacity(0.1);
+      case 'phone_call': return Colors.green[50]!;
+      case 'assessment': return Colors.orange[50]!;
+      default: return Colors.grey[50]!;
+    }
   }
 }

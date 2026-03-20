@@ -23,6 +23,7 @@ abstract class AppRoutes {
   // Coaching
   static const String sessionList = '/enterprises/:id/sessions';
   static const String sessionCreate = '/enterprises/:id/sessions/new';
+  static const String phoneLogCreate = '/enterprises/:id/sessions/phone-log';
   static const String evidenceUpload = '/sessions/:sessionId/evidence';
 
   // Coaches (Supervisor Management)
