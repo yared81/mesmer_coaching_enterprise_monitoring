@@ -22,6 +22,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/co
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipment/equipment_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipment/equipment_entity.dart';
+import 'graduation_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_entity.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -109,7 +111,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             actions: [
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: Colors.white),
-                onSelected: (value) {
+                onSelected: (value) async {
                   if (value == 'edit') {
                     if (currentUser?.role == UserRole.enterprise) {
                       final hoursSinceReg = DateTime.now().difference(enterprise.registeredAt).inHours;
@@ -123,8 +125,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     }
                   } else if (value == 'reassign') {
                     _showReassignCoachSheet(context, ref, enterprise);
-                  } else if (value == 'delete') {
-                    // Logic for delete
+                  } else if (value == 'graduate') {
+                    _handleGraduationRequest(context, ref, enterprise);
                   }
                 },
                 itemBuilder: (context) {
@@ -146,6 +148,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       value: 'delete',
                       child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
                     ),
+                  const PopupMenuItem(
+                    value: 'graduate',
+                    child: Row(children: [Icon(Icons.school_rounded, size: 18), SizedBox(width: 8), Text('Request Graduation')]),
+                  ),
                 ];
                 },
               ),
@@ -218,9 +224,16 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                     ),
                                   ),
                                   _EmployeesChip(enterprise: enterprise),
+                                  const _GraduationEligibilityBadge(eligible: false),
                                 ],
                               );
                             }
+
+                            final sessionsAsync = ref.watch(enterpriseSessionsProvider(enterprise.id));
+                            final isEligible = sessionsAsync.maybeWhen(
+                              data: (sessions) => sessions.where((s) => s.status == SessionStatus.completed).length >= 8,
+                              orElse: () => false,
+                            );
 
                             final color = _healthColorForPercentage(healthPct);
                             final label = _healthLabelForPercentage(healthPct);
@@ -230,6 +243,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                               children: [
                                 _HealthBadge(score: healthPct.toInt(), label: label, color: color),
                                 _EmployeesChip(enterprise: enterprise),
+                                if (isEligible) const _GraduationEligibilityBadge(eligible: true),
                               ],
                             );
                           },
@@ -1327,6 +1341,51 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
   }
 
+  void _handleGraduationRequest(BuildContext context, WidgetRef ref, EnterpriseEntity enterprise) async {
+    final sessionsAsync = ref.read(enterpriseSessionsProvider(enterprise.id));
+    final completedSessions = sessionsAsync.maybeWhen(
+      data: (sessions) => sessions.where((s) => s.status == SessionStatus.completed).length,
+      orElse: () => 0,
+    );
+
+    if (completedSessions < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ineligible: Only $completedSessions/8 sessions completed.')),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Graduation'),
+        content: const Text('This will formally close the coaching cycle for this enterprise and generate a verification code. Proceed?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Graduate', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await ref.read(graduationProvider.notifier).request(enterprise.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Graduation successful! Enterprise status updated.')),
+          );
+          ref.invalidate(enterpriseListProvider); // Refresh to show new status
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Graduation failed: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
   void _showEnterpriseEditSheet(EnterpriseEntity enterprise) {
     final nameController = TextEditingController(text: enterprise.businessName);
     final ownerController = TextEditingController(text: enterprise.ownerName);
@@ -1654,6 +1713,42 @@ class _HealthBadge extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),
+      ),
+    );
+  }
+}
+
+class _GraduationEligibilityBadge extends StatelessWidget {
+  final bool eligible;
+  const _GraduationEligibilityBadge({required this.eligible});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: eligible ? Colors.amber.withOpacity(0.2) : Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: eligible ? Colors.amber.withOpacity(0.5) : Colors.white.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            eligible ? Icons.school_rounded : Icons.lock_outline_rounded, 
+            size: 14, 
+            color: eligible ? Colors.amber[100] : Colors.white70
+          ),
+          const SizedBox(width: 6),
+          Text(
+            eligible ? 'Graduation Eligible' : 'In Progress',
+            style: TextStyle(
+              color: eligible ? Colors.amber[100] : Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
