@@ -10,6 +10,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_a
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/app_search_bar.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SupervisorDashboardScreen extends ConsumerWidget {
   const SupervisorDashboardScreen({super.key});
@@ -221,6 +223,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
+                  const SyncIndicator(),
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
                     onPressed: () => _showNotificationsSheet(context, ref),
@@ -298,12 +301,12 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: ProgramPerformanceChart(),
-                    ),
+                    ).animate(delay: 200.ms).fadeIn(duration: 600.ms).moveY(begin: 30, end: 0, curve: Curves.easeOutCubic),
                     const SizedBox(height: 16),
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: CoachActivityChart(),
-                    ),
+                    ).animate(delay: 400.ms).fadeIn(duration: 600.ms).moveY(begin: 30, end: 0, curve: Curves.easeOutCubic),
 
                     const SizedBox(height: 28),
 

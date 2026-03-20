@@ -4,7 +4,10 @@ import 'equipment_entity.dart';
 import 'equipment_repository.dart';
 
 final equipmentRepositoryProvider = Provider<EquipmentRepository>((ref) {
-  return EquipmentRepositoryImpl(ref.watch(dioProvider));
+  return EquipmentRepositoryImpl(
+    ref.watch(dioProvider),
+    ref.watch(localCacheRepositoryProvider),
+  );
 });
 
 final enterpriseEquipmentProvider = StateNotifierProvider.family<EquipmentNotifier, AsyncValue<List<EquipmentEntity>>, String>((ref, enterpriseId) {

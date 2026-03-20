@@ -87,6 +87,51 @@ class LocalCacheRepository {
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
 
+  // --- Training ---
+  Future<void> cacheTrainings(List<Map<String, dynamic>> trainings) async {
+    final db = await _db.database;
+    final batch = db.batch();
+    batch.delete('trainings');
+    for (final t in trainings) {
+      batch.insert('trainings', {
+        'id': t['id'] ?? t['_id'],
+        'data': jsonEncode(t),
+        'sync_status': 1,
+        'sync_last_updated': DateTime.now().toIso8601String(),
+      });
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<Map<String, dynamic>>> getCachedTrainings() async {
+    final db = await _db.database;
+    final maps = await db.query('trainings');
+    return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
+  }
+
+  // --- Equipment ---
+  Future<void> cacheEnterpriseEquipment(String enterpriseId, List<Map<String, dynamic>> equipment) async {
+    final db = await _db.database;
+    final batch = db.batch();
+    batch.delete('equipment', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
+    for (final e in equipment) {
+      batch.insert('equipment', {
+        'id': e['id'] ?? e['_id'],
+        'enterprise_id': enterpriseId,
+        'data': jsonEncode(e),
+        'sync_status': 1,
+        'sync_last_updated': DateTime.now().toIso8601String(),
+      });
+    }
+    await batch.commit(noResult: true);
+  }
+
+  Future<List<Map<String, dynamic>>> getCachedEnterpriseEquipment(String enterpriseId) async {
+    final db = await _db.database;
+    final maps = await db.query('equipment', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
+    return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
+  }
+
   // --- Offline Sync Queue ---
   Future<void> enqueueSyncAction(String actionType, String endpoint, Map<String, dynamic> payload) async {
     final db = await _db.database;

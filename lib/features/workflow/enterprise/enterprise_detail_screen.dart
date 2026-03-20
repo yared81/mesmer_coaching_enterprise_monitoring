@@ -109,6 +109,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             backgroundColor: const Color(0xFF3D5AFE),
             foregroundColor: Colors.white,
             actions: [
+              const SyncIndicator(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) async {

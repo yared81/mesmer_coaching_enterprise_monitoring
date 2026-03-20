@@ -38,6 +38,7 @@ dependencies:
 
   # Navigation
   go_router: ^14.7.2
+  flutter_animate: ^4.5.2
 
   # Networking & Auth
   dio: ^5.7.0

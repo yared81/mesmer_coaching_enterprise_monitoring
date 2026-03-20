@@ -4,7 +4,10 @@ import 'training_entity.dart';
 import 'training_repository.dart';
 
 final trainingRepositoryProvider = Provider<TrainingRepository>((ref) {
-  return TrainingRepositoryImpl(ref.watch(dioProvider));
+  return TrainingRepositoryImpl(
+    ref.watch(dioProvider),
+    ref.watch(localCacheRepositoryProvider),
+  );
 });
 
 final trainingsProvider = StateNotifierProvider<TrainingsNotifier, AsyncValue<List<TrainingEntity>>>((ref) {

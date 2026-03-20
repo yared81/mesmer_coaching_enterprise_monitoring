@@ -5,6 +5,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainin
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class TrainerDashboardScreen extends ConsumerWidget {
   const TrainerDashboardScreen({super.key});
@@ -20,10 +22,12 @@ class TrainerDashboardScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF111827),
         foregroundColor: Colors.white,
         actions: [
+          const SyncIndicator(),
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: () => _showScheduleModal(context, ref),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: trainingsAsync.when(
@@ -34,7 +38,10 @@ class TrainerDashboardScreen extends ConsumerWidget {
                 itemCount: trainings.length,
                 itemBuilder: (context, index) {
                   final training = trainings[index];
-                  return _TrainingCard(training: training);
+                  return _TrainingCard(training: training)
+                      .animate(delay: (100 * index).ms)
+                      .fadeIn(duration: 500.ms)
+                      .moveY(begin: 16, end: 0, curve: Curves.easeOutCubic);
                 },
               ),
         loading: () => const Center(child: CircularProgressIndicator()),

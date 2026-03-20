@@ -61,7 +61,28 @@ class LocalDatabase {
       )
     ''');
 
-    // 4. Sync Queue Table
+    // 4. Training Cached Table
+    await db.execute('''
+      CREATE TABLE trainings (
+        id TEXT PRIMARY KEY,
+        data TEXT NOT NULL,
+        sync_status INTEGER DEFAULT 0,
+        sync_last_updated TEXT
+      )
+    ''');
+
+    // 5. Equipment Cached Table
+    await db.execute('''
+      CREATE TABLE equipment (
+        id TEXT PRIMARY KEY,
+        enterprise_id TEXT NOT NULL,
+        data TEXT NOT NULL,
+        sync_status INTEGER DEFAULT 0,
+        sync_last_updated TEXT
+      )
+    ''');
+
+    // 6. Sync Queue Table
     // type: POST, PUT, DELETE
     // target: endpoint or entity
     // payload: JSON string of data
@@ -83,6 +104,8 @@ class LocalDatabase {
     await db.delete('enterprises');
     await db.delete('coaching_sessions');
     await db.delete('phone_logs');
+    await db.delete('trainings');
+    await db.delete('equipment');
     await db.delete('sync_queue');
   }
 }
