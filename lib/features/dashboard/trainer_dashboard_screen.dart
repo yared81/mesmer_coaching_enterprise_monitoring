@@ -22,7 +22,7 @@ class TrainerDashboardScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF111827),
         foregroundColor: Colors.white,
         actions: [
-          const SyncIndicator(),
+          SyncIndicator(),
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: () => _showScheduleModal(context, ref),

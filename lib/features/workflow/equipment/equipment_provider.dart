@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/core_providers.dart';
 import 'equipment_entity.dart';
 import 'equipment_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_cache_repository.dart';
 
 final equipmentRepositoryProvider = Provider<EquipmentRepository>((ref) {
   return EquipmentRepositoryImpl(

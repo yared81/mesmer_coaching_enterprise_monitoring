@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'local_cache_repository.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_cache_repository.dart';
 
 final syncStatusProvider = StateProvider<bool>((ref) => false);
 

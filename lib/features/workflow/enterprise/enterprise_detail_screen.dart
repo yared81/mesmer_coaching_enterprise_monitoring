@@ -24,6 +24,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipmen
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipment/equipment_entity.dart';
 import 'graduation_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -109,7 +110,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             backgroundColor: const Color(0xFF3D5AFE),
             foregroundColor: Colors.white,
             actions: [
-              const SyncIndicator(),
+              SyncIndicator(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) async {
@@ -135,25 +136,25 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   final isLocked = hoursSinceReg > 48;
                   
                   return [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
-                  ),
-                  if (currentUser?.role == UserRole.supervisor)
                     const PopupMenuItem(
-                      value: 'reassign',
-                      child: Row(children: [Icon(Icons.swap_horiz_rounded, size: 18), SizedBox(width: 8), Text('Reassign')]),
+                      value: 'edit',
+                      child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
                     ),
-                  if (currentUser?.role == UserRole.admin)
+                    if (currentUser?.role == UserRole.supervisor)
+                      const PopupMenuItem(
+                        value: 'reassign',
+                        child: Row(children: [Icon(Icons.swap_horiz_rounded, size: 18), SizedBox(width: 8), Text('Reassign')]),
+                      ),
+                    if (currentUser?.role == UserRole.admin)
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
+                      ),
                     const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
+                      value: 'graduate',
+                      child: Row(children: [Icon(Icons.school_rounded, size: 18), SizedBox(width: 8), Text('Request Graduation')]),
                     ),
-                  const PopupMenuItem(
-                    value: 'graduate',
-                    child: Row(children: [Icon(Icons.school_rounded, size: 18), SizedBox(width: 8), Text('Request Graduation')]),
-                  ),
-                ];
+                  ];
                 },
               ),
             ],

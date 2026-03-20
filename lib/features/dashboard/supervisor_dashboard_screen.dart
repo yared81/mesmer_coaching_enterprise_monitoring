@@ -223,7 +223,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                   ),
                 ),
                 actions: [
-                  const SyncIndicator(),
+                  SyncIndicator(),
                   IconButton(
                     icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
                     onPressed: () => _showNotificationsSheet(context, ref),
