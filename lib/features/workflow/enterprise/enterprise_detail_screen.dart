@@ -110,6 +110,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 onSelected: (value) {
                   if (value == 'edit') {
                     if (currentUser?.role == UserRole.enterprise) {
+                      final hoursSinceReg = DateTime.now().difference(enterprise.registeredAt).inHours;
+                      if (hoursSinceReg > 48) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Profile locked (48-hour rule). Contact verifier to edit.')),
+                        );
+                        return;
+                      }
                       _showEnterpriseEditSheet(enterprise);
                     }
                   } else if (value == 'reassign') {
@@ -118,7 +125,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     // Logic for delete
                   }
                 },
-                itemBuilder: (context) => [
+                itemBuilder: (context) {
+                  final hoursSinceReg = DateTime.now().difference(enterprise.registeredAt).inHours;
+                  final isLocked = hoursSinceReg > 48;
+                  
+                  return [
                   const PopupMenuItem(
                     value: 'edit',
                     child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
@@ -128,13 +139,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       value: 'reassign',
                       child: Row(children: [Icon(Icons.swap_horiz_rounded, size: 18), SizedBox(width: 8), Text('Reassign')]),
                     ),
-                  // Remove delete for coach; keep for admin only (if needed)
                   if (currentUser?.role == UserRole.admin)
                     const PopupMenuItem(
                       value: 'delete',
                       child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),
                     ),
-                ],
+                ];
+                },
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(

@@ -140,7 +140,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isReadOnly = widget.session.status == SessionStatus.completed;
+    final hoursSinceScheduled = DateTime.now().difference(widget.session.scheduledDate).inHours;
+    final isLocked48Hours = hoursSinceScheduled > 48;
+    final isReadOnly = widget.session.status == SessionStatus.completed || isLocked48Hours;
     final diagnosisReportAsync = ref.watch(existingDiagnosisReportProvider(widget.session.id));
     final hasDiagnosis = diagnosisReportAsync.valueOrNull != null;
 
@@ -204,7 +206,31 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
+            
+            // 48-Hour Lock Badge
+            if (isLocked48Hours && widget.session.status != SessionStatus.completed)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.lock_clock, color: Colors.amber, size: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      'Locked (48-hour rule). Contact verifier for edits.',
+                      style: TextStyle(color: Colors.amber, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 16),
 
             // Supervisor QC Feedback Section
             if (widget.session.qcStatus == QcStatus.flagged || (widget.session.qcFeedback?.isNotEmpty ?? false)) ...[

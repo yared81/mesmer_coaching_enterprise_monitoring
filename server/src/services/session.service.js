@@ -88,6 +88,12 @@ class SessionService {
       throw new Error('Session not found or unauthorized');
     }
 
+    // MERL Compliance: 48-Hour Data Lock
+    const hoursSinceCreation = (Date.now() - new Date(session.created_at || session.createdAt).getTime()) / (1000 * 60 * 60);
+    if (hoursSinceCreation > 48) {
+      throw new Error('48_HOUR_LOCK: This session is locked from edits because it was created over 48 hours ago.');
+    }
+
     // 2. Enforce Metric Capture for Physical Completion
     if (updateData.status === 'completed' && (updateData.followup_type || session.followup_type) === 'physical') {
       const revenue = updateData.revenue_growth_percent !== undefined ? updateData.revenue_growth_percent : session.revenue_growth_percent;

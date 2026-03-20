@@ -129,6 +129,12 @@ class EnterpriseService {
       throw new Error('Enterprise not found');
     }
 
+    // MERL Compliance: 48-Hour Data Lock for Baseline Data
+    const hoursSinceCreation = (Date.now() - new Date(enterprise.registered_at || enterprise.createdAt).getTime()) / (1000 * 60 * 60);
+    if (hoursSinceCreation > 48) {
+      throw new Error('48_HOUR_LOCK: Enterprise baseline data is locked from edits because it was created over 48 hours ago.');
+    }
+
     await enterprise.update(data, { userId });
     return this.getEnterpriseById(id);
   }
