@@ -12,13 +12,11 @@ class ActivityModel extends ActivityEntity {
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
     return ActivityModel(
-      id: json['id'] as String,
-      title: (json['business_name'] ?? json['name'] ?? 'Unknown') as String,
-      description: json['coach'] != null 
-          ? 'Coach: ${json['coach']['name']}' 
-          : 'Enterprise activity',
-      timestamp: DateTime.parse((json['registered_at'] ?? json['timestamp'] ?? DateTime.now().toIso8601String()) as String),
-      type: json['type'] as String? ?? 'enterprise',
+      id: (json['id'] ?? '').toString(),
+      title: (json['title'] ?? json['business_name'] ?? json['name'] ?? 'Activity').toString(),
+      description: (json['description'] ?? 'No details available').toString(),
+      timestamp: DateTime.parse((json['timestamp'] ?? json['registered_at'] ?? json['created_at'] ?? DateTime.now().toIso8601String()).toString()),
+      type: json['type']?.toString() ?? 'unknown',
     );
   }
 }
@@ -34,9 +32,10 @@ class AdminStatsModel extends AdminStatsEntity {
 
   factory AdminStatsModel.fromJson(Map<String, dynamic> json) {
     final stats = json['stats'] as Map<String, dynamic>;
-    final recent = (json['recentEnterprises'] as List)
+    final recent = List<ActivityEntity>.from(
+      (json['recentEnterprises'] as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    );
     
     return AdminStatsModel(
       totalInstitutions: NumUtils.toInt(stats['totalInstitutions']),
@@ -58,9 +57,10 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
 
   factory SupervisorStatsModel.fromJson(Map<String, dynamic> json) {
     final stats = json['stats'] as Map<String, dynamic>;
-    final recent = (json['recentActivity'] as List)
+    final recent = List<ActivityEntity>.from(
+      (json['recentActivity'] as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    );
 
     return SupervisorStatsModel(
       totalCoaches: NumUtils.toInt(stats['totalCoaches']),
@@ -83,13 +83,15 @@ class CoachStatsModel extends CoachStatsEntity {
 
   factory CoachStatsModel.fromJson(Map<String, dynamic> json) {
     final stats = json['stats'] as Map<String, dynamic>;
-    final recent = (json['recentActivity'] as List)
+    final recent = List<ActivityEntity>.from(
+      (json['recentActivity'] as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    );
 
-    final interactions = (json['recentInteractions'] as List? ?? [])
+    final interactions = List<ActivityEntity>.from(
+      (json['recentInteractions'] as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
-        .toList();
+    );
 
     return CoachStatsModel(
       totalEnterprises: NumUtils.toInt(stats['totalEnterprises']),

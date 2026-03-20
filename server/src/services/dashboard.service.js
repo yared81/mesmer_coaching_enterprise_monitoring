@@ -71,7 +71,7 @@ class DashboardService {
    * Get aggregate stats for Coach
    */
   async getCoachStats(coachId) {
-    const [totalEnterprises, totalSessions, avgReport, recentActivity] = await Promise.all([
+    const [totalEnterprises, totalSessions, avgReport, recentActivity, recentSessions, recentPhoneLogs] = await Promise.all([
       Enterprise.count({ where: { coach_id: coachId } }),
       CoachingSession.count({ where: { coach_id: coachId } }),
       DiagnosisReport.findOne({
