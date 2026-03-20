@@ -15,6 +15,15 @@ const startServer = async () => {
     // Connect to Database
     await connectDB();
 
+    // Start background CRON jobs
+    try {
+      const { startStalledEnterpriseJob } = require('./src/cron/stalled_enterprise.job');
+      startStalledEnterpriseJob();
+      console.log('✅ Background CRON Jobs started');
+    } catch (err) {
+      console.warn('⚠️ Could not start CRON Jobs. Please ensure node-cron is installed. err:', err.message);
+    }
+
     // 1. Mandatory Headers (Nuclear Option)
     app.use((req, res, next) => {
       res.header('Access-Control-Allow-Origin', '*');
