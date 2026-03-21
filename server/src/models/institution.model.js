@@ -19,6 +19,14 @@ const Institution = sequelize.define('Institution', {
     validate: {
       isEmail: true
     }
+  },
+  parent_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'institutions',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'institutions',

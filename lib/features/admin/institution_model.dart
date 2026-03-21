@@ -3,12 +3,14 @@ class InstitutionModel {
   final String name;
   final String? region;
   final String? contactEmail;
+  final String? parentId;
 
   InstitutionModel({
     required this.id,
     required this.name,
     this.region,
     this.contactEmail,
+    this.parentId,
   });
 
   factory InstitutionModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class InstitutionModel {
       name: json['name'],
       region: json['region'],
       contactEmail: json['contact_email'],
+      parentId: json['parent_id'],
     );
   }
 }

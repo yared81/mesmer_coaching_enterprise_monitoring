@@ -64,7 +64,7 @@ class UserManagementController {
 
   getInstitutions = async (req, res, next) => {
     try {
-      const institutions = await institutionManagementService.getInstitutions();
+      const institutions = await institutionManagementService.getInstitutions(req.query);
       res.status(200).json({
         success: true,
         data: institutions

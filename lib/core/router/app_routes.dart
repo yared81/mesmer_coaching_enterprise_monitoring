@@ -47,5 +47,7 @@ abstract class AppRoutes {
   static const String templateBuilder = '/supervisor/templates/build';
   static const String chat = '/chat';
   static const String qcDashboard = '/qc-dashboard';
+  static const String userManagement = '/admin/users';
+  static const String institutions = '/admin/organizations';
 }
 

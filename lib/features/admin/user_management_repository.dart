@@ -9,7 +9,9 @@ abstract class UserManagementRepository {
   Future<Either<String, UserModel>> createUser(Map<String, dynamic> userData);
   Future<Either<String, UserModel>> updateUser(String userId, Map<String, dynamic> userData);
   Future<Either<String, bool>> toggleUserStatus(String userId);
-  Future<Either<String, List<InstitutionModel>>> getInstitutions();
+  Future<Either<String, List<InstitutionModel>>> getInstitutions({String? parentId, bool? isRoot});
+  Future<Either<String, InstitutionModel>> createInstitution(Map<String, dynamic> data);
+  Future<Either<String, InstitutionModel>> updateInstitution(String id, Map<String, dynamic> data);
 }
 
 class UserManagementRepositoryImpl implements UserManagementRepository {
@@ -67,11 +69,37 @@ class UserManagementRepositoryImpl implements UserManagementRepository {
   }
 
   @override
-  Future<Either<String, List<InstitutionModel>>> getInstitutions() async {
+  Future<Either<String, List<InstitutionModel>>> getInstitutions({String? parentId, bool? isRoot}) async {
     try {
-      final response = await _dio.get(ApiConstants.institutions);
+      final response = await _dio.get(
+        ApiConstants.institutions,
+        queryParameters: {
+          if (parentId != null) 'parentId': parentId,
+          if (isRoot != null) 'isRoot': isRoot.toString(),
+        },
+      );
       final List institutions = response.data['data'];
       return Right(institutions.map((e) => InstitutionModel.fromJson(e)).toList());
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, InstitutionModel>> createInstitution(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post(ApiConstants.institutions, data: data);
+      return Right(InstitutionModel.fromJson(response.data['data']));
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  @override
+  Future<Either<String, InstitutionModel>> updateInstitution(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put('${ApiConstants.institutions}/$id', data: data);
+      return Right(InstitutionModel.fromJson(response.data['data']));
     } catch (e) {
       return Left(e.toString());
     }

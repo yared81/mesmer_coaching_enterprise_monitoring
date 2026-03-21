@@ -22,9 +22,12 @@ final usersListProvider = FutureProvider.family<List<UserModel>, Map<String, Str
   );
 });
 
-final institutionsListProvider = FutureProvider<List<InstitutionModel>>((ref) async {
+final institutionsListProvider = FutureProvider.family<List<InstitutionModel>, Map<String, dynamic>>((ref, filters) async {
   final repository = ref.watch(userManagementRepositoryProvider);
-  final result = await repository.getInstitutions();
+  final result = await repository.getInstitutions(
+    parentId: filters['parentId'],
+    isRoot: filters['isRoot'],
+  );
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
@@ -36,6 +39,31 @@ class UserManagementNotifier extends StateNotifier<AsyncValue<void>> {
   final Ref _ref;
 
   UserManagementNotifier(this._repository, this._ref) : super(const AsyncValue.data(null));
+
+  Future<void> createInstitution(Map<String, dynamic> data) async {
+    state = const AsyncValue.loading();
+    final result = await _repository.createInstitution(data);
+    result.fold(
+      (l) => state = AsyncValue.error(l, StackTrace.current),
+      (r) {
+        state = const AsyncValue.data(null);
+        _ref.invalidate(institutionsListProvider);
+      },
+    );
+  }
+
+  Future<void> updateInstitution(String id, Map<String, dynamic> data) async {
+    state = const AsyncValue.loading();
+    final result = await _repository.updateInstitution(id, data);
+    result.fold(
+      (l) => state = AsyncValue.error(l, StackTrace.current),
+      (r) {
+        state = const AsyncValue.data(null);
+        _ref.invalidate(institutionsListProvider);
+      },
+    );
+  }
+
 
   Future<void> createUser(Map<String, dynamic> userData) async {
     state = const AsyncValue.loading();
