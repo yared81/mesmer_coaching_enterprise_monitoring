@@ -61,6 +61,7 @@ const startServer = async () => {
     app.use('/api/v1/phone-followups', require('./src/routes/phone_followup.routes'));
     app.use('/api/v1/trainings', require('./src/routes/training.routes'));
     app.use('/api/v1/qc-audits', require('./src/routes/qc_audit.routes'));
+    app.use('/api/v1/user-management', require('./src/routes/user_management.routes'));
     app.use('/api/v1/graduation', require('./src/routes/graduation.routes'));
     app.use('/api/v1/equipment', require('./src/routes/equipment.routes'));
 
