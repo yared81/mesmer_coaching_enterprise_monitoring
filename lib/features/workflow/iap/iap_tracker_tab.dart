@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'iap_provider.dart';
 import 'iap_entity.dart';
 import 'iap_evidence_service.dart';
+import 'iap_progress_card.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
@@ -73,27 +74,35 @@ class IapTrackerTab extends ConsumerWidget {
       itemCount: iap.tasks.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Current Action Plan',
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary)),
-                ElevatedButton.icon(
-                  onPressed: () =>
-                      _showAddTaskDialog(context, ref, iap.id),
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Add Task'),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Live progress ring card
+              IapProgressCard(iapId: iap.id),
+              // Action row
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Current Action Plan',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary)),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          _showAddTaskDialog(context, ref, iap.id),
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('Add Task'),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           );
         }
         final task = iap.tasks[index - 1];

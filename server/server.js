@@ -18,7 +18,9 @@ const startServer = async () => {
     // Start background CRON jobs
     try {
       const { startStalledEnterpriseJob } = require('./src/cron/stalled_enterprise.job');
+      const { startIapAutomationJob } = require('./src/cron/iap_automation.job');
       startStalledEnterpriseJob();
+      startIapAutomationJob();
       console.log('✅ Background CRON Jobs started');
     } catch (err) {
       console.warn('⚠️ Could not start CRON Jobs. Please ensure node-cron is installed. err:', err.message);

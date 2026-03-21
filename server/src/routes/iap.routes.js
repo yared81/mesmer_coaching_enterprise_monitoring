@@ -11,5 +11,6 @@ router.get('/enterprise/:enterpriseId', authorize('super_admin', 'admin', 'progr
 router.post('/:iapId/tasks', authorize('super_admin', 'admin', 'coach'), iapController.addTask);
 router.put('/tasks/:taskId', authorize('super_admin', 'admin', 'coach', 'enterprise_user'), iapController.updateTask);
 router.post('/tasks/:taskId/evidence', authorize('super_admin', 'admin', 'coach', 'enterprise_user'), upload.single('evidence'), iapController.uploadEvidence);
+router.get('/:iapId/progress', authorize('super_admin', 'admin', 'coach', 'enterprise_user', 'me_officer', 'program_manager'), iapController.getIapProgress);
 
 module.exports = router;

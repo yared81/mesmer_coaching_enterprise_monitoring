@@ -43,3 +43,42 @@ final enterpriseIapsProvider = FutureProvider.family<List<IapEntity>, String>((r
     return [];
   }
 });
+
+// ─── IAP Progress Stats ──────────────────────────────────────────────────────
+
+class IapProgressStats {
+  final String iapId;
+  final int total;
+  final int completed;
+  final int pending;
+  final int overdue;
+  final int percentage;
+
+  const IapProgressStats({
+    required this.iapId,
+    required this.total,
+    required this.completed,
+    required this.pending,
+    required this.overdue,
+    required this.percentage,
+  });
+
+  factory IapProgressStats.fromJson(Map<String, dynamic> json) {
+    return IapProgressStats(
+      iapId: json['iap_id'],
+      total: json['total'],
+      completed: json['completed'],
+      pending: json['pending'],
+      overdue: json['overdue'],
+      percentage: json['percentage'],
+    );
+  }
+}
+
+final iapProgressProvider =
+    FutureProvider.family<IapProgressStats, String>((ref, iapId) async {
+  final client = ref.watch(dioProvider);
+  final response =
+      await client.get('${ApiConstants.baseUrl}/iaps/$iapId/progress');
+  return IapProgressStats.fromJson(response.data['data']);
+});
