@@ -11,8 +11,8 @@ class SupervisorReportsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // We reuse enterpriseListProvider with empty map to get all enterprises
-    final enterprisesAsync = ref.watch(enterprisesListProvider({}));
+    // We reuse enterpriseListProvider to get all enterprises
+    final enterprisesAsync = ref.watch(enterpriseListProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -59,12 +59,11 @@ class SupervisorReportsScreen extends ConsumerWidget {
   Widget _buildMetricHighlights(List<dynamic> enterprises) {
     // Simple mock calculation for demonstration
     final total = enterprises.length;
-    final active = enterprises.where((e) => e.status == 'active').length;
     
     return Row(
       children: [
         Expanded(
-          child: DashboardStatCard(
+          child: StatCard(
             title: 'Monitoring Total',
             value: total.toString(),
             icon: Icons.business_rounded,
@@ -73,7 +72,7 @@ class SupervisorReportsScreen extends ConsumerWidget {
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: DashboardStatCard(
+          child: StatCard(
             title: 'Health Score',
             value: '78%',
             icon: Icons.favorite_rounded,
@@ -82,7 +81,7 @@ class SupervisorReportsScreen extends ConsumerWidget {
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: DashboardStatCard(
+          child: StatCard(
             title: 'Reporting Rate',
             value: '92%',
             icon: Icons.bar_chart_rounded,
