@@ -70,6 +70,8 @@ const startServer = async () => {
     app.use('/api/v1/user-management', require('./src/routes/user_management.routes'));
     app.use('/api/v1/graduation', require('./src/routes/graduation.routes'));
     app.use('/api/v1/equipment', require('./src/routes/equipment.routes'));
+    app.use('/api/v1/reports', require('./src/routes/report.routes'));
+
 
     // Error Handler
     app.use((err, req, res, next) => {
