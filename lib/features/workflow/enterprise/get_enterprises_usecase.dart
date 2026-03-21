@@ -9,8 +9,9 @@ class GetEnterprisesUseCase {
 
   Future<Either<Failure, List<EnterpriseEntity>>> call({
     String? search,
-    Sector? sector,
+    String? sector,
+    String? status,
   }) async {
-    return _repository.getEnterprises(search: search, sector: sector);
+    return _repository.getEnterprises(search: search, sector: sector, status: status);
   }
 }

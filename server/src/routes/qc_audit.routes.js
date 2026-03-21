@@ -7,6 +7,7 @@ router.use(protect);
 
 // Only specific roles should be able to do this, mostly data_verifier or admin
 router.get('/pending', authorize('super_admin', 'admin', 'data_verifier', 'program_manager'), qcAuditController.getPendingAudits);
+router.get('/history', authorize('super_admin', 'admin', 'data_verifier', 'program_manager'), qcAuditController.getAuditHistory);
 router.put('/:id/review', authorize('super_admin', 'admin', 'data_verifier', 'program_manager'), qcAuditController.reviewAudit);
 
 module.exports = router;

@@ -14,12 +14,14 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
   @override
   Future<Either<Failure, List<EnterpriseEntity>>> getEnterprises({
     String? search,
-    Sector? sector,
+    String? sector,
+    String? status,
   }) async {
     try {
       final models = await _remoteDatasource.getEnterprises(
         search: search,
-        sector: sector?.name,
+        sector: sector,
+        status: status,
       );
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
     } catch (e) {

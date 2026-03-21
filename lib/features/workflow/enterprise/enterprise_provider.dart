@@ -49,9 +49,9 @@ class EnterpriseListNotifier extends StateNotifier<AsyncValue<List<EnterpriseEnt
   final GetEnterprisesUseCase _getEnterprises;
   final UpdateEnterpriseUseCase _updateEnterprise;
 
-  Future<void> getEnterprises({String? search, Sector? sector}) async {
+  Future<void> getEnterprises({String? search, String? sector, String? status}) async {
     state = const AsyncValue.loading();
-    final result = await _getEnterprises(search: search, sector: sector);
+    final result = await _getEnterprises(search: search, sector: sector, status: status);
     result.fold(
       (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
       (enterprises) => state = AsyncValue.data(enterprises),

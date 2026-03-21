@@ -9,6 +9,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
+import 'enterprise_filter_sheet.dart';
 
 class EnterpriseListScreen extends ConsumerStatefulWidget {
   const EnterpriseListScreen({super.key});
@@ -19,8 +20,6 @@ class EnterpriseListScreen extends ConsumerStatefulWidget {
 
 class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
   final TextEditingController _searchController = TextEditingController();
-  Sector? _selectedSector;
-  bool _showFilters = false;
 
   @override
   void dispose() {
@@ -31,7 +30,15 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
   void _onSearch() {
     ref.read(enterpriseListProvider.notifier).getEnterprises(
       search: _searchController.text.isEmpty ? null : _searchController.text,
-      sector: _selectedSector,
+    );
+  }
+
+  void _showFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const EnterpriseFilterSheet(),
     );
   }
 
@@ -51,99 +58,65 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
             foregroundColor: Colors.white,
             title: const Text('Enterprises', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             actions: [
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert_rounded),
-                color: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                onSelected: (value) {
-                  if (value == 'filter') {
-                    setState(() => _showFilters = !_showFilters);
-                  } else if (value == 'assessment') {
-                    context.push(AppRoutes.templateList);
-                  }
-                },
-                itemBuilder: (context) {
-                  final role = ref.watch(authProvider).user?.role;
-                  return [
-                    PopupMenuItem(
-                      value: 'filter',
-                      child: Row(
-                        children: [
-                          Icon(
-                            _showFilters ? Icons.filter_list_off_rounded : Icons.filter_list_rounded,
-                            color: const Color(0xFF1A1A1A),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(_showFilters ? 'Hide Filters' : 'Show Filters', style: const TextStyle(color: Color(0xFF1A1A1A))),
-                        ],
-                      ),
-                    ),
-                    if (role != UserRole.coach)
-                      const PopupMenuItem(
-                        value: 'assessment',
-                        child: Row(
-                          children: [
-                            Icon(Icons.assignment_rounded, color: Color(0xFF1A1A1A), size: 20),
-                            SizedBox(width: 12),
-                            Text('Assessment Profiles', style: TextStyle(color: Color(0xFF1A1A1A))),
-                          ],
-                        ),
-                      ),
-                  ];
-                },
+               IconButton(
+                icon: const Icon(Icons.refresh_rounded),
+                onPressed: _onSearch,
               ),
             ],
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(_showFilters ? 108 : 56),
-              child: Column(
-                children: [
-                  // Search bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                    child: Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onSubmitted: (_) => _onSearch(),
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
-                        decoration: InputDecoration(
-                          hintText: 'Search enterprises…',
-                          hintStyle: const TextStyle(color: Colors.white60),
-                          prefixIcon: const Icon(Icons.search_rounded, color: Colors.white60, size: 20),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, color: Colors.white70, size: 20),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    _onSearch();
-                                  },
-                                )
-                              : null,
+              preferredSize: const Size.fromHeight(64),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                          ],
+                        ),
+                        child: TextField(
+                          controller: _searchController,
+                          onSubmitted: (_) => _onSearch(),
+                          decoration: InputDecoration(
+                            hintText: 'Search business name...',
+                            prefixIcon: const Icon(Icons.search, size: 20),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear, size: 18),
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _onSearch();
+                                    },
+                                  )
+                                : null,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Filter chips
-                  if (_showFilters)
-                    SizedBox(
-                      height: 44,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                        children: [
-                          _buildFilterChip(null, 'All'),
-                          ...Sector.values.map((s) => _buildFilterChip(s, s.name)),
-                        ],
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: _showFilterSheet,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                          ],
+                        ),
+                        child: const Icon(Icons.filter_list_rounded, color: Color(0xFF3D5AFE)),
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

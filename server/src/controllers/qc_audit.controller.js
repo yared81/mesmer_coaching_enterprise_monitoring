@@ -14,5 +14,12 @@ class QcAuditController {
       res.status(200).json({ success: true, data: audit });
     } catch (error) { next(error); }
   };
+
+  getAuditHistory = async (req, res, next) => {
+    try {
+      const audits = await qcAuditService.getAuditHistory();
+      res.status(200).json({ success: true, data: audits });
+    } catch (error) { next(error); }
+  };
 }
 module.exports = new QcAuditController();

@@ -112,6 +112,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CrossSectorAnalyticsScreen(),
           ),
           GoRoute(
+            path: '/qc/history',
+            builder: (context, state) => const QcAuditHistoryScreen(),
+          ),
+          GoRoute(
             path: AppRoutes.profile,
             builder: (context, state) => const ProfileScreen(),
           ),

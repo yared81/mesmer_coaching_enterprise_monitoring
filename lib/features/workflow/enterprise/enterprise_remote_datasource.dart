@@ -8,12 +8,14 @@ class EnterpriseRemoteDatasource {
   Future<List<Map<String, dynamic>>> getEnterprises({
     String? search,
     String? sector,
+    String? status,
   }) async {
     final response = await _dio.get(
-      ApiConstants.enterprises,
+      '${ApiConstants.baseUrl}/enterprises',
       queryParameters: {
         if (search != null) 'search': search,
         if (sector != null) 'sector': sector,
+        if (status != null) 'status': status,
       },
     );
     

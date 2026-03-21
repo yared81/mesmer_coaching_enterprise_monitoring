@@ -1,4 +1,5 @@
 const { QcAudit, Enterprise, CoachingSession, User } = require('../models');
+const { Op } = require('sequelize');
 
 class QcAuditService {
   async getPendingAudits() {
@@ -29,7 +30,16 @@ class QcAuditService {
       }
     }
 
-    return result;
+  async getAuditHistory() {
+    return await QcAudit.findAll({
+      where: { status: { [Op.ne]: 'pending' } },
+      include: [
+        { model: User, as: 'verifier', attributes: ['name'] },
+        { model: Enterprise, as: 'enterprise', attributes: ['business_name'] },
+        { model: CoachingSession, as: 'session', attributes: ['title'] }
+      ],
+      order: [['updatedAt', 'DESC']]
+    });
   }
 }
 module.exports = new QcAuditService();

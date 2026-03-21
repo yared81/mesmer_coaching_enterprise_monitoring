@@ -174,8 +174,19 @@ Enterprise.hasMany(TrainingAttendance, { foreignKey: 'enterprise_id', as: 'train
 TrainingAttendance.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
 // QC Audit Associations
-User.hasMany(QcAudit, { foreignKey: 'verifier_id', as: 'qcAudits' });
 QcAudit.belongsTo(User, { foreignKey: 'verifier_id', as: 'verifier' });
+
+QcAudit.belongsTo(Enterprise, {
+  foreignKey: 'target_id',
+  constraints: false,
+  as: 'enterprise'
+});
+
+QcAudit.belongsTo(CoachingSession, {
+  foreignKey: 'target_id',
+  constraints: false,
+  as: 'session'
+});
 
 // Equipment Associations
 Enterprise.hasMany(Equipment, { foreignKey: 'enterprise_id', as: 'equipment' });

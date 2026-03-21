@@ -15,6 +15,10 @@ class QcDashboardScreen extends ConsumerWidget {
         title: const Text('QC Verification Inbox'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.history_rounded),
+            onPressed: () => Navigator.pushNamed(context, '/qc/history'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(pendingAuditsProvider.notifier).fetch(),
           ),

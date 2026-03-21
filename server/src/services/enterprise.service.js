@@ -108,6 +108,14 @@ class EnterpriseService {
       query.where.user_id = user_id;
     }
 
+    if (filters.location_name) {
+      query.where.location_name = filters.location_name;
+    }
+
+    if (filters.status) {
+      query.where.status = filters.status;
+    }
+
     const { count, rows } = await Enterprise.findAndCountAll(query);
 
     return {

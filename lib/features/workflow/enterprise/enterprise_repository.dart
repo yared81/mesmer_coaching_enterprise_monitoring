@@ -6,7 +6,8 @@ import 'enterprise_dashboard_stats.dart';
 abstract class EnterpriseRepository {
   Future<Either<Failure, List<EnterpriseEntity>>> getEnterprises({
     String? search,
-    Sector? sector,
+    String? sector,
+    String? status,
   });
   
   Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id);
