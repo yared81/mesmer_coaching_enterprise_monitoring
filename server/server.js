@@ -42,6 +42,10 @@ const startServer = async () => {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    // Serve uploaded evidence files statically
+    const path = require('path');
+    app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
+
     // Health Check
     app.get('/health', (req, res) => {
       res.status(200).json({ status: 'UP', message: 'MESMER API is reaching you!' });
