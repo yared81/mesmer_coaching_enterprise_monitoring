@@ -29,6 +29,10 @@ const QcAudit = sequelize.define('QcAudit', {
   },
   auditor_comments: {
     type: DataTypes.TEXT,
+  },
+  flag_reason: {
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 }, {
   tableName: 'qc_audits',

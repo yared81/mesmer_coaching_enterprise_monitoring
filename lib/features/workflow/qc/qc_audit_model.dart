@@ -9,8 +9,12 @@ class QcAuditModel extends QcAuditEntity {
     required super.isRandomSample,
     required super.status,
     super.auditorComments,
+    this.flagReason,
     required super.createdAt,
   });
+
+  @override
+  final String? flagReason;
 
   factory QcAuditModel.fromJson(Map<String, dynamic> json) {
     return QcAuditModel(
@@ -21,6 +25,7 @@ class QcAuditModel extends QcAuditEntity {
       isRandomSample: json['is_random_sample'] as bool? ?? false,
       status: QcAuditStatus.values.byName(json['status'] as String),
       auditorComments: json['auditor_comments'] as String?,
+      flagReason: json['flag_reason'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }

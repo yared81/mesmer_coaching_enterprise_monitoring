@@ -9,6 +9,7 @@ class QcAuditEntity {
   final bool isRandomSample;
   final QcAuditStatus status;
   final String? auditorComments;
+  final String? flagReason;
   final DateTime createdAt;
 
   const QcAuditEntity({
@@ -19,6 +20,7 @@ class QcAuditEntity {
     required this.isRandomSample,
     required this.status,
     this.auditorComments,
+    this.flagReason,
     required this.createdAt,
   });
 }

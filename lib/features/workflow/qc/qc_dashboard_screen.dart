@@ -54,7 +54,36 @@ class QcDashboardScreen extends ConsumerWidget {
                         ),
                       ),
                       title: Text('${audit.targetType.name.toUpperCase()} Audit'),
-                      subtitle: Text('ID: ${audit.targetId.substring(0, 8)}... | ${audit.isRandomSample ? "Random Sample" : "Triggered Flag"}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('ID: ${audit.targetId.substring(0, 8)}...'),
+                          if (audit.flagReason != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    audit.isRandomSample ? Icons.casino_outlined : Icons.report_problem_rounded,
+                                    size: 14,
+                                    color: audit.isRandomSample ? Colors.blue : Colors.red,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      audit.flagReason!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: audit.isRandomSample ? Colors.blue : Colors.red,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _showReviewDialog(context, ref, audit),
                     ),
