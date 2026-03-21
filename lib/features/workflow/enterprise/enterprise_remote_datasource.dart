@@ -42,4 +42,9 @@ class EnterpriseRemoteDatasource {
     final response = await _dio.get(ApiConstants.enterpriseDashboardStats);
     return response.data['data'];
   }
+
+  Future<List<dynamic>> getEnterpriseTrends(String id) async {
+    final response = await _dio.get('${ApiConstants.baseUrl}/enterprises/$id/trends');
+    return response.data['data'];
+  }
 }

@@ -101,3 +101,12 @@ final enterpriseDashboardStatsProvider = FutureProvider<EnterpriseDashboardStats
     (stats) => stats,
   );
 });
+// 7. Enterprise Trends Provider
+final enterpriseTrendsProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, id) async {
+  final repo = ref.watch(enterpriseRepositoryProvider);
+  final result = await repo.getEnterpriseTrends(id);
+  return result.fold(
+    (failure) => throw failure.message,
+    (trends) => trends,
+  );
+});

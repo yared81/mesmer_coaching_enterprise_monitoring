@@ -92,6 +92,21 @@ class EnterpriseController {
       next(error);
     }
   };
+
+  /**
+   * @route GET /api/v1/enterprises/:id/trends
+   */
+  getTrends = async (req, res, next) => {
+    try {
+      const trends = await enterpriseService.getGrowthTrends(req.params.id);
+      res.status(200).json({
+        success: true,
+        data: trends
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new EnterpriseController();

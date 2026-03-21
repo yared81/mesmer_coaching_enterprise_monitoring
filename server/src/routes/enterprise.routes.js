@@ -30,4 +30,10 @@ router.put(
   enterpriseController.update
 );
 
+router.get(
+  '/:id/trends',
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
+  enterpriseController.getTrends
+);
+
 module.exports = router;

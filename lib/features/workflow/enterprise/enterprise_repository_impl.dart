@@ -62,10 +62,20 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
   @override
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats() async {
     try {
-      final map = await _remoteDatasource.getEnterpriseDashboardStats();
-      return Right(EnterpriseDashboardModel.fromJson(map));
+      final data = await _remoteDatasource.getEnterpriseDashboardStats();
+      return Right(EnterpriseDashboardStats.fromJson(data));
     } catch (e) {
-      return Left(Failure.fromException(e));
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> getEnterpriseTrends(String id) async {
+    try {
+      final data = await _remoteDatasource.getEnterpriseTrends(id);
+      return Right(data.map((e) => e as Map<String, dynamic>).toList());
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

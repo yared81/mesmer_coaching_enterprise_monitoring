@@ -194,6 +194,44 @@ class EnterpriseService {
       approvedBy: approverId
     };
   }
+
+  /**
+   * Get historical growth trends (Baseline vs Sessions) for an enterprise
+   */
+  async getGrowthTrends(enterpriseId) {
+    const enterprise = await Enterprise.findByPk(enterpriseId);
+    if (!enterprise) throw new Error('Enterprise not found');
+
+    const sessions = await CoachingSession.findAll({
+      where: { 
+        enterprise_id: enterpriseId,
+        status: 'completed'
+      },
+      order: [['session_number', 'ASC']]
+    });
+
+    // Start with Baseline
+    const trends = [
+      {
+        period: 'Baseline',
+        revenue: enterprise.annual_revenue || 0,
+        employees: enterprise.employee_count || 0,
+        date: enterprise.createdAt
+      }
+    ];
+
+    // Append Sessions
+    sessions.forEach(session => {
+      trends.push({
+        period: `S${session.session_number}`,
+        revenue: session.revenue_growth_percent || 0, // In reality, we might calculate absolute if needed, but for now we follow the model
+        employees: session.current_employees || 0,
+        date: session.updatedAt
+      });
+    });
+
+    return trends;
+  }
 }
 
 module.exports = new EnterpriseService();

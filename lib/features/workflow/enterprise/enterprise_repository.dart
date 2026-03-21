@@ -17,4 +17,6 @@ abstract class EnterpriseRepository {
   Future<Either<Failure, EnterpriseEntity>> updateEnterprise(String id, Map<String, dynamic> data);
 
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats();
+
+  Future<Either<Failure, List<Map<String, dynamic>>>> getEnterpriseTrends(String id);
 }
