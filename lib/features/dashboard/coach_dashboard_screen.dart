@@ -12,8 +12,29 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboa
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/metric_swiper.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/performance_chart.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_navigation_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/add_session_screen.dart';
+
+class _LiveActivityFeed extends ConsumerWidget {
+  const _LiveActivityFeed();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activityAsync = ref.watch(activityFeedProvider);
+
+    return activityAsync.when(
+      data: (items) => ActivityFeedWidget(
+        activities: items,
+        onActivityTap: (activity) {
+          // Navigation logic based on type
+        },
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error loading feed: $err')),
+    );
+  }
+}
 
 class CoachDashboardScreen extends ConsumerWidget {
   const CoachDashboardScreen({super.key});
@@ -50,24 +71,24 @@ class CoachDashboardScreen extends ConsumerWidget {
                           onTap: () => context.go(AppRoutes.enterpriseList),
                         ),
                         MetricSwiperItem(
+                          icon: Icons.person_pin_rounded,
+                          value: 'Portfolio',
+                          label: 'My Portfolio',
+                          subtitle: 'Coach CRM View',
+                          trend: 'LIVE',
+                          trendUp: true,
+                          gradient: const [Color(0xFF8E24AA), Color(0xFFBA68C8)],
+                          onTap: () => context.push(AppRoutes.coachCrm),
+                        ),
+                        MetricSwiperItem(
                           icon: Icons.calendar_month_rounded,
                           value: stats.totalSessions.toString(),
-                          label: 'Today\'s Sessions',
-                          subtitle: 'Scheduled sessions',
-                          trend: '0',
+                          label: 'Sessions',
+                          subtitle: 'History & Logs',
+                          trend: 'View All',
                           trendUp: true,
                           gradient: const [Color(0xFF0EA5E9), Color(0xFF38BDF8)],
                           onTap: () => context.go('/sessions'),
-                        ),
-                        MetricSwiperItem(
-                          icon: Icons.task_alt_rounded,
-                          value: stats.pendingTasks.toString(),
-                          label: 'Pending Tasks',
-                          subtitle: 'Requires action',
-                          trend: '0',
-                          trendUp: false,
-                          gradient: const [Color(0xFFFF6F00), Color(0xFFFFB300)],
-                          onTap: () {},
                         ),
                       ],
                     ),
@@ -101,7 +122,7 @@ class CoachDashboardScreen extends ConsumerWidget {
                             children: [
                               Expanded(
                                 child: _QuickActionCard(
-                                  title: 'Add Session',
+                                  title: 'Record Session',
                                   icon: Icons.add_circle_outline_rounded,
                                   color: const Color(0xFF3D5AFE),
                                   onTap: () => context.push('/sessions/new'),
@@ -110,10 +131,10 @@ class CoachDashboardScreen extends ConsumerWidget {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: _QuickActionCard(
-                                  title: 'Open Chat',
-                                  icon: Icons.chat_bubble_outline_rounded,
-                                  color: const Color(0xFF0EA5E9),
-                                  onTap: () => context.go(AppRoutes.chat),
+                                  title: 'Schedule Future',
+                                  icon: Icons.calendar_today_rounded,
+                                  color: Colors.deepPurple,
+                                  onTap: () => context.push('/calendar'),
                                 ),
                               ),
                             ],
@@ -124,43 +145,32 @@ class CoachDashboardScreen extends ConsumerWidget {
 
                     const SizedBox(height: 32),
 
-                    // ── Section: Interaction Feed ───────────────────────────
+                    // ── Section: Live Interaction Feed ──────────────────────
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Interaction Feed',
-                            style: TextStyle(
-                              fontSize: 18, 
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.5,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Interaction Feed',
+                                style: TextStyle(
+                                  fontSize: 18, 
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => ref.invalidate(activityFeedProvider),
+                                child: const Text('Refresh'),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          ActivityFeedWidget(
-                            activities: stats.recentInteractions,
-                            onActivityTap: (activity) {
-                              if (activity.type == 'session') {
-                                // Navigate to session detail if possible
-                              }
-                            },
-                          ),
+                          const SizedBox(height: 12),
+                          const _LiveActivityFeed(),
                         ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    // ── Section: Recent Activity (System) ───────────────────
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ActivityFeedWidget(
-                        activities: stats.recentActivity,
-                        onActivityTap: (activity) {
-                          // Handle activity tap
-                        },
                       ),
                     ),
                   ],

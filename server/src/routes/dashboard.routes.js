@@ -4,7 +4,7 @@ const dashboardController = require('../controllers/dashboard.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
 
 // Admin stats
-router.get('/admin', protect, authorize('admin'), dashboardController.getAdminStats);
+router.get('/admin', protect, authorize('super_admin', 'admin'), dashboardController.getAdminStats);
 
 // Supervisor stats
 router.get('/supervisor', protect, authorize('supervisor'), dashboardController.getSupervisorStats);
@@ -13,9 +13,15 @@ router.get('/supervisor', protect, authorize('supervisor'), dashboardController.
 router.get('/coach', protect, authorize('coach'), dashboardController.getCoachStats);
 
 // Supervisor: Get specific coach stats
-router.get('/coach/:coachId', protect, authorize('supervisor'), dashboardController.getSpecificCoachStats);
+router.get('/coach/:coachId', protect, authorize('supervisor', 'super_admin', 'admin'), dashboardController.getSpecificCoachStats);
 
 // M&E / Program Manager stats
-router.get('/me', protect, authorize('me_officer', 'program_manager'), dashboardController.getMeStats);
+router.get('/me', protect, authorize('me_officer', 'program_manager', 'super_admin', 'admin'), dashboardController.getMeStats);
+
+// Live Activity Feed (role-scoped)
+router.get('/activity-feed', protect, authorize('coach', 'supervisor', 'super_admin', 'admin', 'me_officer', 'program_manager'), dashboardController.getActivityFeed);
+
+// Coach CRM Portfolio
+router.get('/coach-portfolio', protect, authorize('coach'), dashboardController.getCoachPortfolio);
 
 module.exports = router;

@@ -49,5 +49,7 @@ abstract class AppRoutes {
   static const String qcDashboard = '/qc-dashboard';
   static const String userManagement = '/admin/users';
   static const String institutions = '/admin/organizations';
+  static const String coachCrm = '/coach/portfolio';
+  static const String calendar = '/calendar';
 }
 

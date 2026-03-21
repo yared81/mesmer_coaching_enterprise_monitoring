@@ -75,6 +75,32 @@ class DashboardController {
       next(error);
     }
   };
+  /**
+   * @route GET /api/v1/dashboard/activity-feed
+   * Returns the 30 most recent actions across sessions, phone logs, IAP tasks, and new enterprises.
+   * Scoped by role: coaches see their own, supervisors/admins see their institution's.
+   */
+  getActivityFeed = async (req, res, next) => {
+    try {
+      const feed = await dashboardService.getActivityFeed(req.user);
+      res.status(200).json({ success: true, data: feed });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * @route GET /api/v1/dashboard/coach-portfolio
+   * Returns all enterprises owned by the authenticated coach, with task completion stats.
+   */
+  getCoachPortfolio = async (req, res, next) => {
+    try {
+      const portfolio = await dashboardService.getCoachPortfolio(req.user.id);
+      res.status(200).json({ success: true, data: portfolio });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 module.exports = new DashboardController();

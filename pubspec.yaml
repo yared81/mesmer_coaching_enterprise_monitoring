@@ -51,6 +51,7 @@ dependencies:
   hive_flutter: ^1.1.0
   image_picker: ^1.1.2
   file_picker: ^8.1.6
+  table_calendar: ^3.1.2
 
   # Data Persistence & Generation
   freezed_annotation: ^2.4.4

@@ -18,7 +18,9 @@ class RolePermissions {
     UserRole.coach: [
       AppRoutes.dashboard,
       '/sessions',
+      '/enterprises',
       '/enterprises/detail',
+      '/reports',
       '/diagnosis',
       '/profile',
       AppRoutes.changePassword,

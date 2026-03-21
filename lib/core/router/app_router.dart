@@ -36,8 +36,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_da
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/user_management_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_management_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_crm_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/calendar_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -202,6 +203,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.institutions,
             builder: (context, state) => const InstitutionManagementScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.coachCrm,
+            builder: (context, state) => const CoachCrmScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.calendar,
+            builder: (context, state) => const CalendarScreen(),
           ),
         ],
       ),
