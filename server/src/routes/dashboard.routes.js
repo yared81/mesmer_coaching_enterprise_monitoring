@@ -15,4 +15,7 @@ router.get('/coach', protect, authorize('coach'), dashboardController.getCoachSt
 // Supervisor: Get specific coach stats
 router.get('/coach/:coachId', protect, authorize('supervisor'), dashboardController.getSpecificCoachStats);
 
+// M&E / Program Manager stats
+router.get('/me', protect, authorize('me_officer', 'program_manager'), dashboardController.getMeStats);
+
 module.exports = router;

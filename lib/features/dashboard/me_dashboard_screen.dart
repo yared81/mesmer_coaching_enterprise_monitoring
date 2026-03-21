@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
 
 class MeDashboardScreen extends ConsumerWidget {
   const MeDashboardScreen({super.key});
@@ -10,6 +7,7 @@ class MeDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
+    final statsAsync = ref.watch(meStatsProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -18,40 +16,67 @@ class MeDashboardScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF111827),
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.refresh(meStatsProvider),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildStatCards(),
-            const SizedBox(height: 24),
-            const Text('Graduation Funnel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _buildFunnelChart(),
-            const SizedBox(height: 24),
-            const Text('QC Verification Health', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            _buildQcPieChart(),
-          ],
+      body: statsAsync.when(
+        data: (stats) => SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStatCards(stats),
+              const SizedBox(height: 24),
+              const Text('Graduation Funnel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildFunnelChart(stats),
+              const SizedBox(height: 24),
+              const Text('QC Verification Health', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildQcPieChart(stats),
+            ],
+          ),
         ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
       ),
     );
   }
 
-  Widget _buildStatCards() {
+  Widget _buildStatCards(MeStatsEntity stats) {
     return Row(
       children: [
-        _StatCard(label: 'Total Active', value: '142', color: Colors.blue, icon: Icons.business),
+        _StatCard(
+            label: 'Total Active',
+            value: stats.totalActive.toString(),
+            color: Colors.blue,
+            icon: Icons.business),
         const SizedBox(width: 12),
-        _StatCard(label: 'Graduated', value: '28', color: Colors.green, icon: Icons.school),
+        _StatCard(
+            label: 'Graduated',
+            value: stats.totalGraduated.toString(),
+            color: Colors.green,
+            icon: Icons.school),
       ],
     );
   }
 
-  Widget _buildFunnelChart() {
+  Widget _buildFunnelChart(MeStatsEntity stats) {
+    final funnel = stats.graduationFunnel;
+    final maxVal = [
+      funnel['baseline'] ?? 1,
+      funnel['training'] ?? 0,
+      funnel['coaching'] ?? 0,
+      funnel['midline'] ?? 0,
+      funnel['graduated'] ?? 0
+    ].reduce((a, b) => a > b ? a : b).toDouble();
+
     return Container(
-      height: 200,
+      height: 220,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -61,13 +86,13 @@ class MeDashboardScreen extends ConsumerWidget {
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
-          maxY: 100,
+          maxY: maxVal > 0 ? maxVal * 1.2 : 100,
           barGroups: [
-            _makeGroupData(0, 95, 'Baseline'),
-            _makeGroupData(1, 80, 'Training'),
-            _makeGroupData(2, 65, 'Coaching'),
-            _makeGroupData(3, 30, 'Midline'),
-            _makeGroupData(4, 15, 'Graduated'),
+            _makeGroupData(0, (funnel['baseline'] ?? 0).toDouble()),
+            _makeGroupData(1, (funnel['training'] ?? 0).toDouble()),
+            _makeGroupData(2, (funnel['coaching'] ?? 0).toDouble()),
+            _makeGroupData(3, (funnel['midline'] ?? 0).toDouble()),
+            _makeGroupData(4, (funnel['graduated'] ?? 0).toDouble()),
           ],
           titlesData: FlTitlesData(
             show: true,
@@ -76,39 +101,52 @@ class MeDashboardScreen extends ConsumerWidget {
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
                   const titles = ['Base', 'Train', 'Coach', 'Mid', 'Grad'];
+                  if (value.toInt() >= titles.length) return const SizedBox.shrink();
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(titles[value.toInt()], style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    child: Text(titles[value.toInt()],
+                        style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
                   );
                 },
               ),
             ),
-            leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                getTitlesWidget: (value, meta) => Text(value.toInt().toString(),
+                    style: const TextStyle(fontSize: 10, color: Colors.grey)),
+              ),
+            ),
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          gridData: const FlGridData(show: false),
+          gridData: const FlGridData(show: true, drawVerticalLine: false),
           borderData: FlBorderData(show: false),
         ),
       ),
     );
   }
 
-  BarChartGroupData _makeGroupData(int x, double y, String label) {
+  BarChartGroupData _makeGroupData(int x, double y) {
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
           toY: y,
           color: const Color(0xFF3D5AFE),
-          width: 22,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+          width: 20,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
         ),
       ],
     );
   }
 
-  Widget _buildQcPieChart() {
+  Widget _buildQcPieChart(MeStatsEntity stats) {
+    final passed = stats.qcStats['passed'] ?? 0;
+    final failed = stats.qcStats['failed'] ?? 0;
+    final total = stats.qcStats['totalReview'] ?? (passed + failed);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -126,22 +164,34 @@ class MeDashboardScreen extends ConsumerWidget {
                 sectionsSpace: 0,
                 centerSpaceRadius: 30,
                 sections: [
-                  PieChartSectionData(color: Colors.green, value: 85, title: '85%', radius: 25, titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  PieChartSectionData(color: Colors.red, value: 15, title: '15%', radius: 25, titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  PieChartSectionData(
+                      color: Colors.green,
+                      value: passed.toDouble(),
+                      title: total > 0 ? '${(passed / total * 100).toInt()}%' : '0%',
+                      radius: 25,
+                      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+                  PieChartSectionData(
+                      color: Colors.red,
+                      value: failed.toDouble(),
+                      title: total > 0 ? '${(failed / total * 100).toInt()}%' : '0%',
+                      radius: 25,
+                      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 24),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _LegendItem(color: Colors.green, label: 'Audit Passed'),
-              SizedBox(height: 8),
-              _LegendItem(color: Colors.red, label: 'Audit Failed'),
-              SizedBox(height: 8),
-              Text('Total Audited: 42', style: TextStyle(color: Colors.grey, fontSize: 12)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _LegendItem(color: Colors.green, label: 'Audit Passed ($passed)'),
+                const SizedBox(height: 8),
+                _LegendItem(color: Colors.red, label: 'Audit Failed ($failed)'),
+                const SizedBox(height: 12),
+                Text('Total Audited: $total', style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
         ],
       ),

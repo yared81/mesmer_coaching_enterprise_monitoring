@@ -58,4 +58,14 @@ class DashboardRepositoryImpl implements DashboardRepository {
       return Left(Failure.fromException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, MeStatsEntity>> getMeStats() async {
+    try {
+      final stats = await remoteDataSource.getMeStats();
+      return Right(stats);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
 }

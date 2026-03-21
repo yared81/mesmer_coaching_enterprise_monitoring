@@ -31,4 +31,9 @@ class DashboardRemoteDataSource {
     final response = await _dio.get('notifications');
     return response.data['data'];
   }
+
+  Future<MeStatsModel> getMeStats() async {
+    final response = await _dio.get('${ApiConstants.dashboard}/me');
+    return MeStatsModel.fromJson(response.data);
+  }
 }

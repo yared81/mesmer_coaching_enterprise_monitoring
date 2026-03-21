@@ -103,3 +103,29 @@ class CoachStatsModel extends CoachStatsEntity {
     );
   }
 }
+
+class MeStatsModel extends MeStatsEntity {
+  MeStatsModel({
+    required super.totalActive,
+    required super.totalGraduated,
+    required super.graduationFunnel,
+    required super.qcStats,
+  });
+
+  factory MeStatsModel.fromJson(Map<String, dynamic> json) {
+    if (json['data'] != null) {
+      json = json['data'] as Map<String, dynamic>;
+    }
+    
+    final stats = (json['stats'] ?? {}) as Map<String, dynamic>;
+    final funnel = Map<String, int>.from(json['graduationFunnel'] as Map? ?? {});
+    final qc = Map<String, int>.from(json['qcStats'] as Map? ?? {});
+
+    return MeStatsModel(
+      totalActive: NumUtils.toInt(stats['totalActive']),
+      totalGraduated: NumUtils.toInt(stats['totalGraduated']),
+      graduationFunnel: funnel,
+      qcStats: qc,
+    );
+  }
+}

@@ -59,3 +59,12 @@ final notificationsProvider = FutureProvider<List<dynamic>>((ref) async {
     (notifications) => notifications,
   );
 });
+
+final meStatsProvider = FutureProvider<MeStatsEntity>((ref) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
+  final result = await repository.getMeStats();
+  return result.fold(
+    (failure) => throw failure.message,
+    (stats) => stats,
+  );
+});

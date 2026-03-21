@@ -61,3 +61,17 @@ class CoachStatsEntity {
     required this.recentInteractions,
   });
 }
+
+class MeStatsEntity {
+  final int totalActive;
+  final int totalGraduated;
+  final Map<String, int> graduationFunnel;
+  final Map<String, int> qcStats;
+
+  MeStatsEntity({
+    required this.totalActive,
+    required this.totalGraduated,
+    required this.graduationFunnel,
+    required this.qcStats,
+  });
+}

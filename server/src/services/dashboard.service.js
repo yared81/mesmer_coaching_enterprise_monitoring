@@ -135,6 +135,59 @@ class DashboardService {
       recentInteractions: interactions
     };
   }
+
+  /**
+   * Get aggregate stats for M&E / Program Manager
+   */
+  async getMeStats() {
+    const [
+      totalActive,
+      totalGraduated,
+      baselineCount,
+      trainingCount,
+      coachingCount,
+      midlineCount,
+      qcPassed,
+      qcFailed
+    ] = await Promise.all([
+      Enterprise.count({ where: { status: 'active' } }),
+      Enterprise.count({ where: { status: 'graduated' } }),
+      // Funnel: Baseline (has score)
+      Enterprise.count({ where: { baseline_score: { [Op.gt]: 0 } } }),
+      // Funnel: Training (attended at least one)
+      TrainingAttendance.count({ distinct: true, col: 'enterprise_id' }),
+      // Funnel: Coaching (had at least one session)
+      CoachingSession.count({ distinct: true, col: 'enterprise_id' }),
+      // Funnel: Midline (has at least 2 reports)
+      DiagnosisReport.count({
+        distinct: true,
+        col: 'CoachingSession.enterprise_id',
+        include: [{ model: CoachingSession, as: 'session', attributes: [] }]
+      }),
+      // QC Health
+      QcAudit.count({ where: { status: 'passed' } }),
+      QcAudit.count({ where: { status: 'failed' } })
+    ]);
+
+    return {
+      stats: {
+        totalActive,
+        totalGraduated,
+      },
+      graduationFunnel: {
+        baseline: baselineCount,
+        training: trainingCount,
+        coaching: coachingCount,
+        midline: midlineCount,
+        graduated: totalGraduated
+      },
+      qcStats: {
+        passed: qcPassed,
+        failed: qcFailed,
+        totalReview: qcPassed + qcFailed
+      }
+    };
+  }
 }
 
 module.exports = new DashboardService();
