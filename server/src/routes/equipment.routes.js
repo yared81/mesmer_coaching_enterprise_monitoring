@@ -6,11 +6,11 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 router.use(protect);
 
 router.route('/')
-  .get(equipmentController.getAllAssets)
-  .post(authorize('admin', 'super_admin', 'supervisor'), equipmentController.addEquipment);
+  .get(authorize('super_admin', 'admin', 'trainer', 'me_officer'), equipmentController.getAllAssets)
+  .post(authorize('super_admin', 'admin', 'supervisor', 'trainer'), equipmentController.addEquipment);
 
-router.get('/enterprise/:enterpriseId', equipmentController.getEnterpriseAssets);
+router.get('/enterprise/:enterpriseId', authorize('super_admin', 'admin', 'trainer', 'coach', 'me_officer', 'enterprise_user'), equipmentController.getEnterpriseAssets);
 
-router.put('/:id/status', equipmentController.updateStatus);
+router.put('/:id/status', authorize('super_admin', 'admin', 'trainer'), equipmentController.updateStatus);
 
 module.exports = router;

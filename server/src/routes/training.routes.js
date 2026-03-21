@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const trainingController = require('../controllers/training.controller');
-const { protect } = require('../middleware/auth.middleware');
+const { protect, authorize } = require('../middleware/auth.middleware');
 
 router.use(protect);
 router.use(authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager'));
