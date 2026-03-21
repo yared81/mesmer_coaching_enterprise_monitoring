@@ -36,6 +36,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_da
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/admin/user_management_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_management_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_crm_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/calendar_screen.dart';

@@ -49,5 +49,40 @@ class CoachingSessionEntity {
   final String? problemsIdentified;
   final String? recommendations;
   final String? notes;
-  // TODO: tasks (List<EnterpriseTaskEntity>) and evidence (List<UploadedEvidenceEntity>)
+
+  factory CoachingSessionEntity.fromJson(Map<String, dynamic> json) {
+    return CoachingSessionEntity(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      enterpriseId: json['enterprise_id'] ?? '',
+      enterpriseName: json['enterprise']?['business_name'],
+      coachId: json['coach_id'] ?? '',
+      scheduledDate: json['scheduled_date'] != null 
+          ? DateTime.parse(json['scheduled_date']) 
+          : DateTime.now(),
+      status: SessionStatus.values.firstWhere(
+        (e) => e.name == (json['status'] ?? 'scheduled'),
+        orElse: () => SessionStatus.scheduled,
+      ),
+      sessionNumber: json['session_number'],
+      followupType: FollowupType.values.firstWhere(
+        (e) => e.name == (json['followup_type'] ?? 'physical'),
+        orElse: () => FollowupType.physical,
+      ),
+      revenueGrowthPercent: double.tryParse(json['revenue_growth_percent']?.toString() ?? '0') ?? 0.0,
+      currentEmployees: json['current_employees'] ?? 0,
+      jobsCreated: json['jobs_created'] ?? 0,
+      qcStatus: QcStatus.values.firstWhere(
+        (e) => e.name == (json['qc_status'] ?? 'pending'),
+        orElse: () => QcStatus.pending,
+      ),
+      qcFeedback: json['qc_feedback'],
+      latitude: double.tryParse(json['latitude']?.toString() ?? ''),
+      longitude: double.tryParse(json['longitude']?.toString() ?? ''),
+      templateId: json['template_id'],
+      problemsIdentified: json['problems_identified'],
+      recommendations: json['recommendations'],
+      notes: json['notes'],
+    );
+  }
 }

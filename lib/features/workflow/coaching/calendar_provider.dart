@@ -10,7 +10,5 @@ final coachSessionsProvider = FutureProvider<List<CoachingSessionEntity>>((ref) 
   final response = await dio.get('${ApiConstants.baseUrl}/sessions/coach/me');
   final List data = response.data['data'] as List;
   
-  // Note: Assuming the backend returns these in a generic sessions list. 
-  // If not, we map them into CoachingSessionEntity.
-  return data.map((e) => CoachingSessionEntity.fromJson(e)).toList();
+  return data.map((e) => CoachingSessionEntity.fromJson(e as Map<String, dynamic>)).toList();
 });
