@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Allow only supervisors to access coach management route
 router.use(protect);
-router.use(authorize('supervisor'));
+router.use(authorize('super_admin', 'admin', 'supervisor'));
 
 router.route('/')
   .get(coachController.getCoaches)

@@ -54,5 +54,16 @@ const restrictToOwnEnterprise = (req, res, next) => {
   next();
 };
 
-module.exports = { protect, authorize, restrictToOwnEnterprise };
+const restrictToSelfOrAdmin = (req, res, next) => {
+  const userId = req.params.id || req.body.user_id;
+  if (req.user.role !== 'super_admin' && req.user.role !== 'admin' && req.user.id !== userId) {
+    return res.status(403).json({
+      success: false,
+      message: 'Unauthorized: You can only access your own accounts/data'
+    });
+  }
+  next();
+};
+
+module.exports = { protect, authorize, restrictToOwnEnterprise, restrictToSelfOrAdmin };
 

@@ -36,6 +36,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_da
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
@@ -55,17 +57,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return AppRoutes.dashboard;
       }
 
-      // 3. Guard: Lock Enterprise Users to authorized paths only
-      if (authState.status == AuthStatus.authenticated && authState.user?.role == UserRole.enterprise) {
-        final allowedPaths = [
-          AppRoutes.dashboard,
+      // 3. RBAC Guard: Verify role permissions for the current path
+      if (authState.status == AuthStatus.authenticated) {
+        final user = authState.user!;
+        final path = state.matchedLocation;
+        
+        // Skip check for basic shared paths
+        final sharedPaths = [
+          AppRoutes.login,
+          AppRoutes.dashboard, // Home is handled by _DashboardHome
           AppRoutes.profile,
           AppRoutes.changePassword,
           '/settings',
           AppRoutes.chat,
         ];
-        if (!allowedPaths.contains(state.matchedLocation)) {
-          return AppRoutes.dashboard;
+        
+        if (!sharedPaths.contains(path)) {
+          if (!RolePermissions.canAccess(user.role, path)) {
+            debugPrint('🛡️ RBAC: Blocking ${user.role} from accessing $path');
+            return AppRoutes.dashboard; // Send back to home
+          }
         }
       }
 

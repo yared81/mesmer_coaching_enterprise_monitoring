@@ -5,9 +5,9 @@ const { protect, authorize, restrictToOwnEnterprise } = require('../middleware/a
 
 router.use(protect);
 
-router.post('/', authorize('super_admin', 'coach'), iapController.createIap);
-router.get('/enterprise/:enterpriseId', authorize('super_admin', 'program_manager', 'trainer', 'coach', 'enterprise_user'), restrictToOwnEnterprise, iapController.getIapsByEnterprise);
-router.post('/:iapId/tasks', authorize('super_admin', 'coach'), iapController.addTask);
-router.put('/tasks/:taskId', authorize('super_admin', 'coach', 'enterprise_user'), iapController.updateTask);
+router.post('/', authorize('super_admin', 'admin', 'coach'), iapController.createIap);
+router.get('/enterprise/:enterpriseId', authorize('super_admin', 'admin', 'program_manager', 'trainer', 'coach', 'enterprise_user'), restrictToOwnEnterprise, iapController.getIapsByEnterprise);
+router.post('/:iapId/tasks', authorize('super_admin', 'admin', 'coach'), iapController.addTask);
+router.put('/tasks/:taskId', authorize('super_admin', 'admin', 'coach', 'enterprise_user'), iapController.updateTask);
 
 module.exports = router;

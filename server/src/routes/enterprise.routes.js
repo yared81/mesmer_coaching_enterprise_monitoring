@@ -8,23 +8,25 @@ router.use(protect);
 
 router.post(
   '/', 
-  authorize('admin', 'institution_admin', 'supervisor'), 
+  authorize('super_admin', 'admin', 'supervisor'), 
   enterpriseController.register
 );
 
 router.get(
   '/', 
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
   enterpriseController.list
 );
 
 router.get(
   '/:id', 
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
   enterpriseController.getById
 );
 
 router.put(
   '/:id',
-  authorize('admin', 'institution_admin', 'supervisor'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach'),
   enterpriseController.update
 );
 
