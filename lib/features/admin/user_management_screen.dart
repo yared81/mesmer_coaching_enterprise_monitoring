@@ -24,7 +24,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
       'search': _searchController.text.isEmpty ? null : _searchController.text,
     }));
 
-    final institutionsAsync = ref.watch(institutionsListProvider);
+    final institutionsAsync = ref.watch(institutionsListProvider(const {}));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -93,7 +93,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                   data: (institutions) => DropdownButtonFormField<String>(
                     value: _selectedInstitution,
                     decoration: const InputDecoration(labelText: 'Institution', border: OutlineInputBorder()),
-                    items: institutions.map((inst) {
+                    items: institutions.map<DropdownMenuItem<String>>((inst) {
                       return DropdownMenuItem(value: inst.id, child: Text(inst.name));
                     }).toList() + [const DropdownMenuItem(value: null, child: Text('ALL INSTITUTIONS'))],
                     onChanged: (val) => setState(() => _selectedInstitution = val),

@@ -31,7 +31,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final institutionsAsync = ref.watch(institutionsListProvider);
+    final institutionsAsync = ref.watch(institutionsListProvider(const {}));
     final actionState = ref.watch(userManagementActionProvider);
 
     return AlertDialog(
