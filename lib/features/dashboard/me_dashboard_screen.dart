@@ -1,3 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
 
@@ -105,7 +110,7 @@ class MeDashboardScreen extends ConsumerWidget {
                   return Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(titles[value.toInt()],
-                        style: const TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                        style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
                   );
                 },
               ),
@@ -115,13 +120,13 @@ class MeDashboardScreen extends ConsumerWidget {
                 showTitles: true,
                 reservedSize: 30,
                 getTitlesWidget: (value, meta) => Text(value.toInt().toString(),
-                    style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                    style: TextStyle(fontSize: 10, color: Colors.grey)),
               ),
             ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
-          gridData: const FlGridData(show: true, drawVerticalLine: false),
+          gridData: FlGridData(show: true, drawVerticalLine: false),
           borderData: FlBorderData(show: false),
         ),
       ),
@@ -136,7 +141,7 @@ class MeDashboardScreen extends ConsumerWidget {
           toY: y,
           color: const Color(0xFF3D5AFE),
           width: 20,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
         ),
       ],
     );
@@ -169,13 +174,13 @@ class MeDashboardScreen extends ConsumerWidget {
                       value: passed.toDouble(),
                       title: total > 0 ? '${(passed / total * 100).toInt()}%' : '0%',
                       radius: 25,
-                      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+                      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
                   PieChartSectionData(
                       color: Colors.red,
                       value: failed.toDouble(),
                       title: total > 0 ? '${(failed / total * 100).toInt()}%' : '0%',
                       radius: 25,
-                      titleStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+                      titleStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
                 ],
               ),
             ),

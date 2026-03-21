@@ -22,6 +22,7 @@ abstract class ApiConstants {
   static const String enterprises = 'enterprises';
 
   // Dashboard Endpoints
+  static const String dashboard = 'dashboard';
   static const String adminStats = 'dashboard/admin';
   static const String supervisorStats = 'dashboard/supervisor';
   static const String coachStats = 'dashboard/coach';
