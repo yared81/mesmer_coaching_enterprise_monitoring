@@ -142,25 +142,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     );
   }
 
-  Widget _buildFilterChip(Sector? sector, String label) {
-    final isSelected = _selectedSector == sector;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ChoiceChip(
-        label: Text(label[0].toUpperCase() + label.substring(1)),
-        selected: isSelected,
-        onSelected: (selected) {
-          setState(() {
-            _selectedSector = selected ? sector : null;
-          });
-          _onSearch();
-        },
-        backgroundColor: Colors.white.withOpacity(0.85),
-        selectedColor: Colors.white,
-        labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF3D5AFE) : Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
+  Widget _buildList(List<EnterpriseEntity> enterprises) {
         ),
       ),
     );

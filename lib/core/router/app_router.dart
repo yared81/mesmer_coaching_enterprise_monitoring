@@ -33,6 +33,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/communication/cha
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_log_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_profile_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_history_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';

@@ -32,4 +32,18 @@ class EnterpriseDashboardStats {
     required this.totalSessions,
     this.lastSessionDate,
   });
+
+  factory EnterpriseDashboardStats.fromJson(Map<String, dynamic> json) {
+    return EnterpriseDashboardStats(
+      enterpriseId: json['enterprise_id'] ?? '',
+      businessName: json['business_name'] ?? '',
+      sector: json['sector'] ?? '',
+      radarScores: (json['radarScores'] as List? ?? [])
+          .map((e) => RadarScore.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      latestRecommendation: json['latestRecommendation'] ?? '',
+      totalSessions: json['totalSessions'] ?? 0,
+      lastSessionDate: json['lastSessionDate'],
+    );
+  }
 }

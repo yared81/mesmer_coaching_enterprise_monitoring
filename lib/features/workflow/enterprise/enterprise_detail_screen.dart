@@ -1945,83 +1945,6 @@ class _EnterpriseDocumentViewerScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _AssetCard extends StatelessWidget {
-  final EquipmentEntity asset;
-  const _AssetCard({required this.asset});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: _getStatusColor(asset.status).withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.devices_other, color: _getStatusColor(asset.status), size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(asset.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                Text('S/N: ${asset.serialNumber ?? 'N/A'}', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                if (asset.notes != null && asset.notes!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(asset.notes!, style: TextStyle(color: Colors.grey[400], fontSize: 12, fontStyle: FontStyle.italic)),
-                  ),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                DateFormat('MMM dd, yyyy').format(asset.receivedDate),
-                style: TextStyle(color: Colors.grey[400], fontSize: 11),
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(asset.status).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  asset.status.name.toUpperCase(),
-                  style: TextStyle(color: _getStatusColor(asset.status), fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getStatusColor(EquipmentStatus status) {
-    switch (status) {
-      case EquipmentStatus.functional: return Colors.green;
-      case EquipmentStatus.broken: return Colors.orange;
-      case EquipmentStatus.lost: return Colors.red;
-      case EquipmentStatus.returned: return Colors.blue;
-    }
-  }
-
   Widget _buildGrowthRadar(String id) {
     final trendsAsync = ref.watch(enterpriseTrendsProvider(id));
 
@@ -2153,3 +2076,78 @@ class _AssetCard extends StatelessWidget {
   }
 }
 
+class _AssetCard extends StatelessWidget {
+  final EquipmentEntity asset;
+  const _AssetCard({required this.asset});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: _getStatusColor(asset.status).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.devices_other, color: _getStatusColor(asset.status), size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(asset.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 4),
+                Text('S/N: ${asset.serialNumber ?? 'N/A'}', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                if (asset.notes != null && asset.notes!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(asset.notes!, style: TextStyle(color: Colors.grey[400], fontSize: 12, fontStyle: FontStyle.italic)),
+                  ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                DateFormat('MMM dd, yyyy').format(asset.receivedDate),
+                style: TextStyle(color: Colors.grey[400], fontSize: 11),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(asset.status).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  asset.status.name.toUpperCase(),
+                  style: TextStyle(color: _getStatusColor(asset.status), fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _getStatusColor(EquipmentStatus status) {
+    switch (status) {
+      case EquipmentStatus.functional: return Colors.green;
+      case EquipmentStatus.broken: return Colors.orange;
+      case EquipmentStatus.lost: return Colors.red;
+      case EquipmentStatus.returned: return Colors.blue;
+    }
+  }
+}

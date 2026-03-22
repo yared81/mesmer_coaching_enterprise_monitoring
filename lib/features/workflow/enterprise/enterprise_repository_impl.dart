@@ -65,7 +65,7 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       final data = await _remoteDatasource.getEnterpriseDashboardStats();
       return Right(EnterpriseDashboardStats.fromJson(data));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 
@@ -75,7 +75,7 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       final data = await _remoteDatasource.getEnterpriseTrends(id);
       return Right(data.map((e) => e as Map<String, dynamic>).toList());
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(message: e.toString()));
     }
   }
 }
