@@ -20,8 +20,8 @@ const IapTask = sequelize.define('IapTask', {
     type: DataTypes.DATE,
     allowNull: false
   },
-  status: {
-    type: DataTypes.ENUM('pending', 'completed'),
+   status: {
+    type: DataTypes.ENUM('pending', 'pending_verification', 'completed'),
     defaultValue: 'pending'
   },
   evidence_url: {

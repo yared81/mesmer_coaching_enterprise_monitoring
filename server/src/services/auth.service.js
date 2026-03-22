@@ -12,7 +12,11 @@ class AuthService {
       where: { email, is_active: true },
       include: [
         { model: Institution, as: 'institution' },
-        { model: Enterprise, as: 'enterpriseAccount' }
+        { 
+          model: Enterprise, 
+          as: 'enterpriseAccount',
+          include: [{ model: User, as: 'coach', attributes: ['id', 'name', 'email', 'phone'] }]
+        }
       ]
     });
 
@@ -35,7 +39,13 @@ class AuthService {
         role: user.role,
         institution_id: user.institution_id,
         institution: user.institution ? user.institution.name : null,
-        enterprise_id: user.enterpriseAccount ? user.enterpriseAccount.id : null
+        enterprise_id: user.enterpriseAccount ? user.enterpriseAccount.id : null,
+        coach: user.enterpriseAccount && user.enterpriseAccount.coach ? {
+          id: user.enterpriseAccount.coach.id,
+          name: user.enterpriseAccount.coach.name,
+          email: user.enterpriseAccount.coach.email,
+          phone: user.enterpriseAccount.coach.phone
+        } : null
       },
       accessToken,
       refreshToken
@@ -73,7 +83,14 @@ class AuthService {
    */
   async getMe(userId) {
     const user = await User.findByPk(userId, {
-      include: [{ model: Institution, as: 'institution' }],
+      include: [
+        { model: Institution, as: 'institution' },
+        { 
+          model: Enterprise, 
+          as: 'enterpriseAccount',
+          include: [{ model: User, as: 'coach', attributes: ['id', 'name', 'email', 'phone'] }]
+        }
+      ],
       attributes: { exclude: ['password_hash'] }
     });
 

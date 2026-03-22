@@ -1,5 +1,5 @@
 enum IapStatus { active, completed }
-enum IapTaskStatus { pending, completed }
+enum IapTaskStatus { pending, pending_verification, completed }
 
 class IapEntity {
   const IapEntity({

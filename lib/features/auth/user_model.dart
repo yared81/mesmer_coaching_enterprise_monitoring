@@ -8,6 +8,7 @@ class UserModel {
   final String institutionId;
   final String? institutionName;
   final String? enterpriseId;
+  final CoachModel? coach;
 
   const UserModel({
     required this.id,
@@ -17,6 +18,7 @@ class UserModel {
     required this.institutionId,
     this.institutionName,
     this.enterpriseId,
+    this.coach,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class UserModel {
       institutionId: json['institution_id'] as String,
       institutionName: json['institution'] as String?,
       enterpriseId: json['enterprise_id'] as String?,
+      coach: json['coach'] != null ? CoachModel.fromJson(json['coach'] as Map<String, dynamic>) : null,
     );
   }
 
@@ -53,5 +56,36 @@ class UserModel {
         institutionId: institutionId,
         institutionName: institutionName,
         enterpriseId: enterpriseId,
+        coach: coach?.toEntity(),
+      );
+}
+
+class CoachModel {
+  final String id;
+  final String name;
+  final String email;
+  final String? phone;
+
+  CoachModel({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.phone,
+  });
+
+  factory CoachModel.fromJson(Map<String, dynamic> json) {
+    return CoachModel(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String?,
+    );
+  }
+
+  CoachEntity toEntity() => CoachEntity(
+        id: id,
+        name: name,
+        email: email,
+        phone: phone,
       );
 }

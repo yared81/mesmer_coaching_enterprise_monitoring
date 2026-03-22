@@ -15,7 +15,8 @@ class TrainingController {
 
   getTrainings = async (req, res, next) => {
     try {
-      const trainings = await trainingService.getTrainings();
+      const enterpriseId = req.user.role === 'enterprise_user' ? req.user.enterprise_id : null;
+      const trainings = await trainingService.getTrainings(enterpriseId);
       res.status(200).json({ success: true, data: trainings });
     } catch (error) { next(error); }
   };

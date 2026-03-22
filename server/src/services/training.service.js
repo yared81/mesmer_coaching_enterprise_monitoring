@@ -6,11 +6,22 @@ class TrainingService {
     return await Training.create(data);
   }
 
-  async getTrainings() {
-    return await Training.findAll({
+  async getTrainings(enterpriseId = null) {
+    const query = {
       include: [{ model: User, as: 'trainer', attributes: ['name', 'email'] }],
       order: [['date', 'DESC']]
-    });
+    };
+
+    if (enterpriseId) {
+      query.include.push({
+        model: TrainingAttendance,
+        as: 'attendees',
+        where: { enterprise_id: enterpriseId },
+        required: true // Must be an attendee to see it
+      });
+    }
+
+    return await Training.findAll(query);
   }
 
   async getTrainingById(id) {

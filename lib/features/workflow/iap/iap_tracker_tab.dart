@@ -22,12 +22,14 @@ class IapTrackerTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final iapsAsync = ref.watch(enterpriseIapsProvider(enterpriseId));
+    final authState = ref.watch(authProvider);
+    final isEnterpriseUser = authState.user?.role == UserRole.enterprise;
 
     return iapsAsync.when(
       data: (iaps) {
-        if (iaps.isEmpty) return _buildEmptyState(context, ref);
+        if (iaps.isEmpty) return _buildEmptyState(context, ref, isEnterpriseUser);
         final activeIap = iaps.first;
-        return _buildTracker(context, ref, activeIap);
+        return _buildTracker(context, ref, activeIap, isEnterpriseUser);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Center(child: Text('Error loading IAP: $err')),
@@ -35,7 +37,7 @@ class IapTrackerTab extends ConsumerWidget {
   }
 
   // ─── empty state ────────────────────────────────────────────────────────────
-  Widget _buildEmptyState(BuildContext context, WidgetRef ref) {
+  Widget _buildEmptyState(BuildContext context, WidgetRef ref, bool isEnterpriseUser) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -48,19 +50,23 @@ class IapTrackerTab extends ConsumerWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[600])),
           const SizedBox(height: 8),
-          const Text('Create an Individual Action Plan to track coaching tasks.',
-              style: TextStyle(color: Colors.grey)),
+          Text(isEnterpriseUser 
+              ? 'Your coach hasn\'t created an action plan for you yet.' 
+              : 'Create an Individual Action Plan to track coaching tasks.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () => CustomToaster.show(
-                context: context,
-                message: 'IAP Builder is under construction.'),
-            icon: const Icon(Icons.add),
-            label: const Text('Create Action Plan'),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white),
-          ),
+          if (!isEnterpriseUser)
+            ElevatedButton.icon(
+              onPressed: () => CustomToaster.show(
+                  context: context,
+                  message: 'IAP Builder is under construction.'),
+              icon: const Icon(Icons.add),
+              label: const Text('Create Action Plan'),
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white),
+            ),
         ],
       ),
     );
@@ -68,46 +74,73 @@ class IapTrackerTab extends ConsumerWidget {
 
   // ─── tracker list ────────────────────────────────────────────────────────────
   Widget _buildTracker(
-      BuildContext context, WidgetRef ref, IapEntity iap) {
-    return ListView.builder(
+      BuildContext context, WidgetRef ref, IapEntity iap, bool isEnterpriseUser) {
+    
+    final activeTasks = iap.tasks.where((t) => t.status == IapTaskStatus.pending).toList();
+    final reviewTasks = iap.tasks.where((t) => t.status == IapTaskStatus.pending_verification).toList();
+    final completedTasks = iap.tasks.where((t) => t.status == IapTaskStatus.completed).toList();
+
+    return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      itemCount: iap.tasks.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Live progress ring card
+        IapProgressCard(iapId: iap.id),
+        
+        // Header Row
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Live progress ring card
-              IapProgressCard(iapId: iap.id),
-              // Action row
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Current Action Plan',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary)),
-                    ElevatedButton.icon(
-                      onPressed: () =>
-                          _showAddTaskDialog(context, ref, iap.id),
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text('Add Task'),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white),
-                    ),
-                  ],
+              Text(isEnterpriseUser ? 'My Action Plan' : 'Enterprise Action Plan',
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary)),
+              if (!isEnterpriseUser)
+                ElevatedButton.icon(
+                  onPressed: () =>
+                      _showAddTaskDialog(context, ref, iap.id),
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('Add Task'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white),
                 ),
-              ),
             ],
-          );
-        }
-        final task = iap.tasks[index - 1];
-        return _TaskCard(task: task, enterpriseId: enterpriseId);
-      },
+          ),
+        ),
+
+        if (activeTasks.isNotEmpty) ...[
+          _buildSectionHeader('Active Tasks', Colors.orange),
+          ...activeTasks.map((t) => _TaskCard(task: t, enterpriseId: enterpriseId, isEnterpriseUser: isEnterpriseUser)),
+        ],
+
+        if (reviewTasks.isNotEmpty) ...[
+          _buildSectionHeader('Under Review', Colors.blue),
+          ...reviewTasks.map((t) => _TaskCard(task: t, enterpriseId: enterpriseId, isEnterpriseUser: isEnterpriseUser)),
+        ],
+
+        if (completedTasks.isNotEmpty) ...[
+          _buildSectionHeader('Completed', Colors.green),
+          ...completedTasks.map((t) => _TaskCard(task: t, enterpriseId: enterpriseId, isEnterpriseUser: isEnterpriseUser)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.sm),
+      child: Row(
+        children: [
+          Container(width: 4, height: 16, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
+          const SizedBox(width: 8),
+          Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[700])),
+          const SizedBox(width: 8),
+          Expanded(child: Divider(color: Colors.grey[200])),
+        ],
+      ),
     );
   }
 
@@ -199,22 +232,22 @@ class IapTrackerTab extends ConsumerWidget {
 class _TaskCard extends ConsumerWidget {
   final IapTaskEntity task;
   final String enterpriseId;
-  const _TaskCard({required this.task, required this.enterpriseId});
+  final bool isEnterpriseUser;
+  const _TaskCard({required this.task, required this.enterpriseId, this.isEnterpriseUser = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final uploadProgress = ref.watch(_uploadProgressProvider(task.id));
     final isCompleted = task.status == IapTaskStatus.completed;
-    final isOverdue = task.deadline.isBefore(DateTime.now()) && !isCompleted;
+    final isUnderReview = task.status == IapTaskStatus.pending_verification;
+    final isOverdue = task.deadline.isBefore(DateTime.now()) && !isCompleted && !isUnderReview;
 
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-            color: isOverdue
-                ? Colors.red.shade200
-                : Colors.grey.shade200),
+            color: isOverdue ? Colors.red.shade200 : (isUnderReview ? Colors.blue.shade200 : Colors.grey.shade200)),
       ),
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Padding(
@@ -227,58 +260,57 @@ class _TaskCard extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Checkbox(
-                  value: isCompleted,
-                  onChanged: (val) =>
-                      _toggleStatus(context, ref, val ?? false),
-                  activeColor: Colors.green,
+                  value: isCompleted || isUnderReview,
+                  onChanged: (isCompleted && isEnterpriseUser) ? null : (val) => _toggleStatus(context, ref, val ?? false),
+                  activeColor: isCompleted ? Colors.green : Colors.blue,
+                  tristate: false,
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      task.description,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        decoration:
-                            isCompleted ? TextDecoration.lineThrough : null,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task.description,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                            color: isCompleted ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                        if (isUnderReview)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 2),
+                            child: Text('Under review by coach', style: TextStyle(fontSize: 10, color: Colors.blue, fontStyle: FontStyle.italic)),
+                          ),
+                      ],
                     ),
                   ),
                 ),
                 // Evidence action button
                 IconButton(
-                  tooltip: task.evidenceUrl != null
-                      ? 'View / Replace Evidence'
-                      : 'Upload Evidence',
+                  tooltip: task.evidenceUrl != null ? 'View / Replace Evidence' : 'Upload Evidence',
                   icon: Icon(
-                    task.evidenceUrl != null
-                        ? Icons.attach_file
-                        : Icons.upload_file,
-                    color: task.evidenceUrl != null
-                        ? AppColors.primary
-                        : Colors.grey,
+                    task.evidenceUrl != null ? Icons.attach_file : Icons.upload_file,
+                    color: task.evidenceUrl != null ? AppColors.primary : Colors.grey,
                   ),
-                  onPressed: () =>
-                      _showEvidenceOptions(context, ref),
+                  onPressed: isCompleted && isEnterpriseUser ? null : () => _showEvidenceOptions(context, ref),
                 ),
               ],
             ),
 
             // ── deadline ──
             Padding(
-              padding:
-                  const EdgeInsets.only(left: 48, bottom: 4),
+              padding: const EdgeInsets.only(left: 48, bottom: 4),
               child: Row(children: [
-                const Icon(Icons.calendar_today,
-                    size: 12, color: Colors.grey),
+                const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
                   'Due: ${DateFormat('MMM dd, yyyy').format(task.deadline)}',
                   style: TextStyle(
                       fontSize: 11,
-                      color: isOverdue
-                          ? Colors.red
-                          : Colors.grey[600]),
+                      color: isOverdue ? Colors.red : Colors.grey[600]),
                 ),
               ]),
             ),
@@ -292,10 +324,8 @@ class _TaskCard extends ConsumerWidget {
                   children: [
                     LinearProgressIndicator(value: uploadProgress),
                     const SizedBox(height: 2),
-                    Text(
-                        '${(uploadProgress * 100).toStringAsFixed(0)}% uploaded',
-                        style: const TextStyle(
-                            fontSize: 10, color: Colors.grey)),
+                    Text('${(uploadProgress * 100).toStringAsFixed(0)}% uploaded',
+                        style: const TextStyle(fontSize: 10, color: Colors.grey)),
                   ],
                 ),
               ),
@@ -305,8 +335,7 @@ class _TaskCard extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 48, top: 4),
                 child: Chip(
-                  avatar: const Icon(Icons.check_circle,
-                      size: 14, color: Colors.green),
+                  avatar: const Icon(Icons.check_circle, size: 14, color: Colors.green),
                   label: Text(
                     _shortenUrl(task.evidenceUrl!),
                     style: const TextStyle(fontSize: 11),
@@ -323,18 +352,30 @@ class _TaskCard extends ConsumerWidget {
 
   String _shortenUrl(String url) {
     final parts = url.split('/');
-    return parts.last.length > 24
-        ? '…${parts.last.substring(parts.last.length - 20)}'
-        : parts.last;
+    return parts.last.length > 24 ? '…${parts.last.substring(parts.last.length - 20)}' : parts.last;
   }
 
-  Future<void> _toggleStatus(
-      BuildContext context, WidgetRef ref, bool completed) async {
+  Future<void> _toggleStatus(BuildContext context, WidgetRef ref, bool checked) async {
     try {
       final svc = ref.read(iapEvidenceServiceProvider);
-      await svc.updateTaskStatus(
-          task.id, completed ? 'completed' : 'pending');
+      String newStatus;
+
+      if (isEnterpriseUser) {
+        // Enterprise users toggle between 'pending' and 'pending_verification'
+        newStatus = checked ? 'pending_verification' : 'pending';
+      } else {
+        // Coaches toggle between 'completed' and 'pending'
+        newStatus = checked ? 'completed' : 'pending';
+      }
+
+      await svc.updateTaskStatus(task.id, newStatus);
       ref.invalidate(enterpriseIapsProvider(enterpriseId));
+      
+      if (context.mounted && isEnterpriseUser && checked) {
+        CustomToaster.show(
+            context: context,
+            message: 'Task submitted for coach review! 🚀');
+      }
     } catch (e) {
       if (context.mounted) {
         CustomToaster.show(

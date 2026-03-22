@@ -24,6 +24,7 @@ class UserEntity {
     required this.institutionId,
     this.institutionName,
     this.enterpriseId,
+    this.coach,
   });
 
   final String id;
@@ -33,6 +34,19 @@ class UserEntity {
   final String institutionId;
   final String? institutionName;
   final String? enterpriseId;
+  final CoachEntity? coach;
+}
 
-  // TODO: Add copyWith if needed
+class CoachEntity {
+  final String id;
+  final String name;
+  final String email;
+  final String? phone;
+
+  const CoachEntity({
+    required this.id,
+    required this.name,
+    required this.email,
+    this.phone,
+  });
 }

@@ -11,12 +11,18 @@ import 'package:intl/intl.dart';
 import 'enterprise_provider.dart';
 import 'enterprise_dashboard_stats.dart';
 
+import 'widgets/coach_contact_card.dart';
+import 'widgets/upcoming_schedule_card.dart';
+
 class EnterpriseDashboardScreen extends ConsumerWidget {
   const EnterpriseDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(enterpriseDashboardStatsProvider);
+    final user = ref.watch(authProvider).user;
+    final coach = user?.coach;
+    final enterpriseId = user?.enterpriseId;
 
     return Scaffold(
       appBar: AppBar(
@@ -47,6 +53,14 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
             children: [
               _buildHeader(context, stats),
               const SizedBox(height: 24),
+              if (coach != null) ...[
+                CoachContactCard(coach: coach),
+                const SizedBox(height: 16),
+              ],
+              if (enterpriseId != null) ...[
+                UpcomingScheduleCard(enterpriseId: enterpriseId),
+                const SizedBox(height: 24),
+              ],
               _buildRadarChart(stats),
               const SizedBox(height: 24),
               _buildActionPlan(context, ref),

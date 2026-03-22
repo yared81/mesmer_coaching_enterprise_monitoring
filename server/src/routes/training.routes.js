@@ -5,11 +5,9 @@ const trainingController = require('../controllers/training.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
 
 router.use(protect);
-router.use(authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager'));
-
 router.route('/')
-  .post(trainingController.createTraining)
-  .get(trainingController.getTrainings);
+  .post(authorize('super_admin', 'admin', 'trainer'), trainingController.createTraining)
+  .get(authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager', 'enterprise_user'), trainingController.getTrainings);
 
 router.route('/:id')
   .get(trainingController.getTrainingById)
