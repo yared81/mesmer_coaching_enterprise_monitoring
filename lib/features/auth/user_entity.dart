@@ -34,16 +34,16 @@ class UserEntity {
   final String institutionId;
   final String? institutionName;
   final String? enterpriseId;
-  final CoachEntity? coach;
+  final UserCoachEntity? coach;
 }
 
-class CoachEntity {
+class UserCoachEntity {
   final String id;
   final String name;
   final String email;
   final String? phone;
 
-  const CoachEntity({
+  const UserCoachEntity({
     required this.id,
     required this.name,
     required this.email,

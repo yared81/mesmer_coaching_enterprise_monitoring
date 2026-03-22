@@ -82,7 +82,7 @@ class CoachModel {
     );
   }
 
-  CoachEntity toEntity() => CoachEntity(
+  UserCoachEntity toEntity() => UserCoachEntity(
         id: id,
         name: name,
         email: email,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
 import 'iap_provider.dart';
 import 'iap_entity.dart';
 import 'iap_evidence_service.dart';
