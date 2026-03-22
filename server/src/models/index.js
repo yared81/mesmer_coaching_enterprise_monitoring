@@ -127,13 +127,13 @@ DiagnosisTemplate.hasMany(DiagnosisReport, { foreignKey: 'template_id', as: 'rep
 DiagnosisReport.belongsTo(DiagnosisTemplate, { foreignKey: 'template_id', as: 'template' });
 
 DiagnosisReport.hasMany(DiagnosisResponse, { foreignKey: 'report_id', as: 'responses', onDelete: 'CASCADE' });
-DiagnosisResponse.belongsTo(DiagnosisReport, { foreignKey: 'report_id' });
+DiagnosisResponse.belongsTo(DiagnosisReport, { foreignKey: 'report_id', as: 'report' });
 
 DiagnosisQuestion.hasMany(DiagnosisResponse, { foreignKey: 'question_id', as: 'responses', onDelete: 'CASCADE' });
-DiagnosisResponse.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id' });
+DiagnosisResponse.belongsTo(DiagnosisQuestion, { foreignKey: 'question_id', as: 'question' });
 
 DiagnosisChoice.hasMany(DiagnosisResponse, { foreignKey: 'choice_id', as: 'responses', onDelete: 'CASCADE' });
-DiagnosisResponse.belongsTo(DiagnosisChoice, { foreignKey: 'choice_id' });
+DiagnosisResponse.belongsTo(DiagnosisChoice, { foreignKey: 'choice_id', as: 'choice' });
 
 // Notification Associations
 User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });

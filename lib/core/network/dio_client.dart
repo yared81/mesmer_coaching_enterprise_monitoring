@@ -7,7 +7,7 @@ class DioClient {
   static Dio createDio(SecureStorage secureStorage) {
     final dio = Dio(
       BaseOptions(
-        baseUrl: ApiConstants.baseUrl,
+        baseUrl: ApiConstants.dioBaseUrl,
         connectTimeout: ApiConstants.connectTimeout,
         receiveTimeout: ApiConstants.receiveTimeout,
       ),

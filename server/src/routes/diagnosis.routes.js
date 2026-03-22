@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const diagnosisController = require('../controllers/diagnosis.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect, authorize, restrictToOwnEnterprise } = require('../middleware/auth.middleware');
 
 // All diagnosis routes require authentication
 router.use(protect);
@@ -17,6 +17,6 @@ router.put('/templates/:id', authorize('supervisor', 'admin'), diagnosisControll
 router.delete('/templates/:id', authorize('supervisor', 'admin'), diagnosisController.deleteTemplate);
 router.post('/reports', diagnosisController.submitReport);
 router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
-router.get('/enterprise/:enterpriseId/performance', diagnosisController.getEnterprisePerformance);
+router.get('/enterprise/:enterpriseId/performance', authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user'), restrictToOwnEnterprise, diagnosisController.getEnterprisePerformance);
 
 module.exports = router;

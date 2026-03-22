@@ -2,10 +2,16 @@
 abstract class ApiConstants {
   // Base URL — set from .env or build config
   // Base URL — set from .env or build config using --dart-define-from-file
-  static const String baseUrl = String.fromEnvironment(
+  static const String _rawBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'http://localhost:3000/api/v1',
   );
+
+  // For manual string concatenations: '${ApiConstants.baseUrl}/path' (Guarantees NO trailing slash)
+  static String get baseUrl => _rawBaseUrl.endsWith('/') ? _rawBaseUrl.substring(0, _rawBaseUrl.length - 1) : _rawBaseUrl;
+
+  // For Dio BaseOptions: (Guarantees A trailing slash)
+  static String get dioBaseUrl => _rawBaseUrl.endsWith('/') ? _rawBaseUrl : '$_rawBaseUrl/';
 
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 15);

@@ -34,10 +34,11 @@ class EnterpriseDashboardStats {
   });
 
   factory EnterpriseDashboardStats.fromJson(Map<String, dynamic> json) {
+    final ent = json['enterprise'] as Map<String, dynamic>?;
     return EnterpriseDashboardStats(
-      enterpriseId: json['enterprise_id'] ?? '',
-      businessName: json['business_name'] ?? '',
-      sector: json['sector'] ?? '',
+      enterpriseId: ent?['id'] ?? json['enterprise_id'] ?? '',
+      businessName: ent?['businessName'] ?? json['business_name'] ?? '',
+      sector: ent?['sector'] ?? json['sector'] ?? '',
       radarScores: (json['radarScores'] as List? ?? [])
           .map((e) => RadarScore.fromJson(e as Map<String, dynamic>))
           .toList(),

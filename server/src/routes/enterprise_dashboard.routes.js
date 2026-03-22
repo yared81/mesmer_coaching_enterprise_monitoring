@@ -4,6 +4,6 @@ const enterpriseDashboardController = require('../controllers/enterprise_dashboa
 const { protect, authorize } = require('../middleware/auth.middleware');
 
 // Enterprise only dashboard stats
-router.get('/stats', protect, authorize('enterprise'), enterpriseDashboardController.getStats);
+router.get('/stats', protect, authorize('enterprise_user'), enterpriseDashboardController.getStats);
 
 module.exports = router;

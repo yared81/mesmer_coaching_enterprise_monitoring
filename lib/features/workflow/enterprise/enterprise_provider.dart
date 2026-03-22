@@ -110,3 +110,13 @@ final enterpriseTrendsProvider = FutureProvider.family<List<Map<String, dynamic>
     (trends) => trends,
   );
 });
+
+// 8. Single Enterprise Detail Provider
+final enterpriseDetailProvider = FutureProvider.family<EnterpriseEntity, String>((ref, id) async {
+  final repo = ref.watch(enterpriseRepositoryProvider);
+  final result = await repo.getEnterpriseById(id);
+  return result.fold(
+    (failure) => throw failure.message,
+    (enterprise) => enterprise,
+  );
+});

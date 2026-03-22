@@ -42,7 +42,7 @@ class ApiInterceptor extends Interceptor {
         }
 
         // Create a separate Dio to avoid interceptor loop
-        final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+        final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.dioBaseUrl));
         final response = await refreshDio.post(
           'auth/refresh',
           data: {'refreshToken': refreshToken},
@@ -57,7 +57,7 @@ class ApiInterceptor extends Interceptor {
 
           // Retry the original failed request with the new token
           err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-          final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+          final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.dioBaseUrl));
           final retryResponse = await retryDio.fetch(err.requestOptions);
 
           // Retry all queued requests too
@@ -86,7 +86,7 @@ class ApiInterceptor extends Interceptor {
   void _retryAll(String newToken) {
     for (final pending in _pendingRequests) {
       pending.options.headers['Authorization'] = 'Bearer $newToken';
-      final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.baseUrl));
+      final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.dioBaseUrl));
       retryDio.fetch(pending.options).then(
         (response) => pending.handler.resolve(response),
         onError: (e) => pending.handler.reject(e is DioException ? e : DioException(requestOptions: pending.options)),

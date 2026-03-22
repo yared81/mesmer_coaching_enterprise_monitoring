@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const enterpriseController = require('../controllers/enterprise.controller');
-const { protect, authorize } = require('../middleware/auth.middleware');
+const { protect, authorize, restrictToOwnEnterprise } = require('../middleware/auth.middleware');
 
 // All enterprise routes are protected
 router.use(protect);
@@ -20,19 +20,22 @@ router.get(
 
 router.get(
   '/:id', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'enterprise_user'),
+  restrictToOwnEnterprise,
   enterpriseController.getById
 );
 
 router.put(
   '/:id',
-  authorize('super_admin', 'admin', 'supervisor', 'coach'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user'),
+  restrictToOwnEnterprise,
   enterpriseController.update
 );
 
 router.get(
   '/:id/trends',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'enterprise_user'),
+  restrictToOwnEnterprise,
   enterpriseController.getTrends
 );
 

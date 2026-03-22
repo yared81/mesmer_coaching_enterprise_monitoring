@@ -31,6 +31,9 @@ const protect = (req, res, next) => {
 
 const authorize = (...roles) => {
   return (req, res, next) => {
+    console.log(`[AUTH-DEBUG] authorize middleware check on ${req.method} ${req.url}`);
+    console.log(`[AUTH-DEBUG] Required Roles:`, roles);
+    console.log(`[AUTH-DEBUG] Provided Role: '${req.user.role}'`);
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -43,8 +46,10 @@ const authorize = (...roles) => {
 
 const restrictToOwnEnterprise = (req, res, next) => {
   if (req.user.role === 'enterprise_user') {
-    const requestedId = req.params.enterpriseId || req.body.enterprise_id || req.query.enterprise_id;
+    const requestedId = req.params.id || req.params.enterpriseId || req.body.enterprise_id || req.query.enterprise_id;
+    console.log(`[AUTH-DEBUG] restrictToOwnEnterprise check: requested=${requestedId}, user_ent=${req.user.enterprise_id}`);
     if (requestedId && requestedId !== req.user.enterprise_id) {
+      console.warn(`[AUTH-DEBUG] Blocked access: User ${req.user.id} tried to access enterprise ${requestedId}`);
       return res.status(403).json({
         success: false,
         message: 'Unauthorized: Enterprise Users can only access their own data'

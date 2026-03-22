@@ -68,25 +68,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   @override
   Widget build(BuildContext context) {
-    final enterprisesAsync = ref.watch(enterpriseListProvider);
+    final enterpriseAsync = ref.watch(enterpriseDetailProvider(widget.enterpriseId));
 
-    return enterprisesAsync.when(
-      data: (enterprises) {
-        final enterprise = enterprises.firstWhere(
-          (e) => e.id == widget.enterpriseId,
-          orElse: () => EnterpriseEntity(
-            id: '',
-            businessName: 'Unknown',
-            ownerName: 'Unknown',
-            sector: Sector.other,
-            employeeCount: 0,
-            location: '',
-            phone: '',
-            coachId: '',
-            institutionId: '',
-            registeredAt: DateTime.now(),
-          ),
-        );
+    return enterpriseAsync.when(
+      data: (enterprise) {
         return _buildBody(context, enterprise);
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
