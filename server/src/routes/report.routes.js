@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const ReportController = require('../controllers/report.controller');
-const { protect, restrictTo } = require('../middleware/auth.middleware');
+const { protect, authorize } = require('../middleware/auth.middleware');
 
 // Apply protection to all report routes
 router.use(protect);
-router.use(restrictTo('supervisor', 'admin'));
+router.use(authorize('supervisor', 'admin'));
 
 /**
  * @route   GET /api/v1/reports/enterprise/:id/pdf

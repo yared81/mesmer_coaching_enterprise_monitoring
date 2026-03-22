@@ -143,12 +143,6 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
   }
 
   Widget _buildList(List<EnterpriseEntity> enterprises) {
-        ),
-      ),
-    );
-  }
-
-  Widget _buildList(List<EnterpriseEntity> enterprises) {
     if (enterprises.isEmpty) {
       return Center(
         child: Column(

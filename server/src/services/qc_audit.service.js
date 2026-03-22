@@ -30,6 +30,9 @@ class QcAuditService {
       }
     }
 
+    return result;
+  }
+
   async getAuditHistory() {
     return await QcAudit.findAll({
       where: { status: { [Op.ne]: 'pending' } },

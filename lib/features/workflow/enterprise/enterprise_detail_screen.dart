@@ -1551,6 +1551,135 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       yearsController.dispose();
     });
   }
+  Widget _buildGrowthRadar(String id) {
+    final trendsAsync = ref.watch(enterpriseTrendsProvider(id));
+
+    return trendsAsync.when(
+      data: (trends) {
+        if (trends.isEmpty) return const SizedBox.shrink();
+
+        final revenueSpots = <FlSpot>[];
+        final employeeSpots = <FlSpot>[];
+        
+        for (int i = 0; i < trends.length; i++) {
+          final x = i.toDouble();
+          revenueSpots.add(FlSpot(x, NumUtils.toDouble(trends[i]['revenue'])));
+          employeeSpots.add(FlSpot(x, NumUtils.toDouble(trends[i]['employees'])));
+        }
+
+        final maxRevenue = revenueSpots.isNotEmpty 
+            ? revenueSpots.map((s) => s.y).reduce((a, b) => a > b ? a : b) : 100.0;
+
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: _cardDecor(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.radar_rounded, color: Color(0xFF3D5AFE), size: 20),
+                  SizedBox(width: 8),
+                  Text('Historical Growth Radar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Longitudinal trajectory of business performance indicators.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                height: 220,
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: maxRevenue > 0 ? maxRevenue / 4 : 25,
+                      getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey[100]!, strokeWidth: 1),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          getTitlesWidget: (v, m) => Text(
+                            v >= 1000 ? '${(v / 1000).toStringAsFixed(0)}k' : v.toStringAsFixed(0),
+                            style: TextStyle(color: Colors.grey[400], fontSize: 10),
+                          ),
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (v, m) {
+                            final i = v.toInt();
+                            if (i < 0 || i >= trends.length) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                trends[i]['period'],
+                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    ),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: revenueSpots,
+                        isCurved: true,
+                        color: const Color(0xFF3D5AFE),
+                        barWidth: 3,
+                        dotData: const FlDotData(show: true),
+                        belowBarData: BarAreaData(show: true, color: const Color(0xFF3D5AFE).withOpacity(0.1)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _buildGrowthLegend('Revenue', const Color(0xFF3D5AFE), revenueSpots),
+              const SizedBox(height: 12),
+              _buildGrowthLegend('Employees', Colors.orange, employeeSpots),
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error loading radar: $err')),
+    );
+  }
+
+  Widget _buildGrowthLegend(String label, Color color, List<FlSpot> spots) {
+    if (spots.length < 2) return const SizedBox.shrink();
+    final first = spots.first.y;
+    final last = spots.last.y;
+    final delta = last - first;
+    final pct = first != 0 ? (delta / first * 100) : 0.0;
+    
+    return Row(
+      children: [
+        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+        const Spacer(),
+        Text(
+          '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(0)} (${pct.toStringAsFixed(1)}%)',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: delta >= 0 ? Colors.green : Colors.red,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1943,135 +2072,6 @@ class _EnterpriseDocumentViewerScreen extends StatelessWidget {
                 ),
               ),
       ),
-    );
-  }
-  Widget _buildGrowthRadar(String id) {
-    final trendsAsync = ref.watch(enterpriseTrendsProvider(id));
-
-    return trendsAsync.when(
-      data: (trends) {
-        if (trends.isEmpty) return const SizedBox.shrink();
-
-        final revenueSpots = <FlSpot>[];
-        final employeeSpots = <FlSpot>[];
-        
-        for (int i = 0; i < trends.length; i++) {
-          final x = i.toDouble();
-          revenueSpots.add(FlSpot(x, NumUtils.toDouble(trends[i]['revenue'])));
-          employeeSpots.add(FlSpot(x, NumUtils.toDouble(trends[i]['employees'])));
-        }
-
-        final maxRevenue = revenueSpots.isNotEmpty 
-            ? revenueSpots.map((s) => s.y).reduce((a, b) => a > b ? a : b) : 100.0;
-
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: _cardDecor(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.radar_rounded, color: Color(0xFF3D5AFE), size: 20),
-                  SizedBox(width: 8),
-                  Text('Historical Growth Radar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Longitudinal trajectory of business performance indicators.',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 220,
-                child: LineChart(
-                  LineChartData(
-                    gridData: FlGridData(
-                      show: true,
-                      drawVerticalLine: false,
-                      horizontalInterval: maxRevenue > 0 ? maxRevenue / 4 : 25,
-                      getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey[100]!, strokeWidth: 1),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          getTitlesWidget: (v, m) => Text(
-                            v >= 1000 ? '${(v / 1000).toStringAsFixed(0)}k' : v.toStringAsFixed(0),
-                            style: TextStyle(color: Colors.grey[400], fontSize: 10),
-                          ),
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (v, m) {
-                            final i = v.toInt();
-                            if (i < 0 || i >= trends.length) return const SizedBox.shrink();
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                trends[i]['period'],
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    ),
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: revenueSpots,
-                        isCurved: true,
-                        color: const Color(0xFF3D5AFE),
-                        barWidth: 3,
-                        dotData: const FlDotData(show: true),
-                        belowBarData: BarAreaData(show: true, color: const Color(0xFF3D5AFE).withOpacity(0.1)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildGrowthLegend('Revenue', const Color(0xFF3D5AFE), revenueSpots),
-              const SizedBox(height: 12),
-              _buildGrowthLegend('Employees', Colors.orange, employeeSpots),
-            ],
-          ),
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error loading radar: $err')),
-    );
-  }
-
-  Widget _buildGrowthLegend(String label, Color color, List<FlSpot> spots) {
-    if (spots.length < 2) return const SizedBox.shrink();
-    final first = spots.first.y;
-    final last = spots.last.y;
-    final delta = last - first;
-    final pct = first != 0 ? (delta / first * 100) : 0.0;
-    
-    return Row(
-      children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-        const Spacer(),
-        Text(
-          '${delta >= 0 ? '+' : ''}${delta.toStringAsFixed(0)} (${pct.toStringAsFixed(1)}%)',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: delta >= 0 ? Colors.green : Colors.red,
-          ),
-        ),
-      ],
     );
   }
 }
