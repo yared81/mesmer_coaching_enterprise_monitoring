@@ -4,8 +4,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dar
 class RolePermissions {
   static const Map<UserRole, List<String>> _allowedPrefixes = {
     UserRole.superAdmin: ['/'],
-    UserRole.admin: ['/'],
-    UserRole.supervisor: [
+    UserRole.programManager: ['/'],
+    UserRole.regionalCoordinator: [
       AppRoutes.dashboard,
       '/coaches',
       '/enterprises',
@@ -38,13 +38,7 @@ class RolePermissions {
       AppRoutes.changePassword,
       '/settings',
     ],
-    UserRole.programManager: [
-      AppRoutes.dashboard,
-      '/enterprises',
-      '/profile',
-      AppRoutes.changePassword,
-      '/settings',
-    ],
+
     UserRole.trainer: [
       AppRoutes.dashboard,
       '/trainings',
@@ -63,7 +57,7 @@ class RolePermissions {
   };
 
   static bool canAccess(UserRole role, String path) {
-    if (role == UserRole.superAdmin || role == UserRole.admin) return true;
+    if (role == UserRole.superAdmin || role == UserRole.programManager) return true;
 
     final allowed = _allowedPrefixes[role] ?? [];
     

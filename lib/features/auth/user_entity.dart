@@ -4,15 +4,17 @@ import 'package:json_annotation/json_annotation.dart';
 // Fields: id, email, name, role, institutionId, createdAt
 
 enum UserRole {
-  @JsonValue('admin') admin,
   @JsonValue('super_admin') superAdmin,
-  @JsonValue('supervisor') supervisor,
-  @JsonValue('coach') coach,
-  @JsonValue('data_verifier') dataVerifier,
-  @JsonValue('me_officer') meOfficer,
   @JsonValue('program_manager') programManager,
+  @JsonValue('regional_coordinator') regionalCoordinator,
+  @JsonValue('me_officer') meOfficer,
+  @JsonValue('data_verifier') dataVerifier,
   @JsonValue('trainer') trainer,
-  @JsonValue('enterprise_user') enterprise
+  @JsonValue('coach') coach,
+  @JsonValue('enumerator') enumerator,
+  @JsonValue('comms_officer') commsOfficer,
+  @JsonValue('enterprise_user') enterprise,
+  @JsonValue('stakeholder') stakeholder
 }
 
 class UserEntity {

@@ -125,12 +125,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       value: 'edit',
                       child: Row(children: [Icon(Icons.edit, size: 18), SizedBox(width: 8), Text('Edit')]),
                     ),
-                    if (currentUser?.role == UserRole.supervisor)
+                    if (currentUser?.role == UserRole.regionalCoordinator)
                       const PopupMenuItem(
                         value: 'reassign',
                         child: Row(children: [Icon(Icons.swap_horiz_rounded, size: 18), SizedBox(width: 8), Text('Reassign')]),
                       ),
-                    if (currentUser?.role == UserRole.admin)
+                    if (currentUser?.role == UserRole.programManager)
                       const PopupMenuItem(
                         value: 'delete',
                         child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 18), SizedBox(width: 8), Text('Delete', style: TextStyle(color: Colors.red))]),

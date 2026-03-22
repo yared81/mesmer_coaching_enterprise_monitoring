@@ -19,8 +19,8 @@ class DashboardMainScreen extends ConsumerWidget {
   const DashboardMainScreen({super.key, required this.child});
 
   Widget _getDashboardBody(UserRole? role) {
-    if (role == UserRole.admin) return const AdminDashboardScreen();
-    if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
+    if (role == UserRole.programManager) return const AdminDashboardScreen();
+    if (role == UserRole.regionalCoordinator) return const SupervisorDashboardScreen();
     return const CoachDashboardScreen();
   }
 
@@ -39,7 +39,7 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith('/chat')) currentIndex = 0; // Chat is now accessed from Home
       else if (location.contains('reports')) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
-    } else if (userRole == UserRole.supervisor) {
+    } else if (userRole == UserRole.regionalCoordinator) {
       if (location.startsWith('/coaches')) currentIndex = 1;
       else if (location.startsWith('/enterprises')) currentIndex = 2;
       else if (location.startsWith('/chat')) currentIndex = 0; // Chat opened from home quick action
@@ -62,7 +62,7 @@ class DashboardMainScreen extends ConsumerWidget {
       ),
     ];
 
-    if (userRole == UserRole.supervisor) {
+    if (userRole == UserRole.regionalCoordinator) {
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.group_outlined),
         selectedIcon: Icon(Icons.group_rounded, color: Colors.blue),
@@ -129,7 +129,7 @@ class DashboardMainScreen extends ConsumerWidget {
           onDestinationSelected: (index) {
             String targetPath = AppRoutes.dashboard;
             
-            if (userRole == UserRole.supervisor) {
+            if (userRole == UserRole.regionalCoordinator) {
               switch (index) {
                 case 1: targetPath = '/coaches'; break;
                 case 2: targetPath = AppRoutes.enterpriseList; break;
@@ -157,7 +157,9 @@ class DashboardMainScreen extends ConsumerWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           indicatorColor: Theme.of(context).primaryColor.withOpacity(0.15),
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          labelBehavior: navItems.length > 3 
+            ? NavigationDestinationLabelBehavior.onlyShowSelected 
+            : NavigationDestinationLabelBehavior.alwaysShow,
           destinations: navItems,
         ),
       ),

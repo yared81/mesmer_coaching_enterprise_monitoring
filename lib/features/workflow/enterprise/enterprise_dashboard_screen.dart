@@ -259,16 +259,22 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, size: 14, color: isOverdue ? Colors.red : Colors.grey),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Due: ${DateFormat('MMM dd, yyyy').format(task.deadline)}',
-                      style: TextStyle(color: isOverdue ? Colors.red : Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today, size: 14, color: isOverdue ? Colors.red : Colors.grey),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          'Due: ${DateFormat('MMM dd, yyyy').format(task.deadline)}',
+                          style: TextStyle(color: isOverdue ? Colors.red : Colors.grey[600], fontSize: 12),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 if (!isDone && task.evidenceUrl == null)
                   ElevatedButton.icon(
                     onPressed: () { 
@@ -324,11 +330,24 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          mainAxisSize: MainAxisSize.min, // Added to prevent vertical stretching
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Text(
+              title,
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),

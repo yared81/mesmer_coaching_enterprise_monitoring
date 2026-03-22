@@ -234,9 +234,9 @@ class _DashboardHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(authProvider).user?.role;
-    if (role == UserRole.admin || role == UserRole.superAdmin) return AdminDashboardScreen();
-    if (role == UserRole.supervisor) return const SupervisorDashboardScreen();
-    if (role == UserRole.meOfficer || role == UserRole.programManager) return const MeDashboardScreen();
+    if (role == UserRole.programManager || role == UserRole.superAdmin) return AdminDashboardScreen();
+    if (role == UserRole.regionalCoordinator) return const SupervisorDashboardScreen();
+    if (role == UserRole.meOfficer) return const MeDashboardScreen();
     if (role == UserRole.trainer) return const TrainerDashboardScreen();
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
     if (role == UserRole.coach) return CoachDashboardScreen();

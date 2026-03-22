@@ -36,14 +36,16 @@ class UserModel {
 
   static UserRole _parseRole(dynamic role) {
     if (role == 'super_admin') return UserRole.superAdmin;
-    if (role == 'admin') return UserRole.admin;
-    if (role == 'supervisor') return UserRole.supervisor;
-    if (role == 'coach') return UserRole.coach;
-    if (role == 'data_verifier') return UserRole.dataVerifier;
-    if (role == 'me_officer') return UserRole.meOfficer;
     if (role == 'program_manager') return UserRole.programManager;
+    if (role == 'regional_coordinator') return UserRole.regionalCoordinator;
+    if (role == 'me_officer') return UserRole.meOfficer;
+    if (role == 'data_verifier') return UserRole.dataVerifier;
     if (role == 'trainer') return UserRole.trainer;
+    if (role == 'coach') return UserRole.coach;
+    if (role == 'enumerator') return UserRole.enumerator;
+    if (role == 'comms_officer') return UserRole.commsOfficer;
     if (role == 'enterprise_user') return UserRole.enterprise;
+    if (role == 'stakeholder') return UserRole.stakeholder;
     
     throw Exception('CRITICAL SECURITY ERROR: Unrecognized user role "$role" detected from API. Authentication safely aborted.');
   }

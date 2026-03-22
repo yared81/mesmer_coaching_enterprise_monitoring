@@ -26,8 +26,8 @@ const User = sequelize.define('User', {
   },
   role: {
     type: DataTypes.ENUM(
-      'super_admin', 'program_manager', 'regional_coordinator', 
-      'me_officer', 'data_verifier', 'trainer', 'coach', 
+      'super_admin', 'program_manager', 'regional_coordinator',
+      'me_officer', 'data_verifier', 'trainer', 'coach',
       'enumerator', 'comms_officer', 'enterprise_user', 'stakeholder'
     ),
     allowNull: false
@@ -42,6 +42,10 @@ const User = sequelize.define('User', {
   is_active: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
   },
   token_version: {
     type: DataTypes.INTEGER,

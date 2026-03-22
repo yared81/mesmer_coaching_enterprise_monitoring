@@ -161,14 +161,14 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
 
   Color _getRoleColor(UserRole role) {
     switch (role) {
-      case UserRole.admin:
+      case UserRole.programManager:
       case UserRole.superAdmin:
         return Colors.red;
       case UserRole.coach:
         return Colors.blue;
       case UserRole.trainer:
         return Colors.orange;
-      case UserRole.supervisor:
+      case UserRole.regionalCoordinator:
         return Colors.purple;
       default:
         return Colors.grey;
