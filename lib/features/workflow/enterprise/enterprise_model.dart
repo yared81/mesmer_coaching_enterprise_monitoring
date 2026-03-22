@@ -74,8 +74,8 @@ class EnterpriseModel {
       consentStatus: json['consent_status'] == true,
       consentDate: json['consent_date'] != null ? DateTime.parse(json['consent_date'] as String) : null,
       status: json['status'] as String? ?? 'active',
-      coachId: json['coach_id'] as String,
-      institutionId: json['institution_id'] as String,
+      coachId: json['coach_id'] as String? ?? '',
+      institutionId: json['institution_id'] as String? ?? '',
       registeredAt: DateTime.parse(json['registered_at'] as String),
     );
   }

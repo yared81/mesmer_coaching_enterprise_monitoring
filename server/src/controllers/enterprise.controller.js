@@ -40,7 +40,7 @@ class EnterpriseController {
    */
   list = async (req, res, next) => {
     try {
-      const { userId, role, institutionId } = req.user;
+      const { userId, role, institution_id: institutionId } = req.user;
       const filters = { ...req.query };
 
       // Enforce Role-Based Data Isolation

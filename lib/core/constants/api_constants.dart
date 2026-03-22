@@ -4,7 +4,7 @@ abstract class ApiConstants {
   // Base URL — set from .env or build config using --dart-define-from-file
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/api/v1/',
+    defaultValue: 'http://localhost:3000/api/v1',
   );
 
   // Timeouts
@@ -31,7 +31,7 @@ abstract class ApiConstants {
   static String coachStatsById(String id) => '/dashboard/coach/$id';
 
   // Enterprise Dashboard
-  static const String enterpriseDashboardStats = '/enterprise-dashboard/stats';
+  static const String enterpriseDashboardStats = 'enterprise-dashboard/stats';
 
   // Session Endpoints
   static const String sessions = 'sessions';
