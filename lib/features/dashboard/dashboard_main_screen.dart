@@ -50,11 +50,10 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.contains('reports')) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.regionalCoordinator) {
-      if (location.startsWith('/coaches')) currentIndex = 1;
-      else if (location.startsWith('/enterprises')) currentIndex = 2;
-      else if (location.startsWith('/chat')) currentIndex = 0;
-      else if (location.startsWith('/reports')) currentIndex = 3;
-      else if (location.startsWith('/settings')) currentIndex = 4;
+      if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.coachList)) currentIndex = 2;
+      else if (location.startsWith(AppRoutes.scheduling)) currentIndex = 3;
+      else if (location.startsWith(AppRoutes.supervisorReports)) currentIndex = 4;
     } else if (userRole == UserRole.enterprise) {
       if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
       else if (location.startsWith('/chat')) currentIndex = 0;
@@ -92,15 +91,21 @@ class DashboardMainScreen extends ConsumerWidget {
       ));
     } else if (userRole == UserRole.regionalCoordinator) {
       navItems.add(const NavigationDestination(
+        icon: Icon(Icons.storefront_outlined),
+        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
+        label: 'Enterprises',
+      ));
+      
+      navItems.add(const NavigationDestination(
         icon: Icon(Icons.group_outlined),
         selectedIcon: Icon(Icons.group_rounded, color: Colors.blue),
         label: 'Coaches',
       ));
-      
+
       navItems.add(const NavigationDestination(
-        icon: Icon(Icons.storefront_outlined),
-        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
-        label: 'Enterprises',
+        icon: Icon(Icons.calendar_month_outlined),
+        selectedIcon: Icon(Icons.calendar_month_rounded, color: Colors.blue),
+        label: 'Scheduling',
       ));
 
       navItems.add(const NavigationDestination(
@@ -191,10 +196,10 @@ class DashboardMainScreen extends ConsumerWidget {
               }
             } else if (userRole == UserRole.regionalCoordinator) {
               switch (index) {
-                case 1: targetPath = '/coaches'; break;
-                case 2: targetPath = AppRoutes.enterpriseList; break;
-                case 3: targetPath = AppRoutes.supervisorReports; break;
-                case 4: targetPath = '/settings'; break;
+                case 1: targetPath = AppRoutes.enterpriseList; break;
+                case 2: targetPath = AppRoutes.coachList; break;
+                case 3: targetPath = AppRoutes.scheduling; break;
+                case 4: targetPath = AppRoutes.supervisorReports; break;
               }
             } else if (userRole == UserRole.coach) {
               switch (index) {

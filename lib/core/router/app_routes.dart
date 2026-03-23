@@ -52,5 +52,6 @@ abstract class AppRoutes {
   static const String institutions = '/admin/organizations';
   static const String coachCrm = '/coach/portfolio';
   static const String calendar = '/calendar';
+  static const String scheduling = '/scheduling';
 }
 

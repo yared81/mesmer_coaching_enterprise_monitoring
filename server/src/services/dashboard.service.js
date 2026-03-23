@@ -139,7 +139,9 @@ class DashboardService {
   /**
    * Get aggregate stats for M&E / Program Manager
    */
-  async getMeStats() {
+  async getMeStats(institutionId = null) {
+    const enterpriseFilter = institutionId ? { institution_id: institutionId } : {};
+
     const [
       totalActive,
       totalGraduated,
@@ -150,19 +152,32 @@ class DashboardService {
       qcPassed,
       qcFailed
     ] = await Promise.all([
-      Enterprise.count({ where: { status: 'active' } }),
-      Enterprise.count({ where: { status: 'graduated' } }),
+      Enterprise.count({ where: { ...enterpriseFilter, status: 'active' } }),
+      Enterprise.count({ where: { ...enterpriseFilter, status: 'graduated' } }),
       // Funnel: Baseline (has score)
-      Enterprise.count({ where: { baseline_score: { [Op.gt]: 0 } } }),
+      Enterprise.count({ where: { ...enterpriseFilter, baseline_score: { [Op.gt]: 0 } } }),
       // Funnel: Training (attended at least one)
-      TrainingAttendance.count({ distinct: true, col: 'enterprise_id' }),
+      TrainingAttendance.count({ 
+        distinct: true, 
+        col: 'enterprise_id',
+        include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
+      }),
       // Funnel: Coaching (had at least one session)
-      CoachingSession.count({ distinct: true, col: 'enterprise_id' }),
+      CoachingSession.count({ 
+        distinct: true, 
+        col: 'enterprise_id',
+        include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
+      }),
       // Funnel: Midline (has at least 2 reports)
       DiagnosisReport.count({
         distinct: true,
         col: 'CoachingSession.enterprise_id',
-        include: [{ model: CoachingSession, as: 'session', attributes: [] }]
+        include: [{ 
+          model: CoachingSession, 
+          as: 'session', 
+          attributes: [],
+          include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
+        }]
       }),
       // QC Health
       QcAudit.count({ where: { status: 'passed' } }),

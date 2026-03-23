@@ -16,7 +16,7 @@ router.get('/coach', protect, authorize('coach'), dashboardController.getCoachSt
 router.get('/coach/:coachId', protect, authorize('supervisor', 'super_admin', 'admin', 'program_manager'), dashboardController.getSpecificCoachStats);
 
 // M&E / Program Manager stats
-router.get('/me', protect, authorize('me_officer', 'program_manager', 'super_admin', 'admin'), dashboardController.getMeStats);
+router.get('/me', protect, authorize('me_officer', 'program_manager', 'super_admin', 'admin', 'regional_coordinator'), dashboardController.getMeStats);
 
 // Live Activity Feed (role-scoped)
 router.get('/activity-feed', protect, authorize('coach', 'supervisor', 'super_admin', 'admin', 'me_officer', 'program_manager', 'regional_coordinator'), dashboardController.getActivityFeed);

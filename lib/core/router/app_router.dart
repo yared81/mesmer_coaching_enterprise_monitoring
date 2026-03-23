@@ -44,6 +44,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/cross_sector_analytics_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/monitoring_tab_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/regional_coordinator_dashboard_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -109,6 +110,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.supervisorReports,
             builder: (context, state) => const SupervisorReportsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.scheduling,
+            builder: (context, state) => const Scaffold(body: Center(child: Text('Scheduling Screen (Coming Soon)'))),
           ),
           GoRoute(
             path: '/analytics',
@@ -241,7 +246,7 @@ class _DashboardHome extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(authProvider).user?.role;
     if (role == UserRole.programManager || role == UserRole.superAdmin) return AdminDashboardScreen();
-    if (role == UserRole.regionalCoordinator) return const SupervisorDashboardScreen();
+    if (role == UserRole.regionalCoordinator) return const RegionalCoordinatorDashboardScreen();
     if (role == UserRole.meOfficer) return const MeDashboardScreen();
     if (role == UserRole.trainer) return const TrainerDashboardScreen();
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
