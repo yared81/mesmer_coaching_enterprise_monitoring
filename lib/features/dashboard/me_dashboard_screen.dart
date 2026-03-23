@@ -313,3 +313,49 @@ class _LegendItem extends StatelessWidget {
     );
   }
 }
+
+  Widget _buildRegionalQuality() {
+    final regions = [
+      {'name': 'Addis Ababa', 'score': 98.5, 'color': Colors.green},
+      {'name': 'Amhara', 'score': 94.2, 'color': Colors.green[400]},
+      {'name': 'Oromia', 'score': 88.7, 'color': Colors.orange},
+      {'name': 'Tigray', 'score': 82.1, 'color': Colors.red[300]},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+      ),
+      child: Column(
+        children: regions.map((r) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(r['name'] as String, style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text('${r['score']}% Quality', style: TextStyle(color: r['color'] as Color, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (r['score'] as double) / 100,
+                  backgroundColor: Colors.grey[100],
+                  color: r['color'] as Color,
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
+        )).toList(),
+      ),
+    );
+  }
+
