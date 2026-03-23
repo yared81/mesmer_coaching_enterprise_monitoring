@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'qc_audit_entity.dart';
 import 'qc_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coach_session_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 
 class QcRecordDetailScreen extends ConsumerWidget {
   final String auditId;

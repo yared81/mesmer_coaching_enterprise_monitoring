@@ -39,6 +39,7 @@ abstract class AppRoutes {
   static const String enterpriseProfile = '/enterprise/profile';
 
   // Monitoring & Reports
+  static const String surveyHub = '/survey-hub';
   static const String monitoring = '/monitoring-hub';
   static const String supervisorReports = '/regional-reports'; 
   static const String diagnosis = '/diagnosis';

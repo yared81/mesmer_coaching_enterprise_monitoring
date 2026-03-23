@@ -46,6 +46,10 @@ class MeDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               _buildActionHub(context),
               const SizedBox(height: 24),
+              const Text('Regional Data Quality leaderboard', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildRegionalQuality(),
+              const SizedBox(height: 24),
               const Text('QC Verification Health', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               _buildQcPieChart(stats),
@@ -55,6 +59,24 @@ class MeDashboardScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
+    );
+  }
+
+  Widget _buildStatCards(MeStatsEntity stats) {
+    return Row(
+      children: [
+        _StatCard(
+            label: 'Total Active',
+            value: stats.totalActive.toString(),
+            color: Colors.blue,
+            icon: Icons.business),
+        const SizedBox(width: 12),
+        _StatCard(
+            label: 'Graduated',
+            value: stats.totalGraduated.toString(),
+            color: Colors.green,
+            icon: Icons.school),
+      ],
     );
   }
 
@@ -94,7 +116,7 @@ class MeDashboardScreen extends ConsumerWidget {
               _ActionButton(
                 label: 'Survey Hub',
                 icon: Icons.assignment_outlined,
-                onTap: () => Navigator.pushNamed(context, '/survey-hub'),
+                onTap: () => context.push(AppRoutes.surveyHub),
               ),
               const SizedBox(width: 12),
               _ActionButton(

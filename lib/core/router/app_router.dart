@@ -155,11 +155,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.changePassword,
             builder: (context, state) => const ChangePasswordScreen(),
           ),
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/survey_management_hub_screen.dart';
-
-...
           GoRoute(
-            path: '/survey-hub',
+            path: AppRoutes.surveyHub,
             builder: (context, state) => const SurveyManagementHubScreen(),
           ),
           GoRoute(
