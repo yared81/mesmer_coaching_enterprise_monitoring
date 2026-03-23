@@ -58,6 +58,14 @@ class RolePermissions {
       AppRoutes.changePassword,
       '/settings',
     ],
+    UserRole.dataVerifier: [
+      AppRoutes.dashboard,
+      AppRoutes.qcDashboard,
+      '/qc',
+      '/profile',
+      AppRoutes.changePassword,
+      '/settings',
+    ],
   };
 
   static bool canAccess(UserRole role, String path) {

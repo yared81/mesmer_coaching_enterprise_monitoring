@@ -73,7 +73,7 @@ class QcDashboardScreen extends ConsumerWidget {
                         ],
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.go('/qc/detail/${audit.id}'),
+                      onTap: () => context.go(AppRoutes.qcDetail.replaceAll(':id', audit.id)),
                     ),
                   );
                 },
@@ -89,10 +89,6 @@ class QcDashboardScreen extends ConsumerWidget {
         title: const Text('QC Verification Inbox'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history_rounded),
-            onPressed: () => Navigator.pushNamed(context, '/qc/history'),
-          ),
-          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.read(pendingAuditsProvider.notifier).fetch(),
           ),
@@ -102,78 +98,5 @@ class QcDashboardScreen extends ConsumerWidget {
     );
   }
 
-  void _showReviewDialog(BuildContext context, WidgetRef ref, QcAuditEntity audit) {
-    final commentController = TextEditingController();
-    QcAuditStatus selectedStatus = QcAuditStatus.passed;
 
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text('Review ${audit.targetType.name}'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Evaluate the quality of this record based on the evidence provided.'),
-                const SizedBox(height: 20),
-                DropdownButtonFormField<QcAuditStatus>(
-                  value: selectedStatus,
-                  decoration: const InputDecoration(labelText: 'Verdict'),
-                  items: [
-                    const DropdownMenuItem(value: QcAuditStatus.passed, child: Text('PASS')),
-                    const DropdownMenuItem(value: QcAuditStatus.failed, child: Text('FAIL')),
-                  ],
-                  onChanged: (val) => setState(() => selectedStatus = val!),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: commentController,
-                  decoration: const InputDecoration(
-                    labelText: 'Auditor Comments',
-                    hintText: 'Required if failed...',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('CANCEL')),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedStatus == QcAuditStatus.passed ? Colors.green : Colors.red,
-              ),
-              onPressed: () async {
-                if (selectedStatus == QcAuditStatus.failed && commentController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Please provide comments for failures.')),
-                  );
-                  return;
-                }
-                
-                try {
-                  await ref.read(pendingAuditsProvider.notifier).review(
-                    audit.id, 
-                    selectedStatus, 
-                    commentController.text
-                  );
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Review submitted successfully.')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: $e')),
-                  );
-                }
-              },
-              child: const Text('SUBMIT VERDICT', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

@@ -65,6 +65,9 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith(AppRoutes.surveyHub)) currentIndex = 2;
       else if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
+    } else if (userRole == UserRole.dataVerifier) {
+      if (location.startsWith('/qc/history')) currentIndex = 1;
+      else if (location.startsWith('/settings')) currentIndex = 2;
     } else {
       if (location.startsWith('/settings')) currentIndex = 1;
     }
@@ -178,6 +181,17 @@ class DashboardMainScreen extends ConsumerWidget {
         selectedIcon: Icon(Icons.business_rounded, color: Colors.blue),
         label: 'Enterprises',
       ));
+    } else if (userRole == UserRole.dataVerifier) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.all_inbox_outlined),
+        selectedIcon: Icon(Icons.all_inbox_rounded, color: Colors.blue),
+        label: 'QC Inbox',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.history_outlined),
+        selectedIcon: Icon(Icons.history_rounded, color: Colors.blue),
+        label: 'History',
+      ));
     }
 
     navItems.add(const NavigationDestination(
@@ -243,6 +257,12 @@ class DashboardMainScreen extends ConsumerWidget {
                 case 2: targetPath = AppRoutes.surveyHub; break;
                 case 3: targetPath = AppRoutes.enterpriseList; break;
                 case 4: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.dataVerifier) {
+              switch (index) {
+                case 0: targetPath = AppRoutes.dashboard; break;
+                case 1: targetPath = '/qc/history'; break;
+                case 2: targetPath = '/settings'; break;
               }
             } else {
               if (index == 1) targetPath = '/settings';

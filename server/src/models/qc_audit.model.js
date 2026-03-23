@@ -24,7 +24,7 @@ const QcAudit = sequelize.define('QcAudit', {
     defaultValue: false,
   },
   status: {
-    type: DataTypes.ENUM('pending', 'passed', 'failed'),
+    type: DataTypes.ENUM('pending', 'passed', 'failed', 'correction_requested'),
     defaultValue: 'pending',
   },
   auditor_comments: {

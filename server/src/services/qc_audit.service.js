@@ -32,28 +32,34 @@ class QcAuditService {
           qc_feedback: data.auditor_comments || session.qc_feedback
         });
 
-        if (data.status === 'failed') {
+        if (data.status === 'failed' || data.status === 'correction_requested') {
           const notificationService = require('./notification.service');
+          const isCorrection = data.status === 'correction_requested';
           await notificationService.createNotification({
             userId: session.coach_id,
-            title: 'Action Required: Session QC Failed',
-            message: `Your session "${session.title}" failed QC verification. Reason: ${data.auditor_comments}`,
-            type: 'warning'
+            title: isCorrection ? 'Correction Required: Session QC' : 'Action Required: Session QC Failed',
+            message: isCorrection 
+              ? `Verification for "${session.title}" requires corrections: ${data.auditor_comments}`
+              : `Your session "${session.title}" failed QC verification. Reason: ${data.auditor_comments}`,
+            type: isCorrection ? 'info' : 'warning'
           });
         }
       }
     }
 
-    // 2. Handle Baseline Failure Notification
-    if (audit.target_type === 'baseline' && data.status === 'failed') {
+    // 2. Handle Baseline Failure/Correction Notification
+    if (audit.target_type === 'baseline' && (data.status === 'failed' || data.status === 'correction_requested')) {
       const enterprise = await Enterprise.findByPk(audit.target_id);
       if (enterprise) {
         const notificationService = require('./notification.service');
+        const isCorrection = data.status === 'correction_requested';
         await notificationService.createNotification({
           userId: enterprise.coach_id,
-          title: 'Action Required: Baseline QC Failed',
-          message: `The baseline data for "${enterprise.business_name}" failed QC. Reason: ${data.auditor_comments}`,
-          type: 'warning'
+          title: isCorrection ? 'Correction Required: Baseline QC' : 'Action Required: Baseline QC Failed',
+          message: isCorrection
+            ? `Baseline data for "${enterprise.business_name}" requires corrections: ${data.auditor_comments}`
+            : `The baseline data for "${enterprise.business_name}" failed QC. Reason: ${data.auditor_comments}`,
+          type: isCorrection ? 'info' : 'warning'
         });
       }
     }

@@ -33,8 +33,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/communication/cha
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_log_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_profile_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_history_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_record_detail_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_history_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';
@@ -247,6 +247,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const QcDashboardScreen(),
           ),
           GoRoute(
+            path: AppRoutes.qcHistory,
+            builder: (context, state) => const QcAuditHistoryScreen(hideAppBar: true),
+          ),
+          GoRoute(
+            path: AppRoutes.qcDetail,
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return QcRecordDetailScreen(auditId: id);
+            },
+          ),
+          GoRoute(
             path: AppRoutes.userManagement,
             builder: (context, state) => const UserManagementScreen(),
           ),
@@ -280,7 +291,7 @@ class _DashboardHome extends ConsumerWidget {
     if (role == UserRole.trainer) return const TrainerDashboardScreen();
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
     if (role == UserRole.coach) return CoachDashboardScreen();
-    if (role == UserRole.dataVerifier) return const QcDashboardScreen();
+    if (role == UserRole.dataVerifier) return const QcDashboardScreen(hideAppBar: true);
     
     return const Scaffold(
       body: Center(

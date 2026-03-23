@@ -5,6 +5,9 @@ import 'qc_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 
 class QcRecordDetailScreen extends ConsumerWidget {
   final String auditId;
@@ -33,7 +36,13 @@ class QcRecordDetailScreen extends ConsumerWidget {
                 const Text('Parent Record Data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 _buildTargetData(ref, audit),
-                const SizedBox(height: 40),
+                const Divider(height: 40),
+                const Text('Evidence & Attachments', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                _buildEvidenceSection(ref, audit),
+                const Divider(height: 40),
+                _buildVerificationChecklist(),
+                const Divider(height: 40),
                 _buildVerdictSection(context, ref, audit),
               ],
             ),
@@ -155,23 +164,35 @@ class QcRecordDetailScreen extends ConsumerWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () => _submit(context, ref, audit.id, QcAuditStatus.failed, commentController.text),
-                icon: const Icon(Icons.close, color: Colors.white),
-                label: const Text('REJECT / FAIL', style: TextStyle(color: Colors.white)),
+                icon: const Icon(Icons.error_outline, color: Colors.white),
+                label: const Text('FAIL', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _submit(context, ref, audit.id, QcAuditStatus.correction_requested, commentController.text),
+                icon: const Icon(Icons.assignment_return_outlined, color: Colors.white),
+                label: const Text('CORRECTION', style: TextStyle(color: Colors.white, fontSize: 13)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () => _submit(context, ref, audit.id, QcAuditStatus.passed, commentController.text),
                 icon: const Icon(Icons.check, color: Colors.white),
-                label: const Text('APPROVE / PASS', style: TextStyle(color: Colors.white)),
+                label: const Text('PASS', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
@@ -181,9 +202,95 @@ class QcRecordDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildEvidenceSection(WidgetRef ref, QcAuditEntity audit) {
+    final docsAsync = audit.targetType == QcTargetType.baseline 
+      ? ref.watch(enterpriseDocumentsProvider(audit.targetId))
+      : ref.watch(sessionDocumentsProvider(audit.targetId));
+
+    return docsAsync.when(
+      data: (docs) => docs.isEmpty 
+        ? const Center(child: Text('No evidence uploaded.', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)))
+        : GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
+            itemCount: docs.length,
+            itemBuilder: (context, index) {
+              final doc = docs[index];
+              final fullUrl = '${ApiConstants.baseUrl}${doc.fileUrl}';
+              return GestureDetector(
+                onTap: () => _showImageDialog(context, fullUrl),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    fullUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey[200],
+                      child: const Icon(Icons.broken_image, color: Colors.grey),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => Text('Error loading evidence: $e'),
+    );
+  }
+
+  Widget _buildVerificationChecklist() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Self-Verification Checklist', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        _checkItem('All photos match business description'),
+        _checkItem('GPS coordinates are within expected range'),
+        _checkItem('Owner info matches ID/License'),
+        _checkItem('Revenue data is plausible for sector'),
+      ],
+    );
+  }
+
+  Widget _checkItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          const Icon(Icons.check_box_outline_blank, color: Colors.grey, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
+  }
+
+  void _showImageDialog(BuildContext context, String url) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(url),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CLOSE'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _submit(BuildContext context, WidgetRef ref, String auditId, QcAuditStatus status, String comment) async {
-    if (status == QcAuditStatus.failed && comment.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reason for failure is required.')));
+    if ((status == QcAuditStatus.failed || status == QcAuditStatus.correction_requested) && comment.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reason for ${status.name} is required.')));
       return;
     }
     
