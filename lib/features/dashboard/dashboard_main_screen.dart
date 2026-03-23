@@ -69,6 +69,12 @@ class DashboardMainScreen extends ConsumerWidget {
       if (location.startsWith(AppRoutes.qcDashboard) || location == AppRoutes.dashboard) currentIndex = 0;
       else if (location.startsWith('/qc/history')) currentIndex = 1;
       else if (location.startsWith('/settings')) currentIndex = 2;
+    } else if (userRole == UserRole.enumerator) {
+      if (location.startsWith(AppRoutes.intakeRegister)) currentIndex = 1;
+      else if (location.startsWith('/intake/baseline')) currentIndex = 2;
+      else if (location.startsWith(AppRoutes.enumeratorSubmissions)) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
+      else if (location.startsWith(AppRoutes.intakeQueue) || location == AppRoutes.dashboard) currentIndex = 0;
     } else {
       if (location.startsWith('/settings')) currentIndex = 1;
     }
@@ -189,6 +195,22 @@ class DashboardMainScreen extends ConsumerWidget {
         selectedIcon: Icon(Icons.history_rounded, color: Colors.blue),
         label: 'History',
       ));
+    } else if (userRole == UserRole.enumerator) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.storefront_outlined),
+        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
+        label: 'New Ent.',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.assignment_outlined),
+        selectedIcon: Icon(Icons.assignment_rounded, color: Colors.blue),
+        label: 'Baseline',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.task_outlined),
+        selectedIcon: Icon(Icons.task_rounded, color: Colors.blue),
+        label: 'Submissions',
+      ));
     }
 
     navItems.add(const NavigationDestination(
@@ -260,6 +282,14 @@ class DashboardMainScreen extends ConsumerWidget {
                 case 0: targetPath = AppRoutes.dashboard; break;
                 case 1: targetPath = '/qc/history'; break;
                 case 2: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.enumerator) {
+              switch (index) {
+                case 0: targetPath = AppRoutes.intakeQueue; break;
+                case 1: targetPath = AppRoutes.intakeRegister; break;
+                case 2: targetPath = AppRoutes.intakeSubmissions; break; // This should be a list to pick from
+                case 3: targetPath = AppRoutes.enumeratorSubmissions; break;
+                case 4: targetPath = '/settings'; break;
               }
             } else {
               if (index == 1) targetPath = '/settings';

@@ -54,6 +54,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/s
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/training_attendance_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/intake_queue_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_assessment_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/enumerator_submissions_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -293,6 +296,30 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return TrainingAttendanceScreen(training: training);
             },
           ),
+          // Enumerator / Intake Routes
+          GoRoute(
+            path: AppRoutes.intakeQueue,
+            builder: (context, state) => const IntakeQueueScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.intakeRegister,
+            builder: (context, state) => const EnterpriseFormScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.intakeSubmissions,
+            builder: (context, state) => const IntakeQueueScreen(), // Reusing for now, will filter for baseline
+          ),
+          GoRoute(
+            path: AppRoutes.intakeBaseline,
+            builder: (context, state) {
+              final id = state.pathParameters['id'] ?? '';
+              return BaselineAssessmentScreen(enterpriseId: id);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.enumeratorSubmissions,
+            builder: (context, state) => const EnumeratorSubmissionsScreen(),
+          ),
         ],
       ),
     ],
@@ -312,6 +339,7 @@ class _DashboardHome extends ConsumerWidget {
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();
     if (role == UserRole.coach) return CoachDashboardScreen();
     if (role == UserRole.dataVerifier) return const QcDashboardScreen(hideAppBar: true);
+    if (role == UserRole.enumerator) return const IntakeQueueScreen();
     
     return const Scaffold(
       body: Center(

@@ -44,6 +44,13 @@ abstract class AppRoutes {
   static const String supervisorReports = '/regional-reports'; 
   static const String reports = '/reports';
   static const String diagnosis = '/diagnosis';
+  
+  // Enumerator / Intake Routes
+  static const String intakeQueue = '/intake';
+  static const String intakeRegister = '/intake/register';
+  static const String intakeBaseline = '/intake/baseline/:id';
+  static const String intakeSubmissions = '/intake/baseline-list'; // Added this
+  static const String enumeratorSubmissions = '/intake/submissions';
 
   // Templates
   static const String templateList = '/supervisor/templates';
