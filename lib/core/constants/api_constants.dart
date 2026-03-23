@@ -42,4 +42,8 @@ abstract class ApiConstants {
   // Session Endpoints
   static const String sessions = 'sessions';
   static const String phoneFollowups = 'phone-followups';
+  
+  // Audit Logs
+  static const String audits = 'audits';
 }
+

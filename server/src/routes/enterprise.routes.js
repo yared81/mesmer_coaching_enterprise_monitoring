@@ -14,27 +14,27 @@ router.post(
 
 router.get(
   '/', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator'),
   enterpriseController.list
 );
 
 router.get(
   '/:id', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'enterprise_user'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise_user'),
   restrictToOwnEnterprise,
   enterpriseController.getById
 );
 
 router.put(
   '/:id',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user', 'program_manager'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user', 'program_manager', 'regional_coordinator'),
   restrictToOwnEnterprise,
   enterpriseController.update
 );
 
 router.get(
   '/:id/trends',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'enterprise_user'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise_user'),
   restrictToOwnEnterprise,
   enterpriseController.getTrends
 );

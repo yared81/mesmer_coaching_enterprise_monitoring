@@ -6,7 +6,13 @@ class UserManagementController {
 
   getUsers = async (req, res, next) => {
     try {
-      const users = await userManagementService.getUsers(req.query);
+      const query = { ...req.query };
+      if (req.user.role === 'regional_coordinator') {
+        query.institution_id = req.user.institution_id;
+        query.role = 'coach'; // Restrict to seeing coaches only within their region
+      }
+
+      const users = await userManagementService.getUsers(query);
       res.status(200).json({
         success: true,
         data: users

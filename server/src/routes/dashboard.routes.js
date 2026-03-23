@@ -7,7 +7,7 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 router.get('/admin', protect, authorize('super_admin', 'admin', 'supervisor', 'program_manager'), dashboardController.getAdminStats);
 
 // Supervisor stats
-router.get('/supervisor', protect, authorize('supervisor'), dashboardController.getSupervisorStats);
+router.get('/supervisor', protect, authorize('supervisor', 'regional_coordinator'), dashboardController.getSupervisorStats);
 
 // Coach stats (Self)
 router.get('/coach', protect, authorize('coach'), dashboardController.getCoachStats);
@@ -19,7 +19,7 @@ router.get('/coach/:coachId', protect, authorize('supervisor', 'super_admin', 'a
 router.get('/me', protect, authorize('me_officer', 'program_manager', 'super_admin', 'admin'), dashboardController.getMeStats);
 
 // Live Activity Feed (role-scoped)
-router.get('/activity-feed', protect, authorize('coach', 'supervisor', 'super_admin', 'admin', 'me_officer', 'program_manager'), dashboardController.getActivityFeed);
+router.get('/activity-feed', protect, authorize('coach', 'supervisor', 'super_admin', 'admin', 'me_officer', 'program_manager', 'regional_coordinator'), dashboardController.getActivityFeed);
 
 // Coach CRM Portfolio
 router.get('/coach-portfolio', protect, authorize('coach'), dashboardController.getCoachPortfolio);

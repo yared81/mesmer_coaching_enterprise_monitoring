@@ -3,19 +3,18 @@ const router = express.Router();
 const userManagementController = require('../controllers/user_management.controller');
 const { protect, authorize } = require('../middleware/auth.middleware');
 
-// All routes here require authentication and admin/super_admin role
+// All routes here require authentication
 router.use(protect);
-router.use(authorize('super_admin', 'admin', 'program_manager'));
 
 // User Management
-router.get('/users', userManagementController.getUsers);
-router.post('/users', userManagementController.createUser);
-router.put('/users/:id', userManagementController.updateUser);
-router.patch('/users/:id/toggle-status', userManagementController.toggleUserStatus);
+router.get('/users', authorize('super_admin', 'admin', 'program_manager', 'regional_coordinator'), userManagementController.getUsers);
+router.post('/users', authorize('super_admin', 'admin', 'program_manager'), userManagementController.createUser);
+router.put('/users/:id', authorize('super_admin', 'admin', 'program_manager'), userManagementController.updateUser);
+router.patch('/users/:id/toggle-status', authorize('super_admin', 'admin', 'program_manager'), userManagementController.toggleUserStatus);
 
 // Institution Management
-router.get('/institutions', userManagementController.getInstitutions);
-router.post('/institutions', userManagementController.createInstitution);
-router.put('/institutions/:id', userManagementController.updateInstitution);
+router.get('/institutions', authorize('super_admin', 'admin', 'program_manager', 'regional_coordinator'), userManagementController.getInstitutions);
+router.post('/institutions', authorize('super_admin', 'admin', 'program_manager'), userManagementController.createInstitution);
+router.put('/institutions/:id', authorize('super_admin', 'admin', 'program_manager'), userManagementController.updateInstitution);
 
 module.exports = router;

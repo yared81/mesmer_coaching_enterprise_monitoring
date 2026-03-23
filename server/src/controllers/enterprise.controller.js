@@ -46,7 +46,7 @@ class EnterpriseController {
       // Enforce Role-Based Data Isolation
       if (role === 'coach') {
         filters.coach_id = userId;
-      } else if (role === 'supervisor') {
+      } else if (role === 'supervisor' || role === 'regional_coordinator') {
         filters.institution_id = institutionId;
       } else if (role === 'enterprise') {
         filters.user_id = userId;

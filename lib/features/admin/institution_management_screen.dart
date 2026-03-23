@@ -70,7 +70,22 @@ class _InstitutionTile extends ConsumerWidget {
       child: ExpansionTile(
         leading: const Icon(Icons.business, color: Colors.blue),
         title: Text(institution.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(institution.region ?? 'Global', style: const TextStyle(fontSize: 12)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(institution.region ?? 'Global', style: const TextStyle(fontSize: 12)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                _buildKpiBadge('Active', Colors.green),
+                const SizedBox(width: 8),
+                _buildKpiBadge('92% Health', Colors.blue),
+                const SizedBox(width: 8),
+                _buildKpiBadge('15 Branches', Colors.orange),
+              ],
+            ),
+          ],
+        ),
         trailing: IconButton(
           icon: const Icon(Icons.add_circle_outline, size: 20),
           onPressed: () => _showAddBranchDialog(context, institution.id),
@@ -112,4 +127,20 @@ class _InstitutionTile extends ConsumerWidget {
       builder: (context) => AddInstitutionDialog(institution: inst),
     );
   }
+
+  Widget _buildKpiBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
 }
+

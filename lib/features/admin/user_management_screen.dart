@@ -135,29 +135,19 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           Row(
             children: [
               Expanded(
-                child: DropdownButtonFormField<String>(
-                  value: filters.role,
-                  isExpanded: true,
-                  decoration: InputDecoration(
-                    labelText: 'Role',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    isDense: true,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildRoleTab('All Roles', null, filters.role),
+                      _buildRoleTab('Coaches', UserRole.coach.snakeCase, filters.role),
+                      _buildRoleTab('Trainers', UserRole.trainer.snakeCase, filters.role),
+                      _buildRoleTab('Verifiers', UserRole.dataVerifier.snakeCase, filters.role),
+                      _buildRoleTab('Coordinators', UserRole.regionalCoordinator.snakeCase, filters.role),
+                      _buildRoleTab('M&E Officers', UserRole.meOfficer.snakeCase, filters.role),
+                      _buildRoleTab('Program Managers', UserRole.programManager.snakeCase, filters.role),
+                    ],
                   ),
-                  items: [
-                    const DropdownMenuItem<String>(value: null, child: Text('All Roles')),
-                    ...UserRole.values.map((role) {
-                      final label = role.name.replaceAllMapped(
-                        RegExp(r'([A-Z])'),
-                        (m) => ' ${m.group(0)}',
-                      ).trim();
-                      return DropdownMenuItem<String>(
-                        value: role.snakeCase,
-                        child: Text(label, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
-                      );
-                    }),
-                  ],
-                  onChanged: (val) => _updateFilter(role: val),
                 ),
               ),
               const SizedBox(width: 10),
@@ -196,6 +186,35 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildRoleTab(String label, String? roleValue, String? currentRole) {
+    final isSelected = currentRole == roleValue;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (selected) {
+          if (selected) {
+            _updateFilter(role: roleValue);
+          } else if (roleValue != null) { // Unselecting a specific role goes back to "All Roles"
+            _updateFilter(role: null);
+          }
+        },
+        selectedColor: AppColors.primary.withOpacity(0.1),
+        labelStyle: TextStyle(
+          color: isSelected ? AppColors.primary : Colors.grey[700],
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: isSelected ? AppColors.primary : Colors.grey[300]!,
+          ),
+        ),
       ),
     );
   }
