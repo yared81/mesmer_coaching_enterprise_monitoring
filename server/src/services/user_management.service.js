@@ -18,31 +18,26 @@ class UserManagementService {
       ];
     }
 
+    const attributesToInclude = [];
+    if (role === 'coach') {
+      attributesToInclude.push([
+        sequelize.literal(`(SELECT COUNT(*) FROM enterprises AS e WHERE e.coach_id = users.id)`),
+        'enterpriseCount'
+      ]);
+      attributesToInclude.push([
+        sequelize.literal(`(SELECT COUNT(*) FROM coaching_sessions AS s WHERE s.coach_id = users.id)`),
+        'sessionCount'
+      ]);
+    }
+
     const users = await User.findAll({
       where,
       include: [
         { model: Institution, as: 'institution', attributes: ['name'] }
       ],
-      attributes: { 
+      attributes: {
         exclude: ['password_hash'],
-        include: role === 'coach' ? [
-          [
-            sequelize.literal(`(
-              SELECT COUNT(*)
-              FROM enterprises AS e
-              WHERE e.coach_id = "User".id
-            )`),
-            'enterpriseCount'
-          ],
-          [
-            sequelize.literal(`(
-              SELECT COUNT(*)
-              FROM coaching_sessions AS s
-              WHERE s.coach_id = "User".id
-            )`),
-            'sessionCount'
-          ]
-        ] : []
+        include: attributesToInclude
       },
       order: [['created_at', 'DESC']]
     });

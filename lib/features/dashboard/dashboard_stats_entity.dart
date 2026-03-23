@@ -33,12 +33,14 @@ class AdminStatsEntity {
 class SupervisorStatsEntity {
   final int totalCoaches;
   final int totalEnterprises;
+  final int totalAssessments;
   final double avgAssessmentScore;
   final List<ActivityEntity> recentActivity;
 
   SupervisorStatsEntity({
     required this.totalCoaches,
     required this.totalEnterprises,
+    required this.totalAssessments,
     required this.avgAssessmentScore,
     required this.recentActivity,
   });

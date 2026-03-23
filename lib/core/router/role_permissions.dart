@@ -11,7 +11,7 @@ class RolePermissions {
       '/enterprises',
       '/sessions',
       AppRoutes.scheduling,
-      AppRoutes.monitoring,
+      AppRoutes.supervisorReports,
       '/analytics',
       '/qc/history',
       '/profile',

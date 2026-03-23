@@ -35,9 +35,17 @@ class DashboardService {
    * Get aggregate stats for Supervisor
    */
   async getSupervisorStats(institutionId) {
-    const [totalCoaches, totalEnterprises, avgReport, recentActivity] = await Promise.all([
+    const [totalCoaches, totalEnterprises, totalAssessments, avgReport, recentActivity] = await Promise.all([
       User.count({ where: { institution_id: institutionId, role: 'coach' } }),
       Enterprise.count({ where: { institution_id: institutionId } }),
+      DiagnosisReport.count({
+        include: [{
+          model: DiagnosisTemplate,
+          as: 'template',
+          where: { institution_id: institutionId },
+          attributes: []
+        }]
+      }),
       DiagnosisReport.findOne({
         include: [{
           model: DiagnosisTemplate,
@@ -61,6 +69,7 @@ class DashboardService {
       stats: {
         totalCoaches,
         totalEnterprises,
+        totalAssessments,
         avgAssessmentScore: avgReport ? parseFloat(parseFloat(avgReport.avgHealth || 0).toFixed(1)) : 0
       },
       recentActivity

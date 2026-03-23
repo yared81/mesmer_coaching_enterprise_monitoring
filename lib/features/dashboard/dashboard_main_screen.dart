@@ -9,6 +9,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/supervi
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/common/settings_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/regional_coordinator_dashboard_screen.dart';
 
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_enterprise_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coach_session_list_screen.dart';
@@ -20,7 +21,7 @@ class DashboardMainScreen extends ConsumerWidget {
 
   Widget _getDashboardBody(UserRole? role) {
     if (role == UserRole.programManager) return const AdminDashboardScreen();
-    if (role == UserRole.regionalCoordinator) return const SupervisorDashboardScreen();
+    if (role == UserRole.regionalCoordinator) return RegionalCoordinatorDashboardScreen();
     return const CoachDashboardScreen();
   }
 
@@ -54,6 +55,7 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith(AppRoutes.coachList)) currentIndex = 2;
       else if (location.startsWith(AppRoutes.scheduling)) currentIndex = 3;
       else if (location.startsWith(AppRoutes.supervisorReports)) currentIndex = 4;
+      else if (location.startsWith('/settings')) currentIndex = 5;
     } else if (userRole == UserRole.enterprise) {
       if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
       else if (location.startsWith('/chat')) currentIndex = 0;
@@ -200,6 +202,7 @@ class DashboardMainScreen extends ConsumerWidget {
                 case 2: targetPath = AppRoutes.coachList; break;
                 case 3: targetPath = AppRoutes.scheduling; break;
                 case 4: targetPath = AppRoutes.supervisorReports; break;
+                case 5: targetPath = '/settings'; break;
               }
             } else if (userRole == UserRole.coach) {
               switch (index) {

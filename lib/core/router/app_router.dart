@@ -83,6 +83,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           '/settings',
           AppRoutes.chat,
           AppRoutes.monitoring,
+          AppRoutes.supervisorReports,
         ];
         
         if (!sharedPaths.contains(path)) {
@@ -266,7 +267,7 @@ class _DashboardHome extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(authProvider).user?.role;
     if (role == UserRole.programManager || role == UserRole.superAdmin) return AdminDashboardScreen();
-    if (role == UserRole.regionalCoordinator) return const RegionalCoordinatorDashboardScreen();
+    if (role == UserRole.regionalCoordinator) return RegionalCoordinatorDashboardScreen();
     if (role == UserRole.meOfficer) return const MeDashboardScreen();
     if (role == UserRole.trainer) return const TrainerDashboardScreen();
     if (role == UserRole.enterprise) return const EnterpriseDashboardScreen();

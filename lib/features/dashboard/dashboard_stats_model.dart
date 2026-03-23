@@ -51,6 +51,7 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
   SupervisorStatsModel({
     required super.totalCoaches,
     required super.totalEnterprises,
+    required super.totalAssessments,
     required super.avgAssessmentScore,
     required super.recentActivity,
   });
@@ -65,6 +66,7 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
     return SupervisorStatsModel(
       totalCoaches: NumUtils.toInt(stats['totalCoaches']),
       totalEnterprises: NumUtils.toInt(stats['totalEnterprises']),
+      totalAssessments: NumUtils.toInt(stats['totalAssessments']),
       avgAssessmentScore: NumUtils.toDouble(stats['avgAssessmentScore']),
       recentActivity: recent,
     );

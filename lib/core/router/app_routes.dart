@@ -40,7 +40,7 @@ abstract class AppRoutes {
 
   // Monitoring & Reports
   static const String monitoring = '/monitoring-hub';
-  static const String supervisorReports = '/monitoring-hub'; 
+  static const String supervisorReports = '/regional-reports'; 
   static const String diagnosis = '/diagnosis';
 
   // Templates

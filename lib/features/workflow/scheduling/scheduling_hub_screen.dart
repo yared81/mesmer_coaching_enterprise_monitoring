@@ -5,7 +5,7 @@ class SchedulingHubScreen extends ConsumerWidget {
   const SchedulingHubScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
