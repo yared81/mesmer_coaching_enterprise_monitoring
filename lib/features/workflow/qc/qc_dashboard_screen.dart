@@ -53,17 +53,17 @@ class QcDashboardScreen extends ConsumerWidget {
                               child: Row(
                                 children: [
                                   Icon(
-                                    audit.isRandomSample ? Icons.casino_outlined : Icons.report_problem_rounded,
+                                    audit.isRandomSample == true ? Icons.casino_outlined : Icons.report_problem_rounded,
                                     size: 14,
-                                    color: audit.isRandomSample ? Colors.blue : Colors.red,
+                                    color: audit.isRandomSample == true ? Colors.blue : Colors.red,
                                   ),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      audit.flagReason!,
+                                      audit.flagReason ?? 'System Flag',
                                       style: TextStyle(
                                         fontSize: 11,
-                                        color: audit.isRandomSample ? Colors.blue : Colors.red,
+                                        color: audit.isRandomSample == true ? Colors.blue : Colors.red,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),

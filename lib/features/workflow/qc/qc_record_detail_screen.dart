@@ -57,9 +57,9 @@ class QcRecordDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: audit.isRandomSample ? Colors.blue[50] : Colors.red[50],
+        color: audit.isRandomSample == true ? Colors.blue[50] : Colors.red[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: audit.isRandomSample ? Colors.blue[200]! : Colors.red[200]!),
+        border: Border.all(color: audit.isRandomSample == true ? Colors.blue[200]! : Colors.red[200]!),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,15 +67,15 @@ class QcRecordDetailScreen extends ConsumerWidget {
           Row(
             children: [
               Icon(
-                audit.isRandomSample ? Icons.casino_outlined : Icons.report_problem_rounded,
-                color: audit.isRandomSample ? Colors.blue : Colors.red,
+                audit.isRandomSample == true ? Icons.casino_outlined : Icons.report_problem_rounded,
+                color: audit.isRandomSample == true ? Colors.blue : Colors.red,
               ),
               const SizedBox(width: 8),
               Text(
-                audit.isRandomSample ? 'Random Statistical Sample' : 'Priority Risk Flag',
+                audit.isRandomSample == true ? 'Random Statistical Sample' : 'Priority Risk Flag',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: audit.isRandomSample ? Colors.blue[800] : Colors.red[800],
+                  color: audit.isRandomSample == true ? Colors.blue[800] : Colors.red[800],
                 ),
               ),
             ],
