@@ -130,6 +130,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(
+            path: AppRoutes.reports,
+            builder: (context, state) => const SupervisorReportsScreen(),
+          ),
+          GoRoute(
             path: AppRoutes.scheduling,
             builder: (context, state) {
               final role = ref.watch(authProvider).user?.role;

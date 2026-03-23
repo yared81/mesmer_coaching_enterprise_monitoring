@@ -240,7 +240,7 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 1: targetPath = AppRoutes.enterpriseList; break;
                 case 2: targetPath = '/sessions'; break;
-                case 3: targetPath = '/reports'; break;
+                case 3: targetPath = AppRoutes.reports; break;
                 case 4: targetPath = '/settings'; break;
               }
             } else if (userRole == UserRole.enterprise) {
