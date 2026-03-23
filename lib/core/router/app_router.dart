@@ -57,6 +57,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/intake_queue_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_assessment_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/enumerator_submissions_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_list_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -307,7 +308,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.intakeSubmissions,
-            builder: (context, state) => const IntakeQueueScreen(), // Reusing for now, will filter for baseline
+            builder: (context, state) => const BaselineListScreen(),
           ),
           GoRoute(
             path: AppRoutes.intakeBaseline,

@@ -199,7 +199,7 @@ class DashboardMainScreen extends ConsumerWidget {
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.storefront_outlined),
         selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
-        label: 'New Ent.',
+        label: 'Register',
       ));
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.assignment_outlined),
@@ -287,7 +287,7 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 0: targetPath = AppRoutes.intakeQueue; break;
                 case 1: targetPath = AppRoutes.intakeRegister; break;
-                case 2: targetPath = AppRoutes.intakeSubmissions; break; // This should be a list to pick from
+                case 2: targetPath = AppRoutes.intakeSubmissions; break;
                 case 3: targetPath = AppRoutes.enumeratorSubmissions; break;
                 case 4: targetPath = '/settings'; break;
               }

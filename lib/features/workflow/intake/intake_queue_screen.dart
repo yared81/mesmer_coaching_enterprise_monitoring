@@ -40,6 +40,7 @@ class IntakeQueueScreen extends ConsumerWidget {
             const Text('PENDING OUTREACH (8)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
             const SizedBox(height: AppSpacing.md),
             _buildEnterpriseCard(
+              context,
               name: 'ABC Hardware',
               owner: 'Ayele T.',
               location: 'Bole',
@@ -47,6 +48,7 @@ class IntakeQueueScreen extends ConsumerWidget {
               status: 'Not contacted',
             ),
             _buildEnterpriseCard(
+              context,
               name: 'Tesfa Bakery',
               owner: 'Tigist M.',
               location: 'Piassa',
@@ -54,6 +56,7 @@ class IntakeQueueScreen extends ConsumerWidget {
               status: 'Not contacted',
             ),
             _buildEnterpriseCard(
+              context,
               name: 'Kebede Traders',
               owner: 'Kebede A.',
               location: 'Merkato',
@@ -99,7 +102,8 @@ class IntakeQueueScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEnterpriseCard({
+  Widget _buildEnterpriseCard(
+    BuildContext context, {
     required String name,
     required String owner,
     required String location,
@@ -141,13 +145,21 @@ class IntakeQueueScreen extends ConsumerWidget {
                 ),
                 const Spacer(),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Starting call to $phone...')),
+                    );
+                  },
                   icon: const Icon(Icons.call, size: 16),
                   label: const Text('CALL'),
                   style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Logging visit attempt for $name...')),
+                    );
+                  },
                   icon: const Icon(Icons.directions_walk, size: 16),
                   label: const Text('VISIT'),
                   style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
