@@ -5,6 +5,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/stat_ca
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/app_search_bar.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/program_funnel_widget.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/regional_performance_widget.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -137,6 +139,10 @@ class AdminDashboardScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 32),
+                      const ProgramFunnelWidget(),
+                      const SizedBox(height: 32),
+                      const RegionalPerformanceWidget(),
                       const SizedBox(height: 32),
                       ActivityFeedWidget(activities: stats.recentEnterprises),
                       const SizedBox(height: 40),
