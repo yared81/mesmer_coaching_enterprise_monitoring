@@ -51,6 +51,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/re
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/scheduling/scheduling_hub_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/regional_reports_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/survey_management_hub_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/training_attendance_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -277,6 +280,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return Scaffold(body: Center(child: Text('Training Detail: $id')));
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.trainingAttendance,
+            builder: (context, state) {
+              final training = state.extra as TrainingEntity;
+              return TrainingAttendanceScreen(training: training);
             },
           ),
         ],

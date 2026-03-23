@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../features/workflow/training/training_provider.dart';
-import '../features/workflow/training/training_entity.dart';
-import '../../core/widgets/sync_indicator.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
@@ -87,6 +87,56 @@ class TrainerDashboardScreen extends ConsumerWidget {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => const _ScheduleTrainingBottomSheet(),
+    );
+  }
+
+  Widget _buildStatsSummary(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(trainerStatsProvider);
+
+    return statsAsync.when(
+      loading: () => const Center(child: LinearProgressIndicator()),
+      error: (err, _) => const SizedBox.shrink(),
+      data: (stats) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildStatCard('Sessions', stats.totalSessions.toString(), Icons.event_available, Colors.blue),
+              const SizedBox(width: 12),
+              _buildStatCard('Attendees', stats.totalAttendees.toString(), Icons.people, Colors.green),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildStatCard('Avg Score', '${stats.averageScore} / 5', Icons.star, Colors.amber),
+              const SizedBox(width: 12),
+              _buildStatCard('Completion', '${stats.completionRate}%', Icons.check_circle, Colors.teal),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 8),
+            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -288,7 +338,7 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color color;
+    Color color = Colors.grey;
     switch (status) {
       case TrainingStatus.completed: color = Colors.green; break;
       case TrainingStatus.cancelled: color = Colors.red; break;
@@ -298,57 +348,6 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
       child: Text(status.name.toUpperCase(), style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
-    );
-  }
-}
-
-  Widget _buildStatsSummary(BuildContext context, WidgetRef ref) {
-    final statsAsync = ref.watch(trainerStatsProvider);
-
-    return statsAsync.when(
-      loading: () => const Center(child: LinearProgressIndicator()),
-      error: (err, _) => const SizedBox.shrink(),
-      data: (stats) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _buildStatCard('Sessions', stats.totalSessions.toString(), Icons.event_available, Colors.blue),
-              const SizedBox(width: 12),
-              _buildStatCard('Attendees', stats.totalAttendees.toString(), Icons.people, Colors.green),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildStatCard('Avg Score', '${stats.averageScore} / 5', Icons.star, Colors.amber),
-              const SizedBox(width: 12),
-              _buildStatCard('Completion', '${stats.completionRate}%', Icons.check_circle, Colors.teal),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-          ],
-        ),
-      ),
     );
   }
 }

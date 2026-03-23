@@ -61,5 +61,6 @@ abstract class AppRoutes {
   static const String trainingDashboard = '/training';
   static const String trainingCreate = '/training/new';
   static const String trainingDetail = '/training/:id';
+  static const String trainingAttendance = '/training/:id/attendance';
 }
 

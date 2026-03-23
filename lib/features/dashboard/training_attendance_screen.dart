@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dartz/dartz.dart' hide Column;
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_repository.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
 
 class TrainingAttendanceScreen extends ConsumerStatefulWidget {
