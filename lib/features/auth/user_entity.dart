@@ -45,6 +45,8 @@ class UserEntity {
     this.institutionName,
     this.enterpriseId,
     this.coach,
+    this.enterpriseCount,
+    this.sessionCount,
   });
 
   final String id;
@@ -55,6 +57,8 @@ class UserEntity {
   final String? institutionName;
   final String? enterpriseId;
   final UserCoachEntity? coach;
+  final int? enterpriseCount;
+  final int? sessionCount;
 }
 
 class UserCoachEntity {

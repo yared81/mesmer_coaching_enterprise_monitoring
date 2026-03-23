@@ -46,6 +46,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/cross_s
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/monitoring_tab_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/regional_coordinator_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/regional_enterprise_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/regional_coach_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/scheduling/scheduling_hub_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/regional_reports_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -114,11 +117,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.supervisorReports,
-            builder: (context, state) => const SupervisorReportsScreen(),
+            builder: (context, state) {
+              final role = ref.watch(authProvider).user?.role;
+              if (role == UserRole.regionalCoordinator) return const RegionalReportsScreen();
+              return const SupervisorReportsScreen();
+            },
           ),
           GoRoute(
             path: AppRoutes.scheduling,
-            builder: (context, state) => const Scaffold(body: Center(child: Text('Scheduling Screen (Coming Soon)'))),
+            builder: (context, state) {
+              final role = ref.watch(authProvider).user?.role;
+              if (role == UserRole.regionalCoordinator) return const SchedulingHubScreen();
+              return const Scaffold(body: Center(child: Text('Scheduling Screen (Coming Soon)')));
+            },
           ),
           GoRoute(
             path: '/analytics',
@@ -161,7 +172,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/coaches',
-            builder: (context, state) => const CoachListScreen(),
+            builder: (context, state) {
+              final role = ref.watch(authProvider).user?.role;
+              if (role == UserRole.regionalCoordinator) return const RegionalCoachListScreen();
+              return const CoachListScreen();
+            },
           ),
           GoRoute(
             path: AppRoutes.addCoach,

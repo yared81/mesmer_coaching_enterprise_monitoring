@@ -10,6 +10,8 @@ class UserModel {
   final String? enterpriseId;
   final bool isActive;
   final CoachModel? coach;
+  final int? enterpriseCount;
+  final int? sessionCount;
 
   const UserModel({
     required this.id,
@@ -21,6 +23,8 @@ class UserModel {
     this.institutionName,
     this.enterpriseId,
     this.coach,
+    this.enterpriseCount,
+    this.sessionCount,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +38,8 @@ class UserModel {
       institutionName: _parseInstitution(json['institution']),
       enterpriseId: json['enterprise_id'] as String?,
       coach: json['coach'] != null ? CoachModel.fromJson(json['coach'] as Map<String, dynamic>) : null,
+      enterpriseCount: json['enterpriseCount'] != null ? int.tryParse(json['enterpriseCount'].toString()) : null,
+      sessionCount: json['sessionCount'] != null ? int.tryParse(json['sessionCount'].toString()) : null,
     );
   }
 
@@ -69,6 +75,8 @@ class UserModel {
         institutionName: institutionName,
         enterpriseId: enterpriseId,
         coach: coach?.toEntity(),
+        enterpriseCount: enterpriseCount,
+        sessionCount: sessionCount,
       );
 }
 
