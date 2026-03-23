@@ -16,6 +16,15 @@ final pendingAuditsProvider = StateNotifierProvider<PendingAuditsNotifier, Async
   return PendingAuditsNotifier(ref.watch(qcRepositoryProvider));
 });
 
+final qcAuditProvider = FutureProvider.family<QcAuditEntity, String>((ref, id) async {
+  final repo = ref.watch(qcRepositoryProvider);
+  final result = await repo.getAuditById(id);
+  return result.fold(
+    (failure) => throw failure.message,
+    (audit) => audit,
+  );
+});
+
 class PendingAuditsNotifier extends StateNotifier<AsyncValue<List<QcAuditEntity>>> {
   PendingAuditsNotifier(this._repository) : super(const AsyncValue.loading()) {
     fetch();

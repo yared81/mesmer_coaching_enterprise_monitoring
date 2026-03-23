@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'qc_audit_entity.dart';
 import 'qc_provider.dart';
+import '../../../core/router/app_routes.dart';
 
 class QcDashboardScreen extends ConsumerWidget {
   final bool hideAppBar;

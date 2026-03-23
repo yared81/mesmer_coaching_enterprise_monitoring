@@ -13,6 +13,15 @@ class QcAuditService {
     });
   }
 
+  async getAuditById(auditId) {
+    return await QcAudit.findByPk(auditId, {
+      include: [
+        { model: Enterprise, as: 'enterprise', attributes: ['business_name'] },
+        { model: CoachingSession, as: 'session', attributes: ['title'] }
+      ]
+    });
+  }
+
   async reviewAudit(auditId, data, verifierId) {
     const audit = await QcAudit.findByPk(auditId);
     if (!audit) throw new Error('QC Audit not found');

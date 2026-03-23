@@ -26,11 +26,17 @@ class QcRemoteDataSource {
       'auditor_comments': comments,
     });
   }
+
+  Future<QcAuditModel> getAuditById(String id) async {
+    final response = await _dio.get('/qc-audits/$id');
+    return QcAuditModel.fromJson(response.data['data']);
+  }
 }
 
 abstract class QcRepository {
   Future<Either<Failure, List<QcAuditEntity>>> getPendingAudits();
   Future<Either<Failure, List<QcAuditEntity>>> getAuditHistory();
+  Future<Either<Failure, QcAuditEntity>> getAuditById(String id);
   Future<Either<Failure, void>> reviewAudit(String id, QcAuditStatus status, String? comments);
 }
 
@@ -65,6 +71,16 @@ class QcRepositoryImpl implements QcRepository {
       return const Right(null);
     } on DioException catch (e) {
       return Left(ServerFailure(message: e.response?.data['message'] ?? 'Review failed'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, QcAuditEntity>> getAuditById(String id) async {
+    try {
+      final audit = await remoteDataSource.getAuditById(id);
+      return Right(audit);
+    } on DioException catch (e) {
+      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Fetch failed'));
     }
   }
 }

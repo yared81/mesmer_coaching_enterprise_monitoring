@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/app_routes.dart';
 import 'qc_audit_entity.dart';
 import 'qc_provider.dart';
 
@@ -49,10 +51,7 @@ class QcAuditHistoryScreen extends ConsumerWidget {
                       ],
                     ),
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      // Navigate to detail if needed, but detail currently only works for pending
-                      // In a real app we'd show a read-only detail view
-                    },
+                    onTap: () => context.go(AppRoutes.qcDetail.replaceAll(':id', audit.id)),
                   ),
                 );
               },

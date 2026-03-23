@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'qc_audit_entity.dart';
 import 'qc_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import '../enterprise/enterprise_provider.dart';
+import '../coaching/coaching_provider.dart';
+import '../../../core/router/app_routes.dart';
+import '../enterprise/enterprise_document_provider.dart';
+import '../enterprise/enterprise_document_entity.dart';
+import '../../../core/constants/api_constants.dart';
 
 class QcRecordDetailScreen extends ConsumerWidget {
   final String auditId;
@@ -15,11 +15,10 @@ class QcRecordDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auditsAsync = ref.watch(pendingAuditsProvider);
+    final auditAsync = ref.watch(qcAuditProvider(auditId));
     
-    return auditsAsync.when(
-      data: (audits) {
-        final audit = audits.firstWhere((a) => a.id == auditId, orElse: () => throw Exception('Audit not found'));
+    return auditAsync.when(
+      data: (audit) {
         return Scaffold(
           appBar: AppBar(
             title: Text('${audit.targetType.name.toUpperCase()} Review'),
@@ -142,6 +141,45 @@ class QcRecordDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildVerdictSection(BuildContext context, WidgetRef ref, QcAuditEntity audit) {
+    if (audit.status != QcAuditStatus.pending) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: audit.status == QcAuditStatus.passed ? Colors.green[50] : Colors.red[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: audit.status == QcAuditStatus.passed ? Colors.green[200]! : Colors.red[200]!),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  audit.status == QcAuditStatus.passed ? Icons.check_circle : Icons.cancel,
+                  color: audit.status == QcAuditStatus.passed ? Colors.green : Colors.red,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'AUDIT ${audit.status.name.toUpperCase()}',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: audit.status == QcAuditStatus.passed ? Colors.green[800] : Colors.red[800],
+                  ),
+                ),
+              ],
+            ),
+            if (audit.auditorComments != null && audit.auditorComments!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              const Text('Auditor Comments:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 4),
+              Text(audit.auditorComments!, style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
+            ],
+          ],
+        ),
+      );
+    }
+
     final commentController = TextEditingController();
     
     return Column(

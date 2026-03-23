@@ -138,16 +138,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/analytics',
             builder: (context, state) => const CrossSectorAnalyticsScreen(),
           ),
-          GoRoute(
-            path: '/qc/history',
-            builder: (context, state) => const QcAuditHistoryScreen(),
-          ),
-          GoRoute(
-            path: '/qc/detail/:id',
-            builder: (context, state) => QcRecordDetailScreen(
-              auditId: state.pathParameters['id']!,
-            ),
-          ),
+
           GoRoute(
             path: AppRoutes.profile,
             builder: (context, state) => const ProfileScreen(),
