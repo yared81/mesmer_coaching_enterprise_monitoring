@@ -37,6 +37,7 @@ const QcAudit = sequelize.define('QcAudit', {
 }, {
   tableName: 'qc_audits',
   timestamps: true,
+  underscored: true,
 });
 
 module.exports = QcAudit;

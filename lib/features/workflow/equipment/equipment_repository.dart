@@ -19,7 +19,7 @@ class EquipmentRepositoryImpl implements EquipmentRepository {
   @override
   Future<Either<Failure, List<EquipmentEntity>>> getEnterpriseAssets(String enterpriseId) async {
     try {
-      final response = await _dio.get('/api/v1/equipment/enterprise/$enterpriseId');
+      final response = await _dio.get('/equipment/enterprise/$enterpriseId');
       final list = (response.data['data'] as List).map((j) => EquipmentModel.fromJson(j)).toList();
       await _cache.cacheEnterpriseEquipment(enterpriseId, response.data['data'] as List<Map<String, dynamic>>);
       return Right(list);
@@ -44,11 +44,11 @@ class EquipmentRepositoryImpl implements EquipmentRepository {
     );
 
     try {
-      final response = await _dio.post('/api/v1/equipment', data: model.toJson());
+      final response = await _dio.post('/equipment', data: model.toJson());
       return Right(EquipmentModel.fromJson(response.data['data']));
     } on DioException catch (e) {
       if (e.type != DioExceptionType.badResponse) {
-        await _cache.enqueueSyncAction('POST', '/api/v1/equipment', model.toJson());
+        await _cache.enqueueSyncAction('POST', '/equipment', model.toJson());
         return Right(asset);
       }
       return Left(ServerFailure(message: e.response?.data['message'] ?? 'Addition failed'));
@@ -59,11 +59,11 @@ class EquipmentRepositoryImpl implements EquipmentRepository {
   Future<Either<Failure, EquipmentEntity>> updateStatus(String id, EquipmentStatus status, String? notes) async {
     final payload = {'status': status.name, 'notes': notes};
     try {
-      final response = await _dio.put('/api/v1/equipment/$id/status', data: payload);
+      final response = await _dio.put('/equipment/$id/status', data: payload);
       return Right(EquipmentModel.fromJson(response.data['data']));
     } on DioException catch (e) {
       if (e.type != DioExceptionType.badResponse) {
-        await _cache.enqueueSyncAction('PUT', '/api/v1/equipment/$id/status', payload);
+        await _cache.enqueueSyncAction('PUT', '/equipment/$id/status', payload);
         // Best effort: we don't return the full updated model but at least enqueued
         return Left(CacheFailure(message: 'Enqueued for sync (Offline)'));
       }

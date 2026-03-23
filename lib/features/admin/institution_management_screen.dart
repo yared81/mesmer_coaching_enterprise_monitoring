@@ -10,7 +10,7 @@ class InstitutionManagementScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Fetch only root institutions (parent_id is null)
-    final rootsAsync = ref.watch(institutionsListProvider({'isRoot': true}));
+    final rootsAsync = ref.watch(institutionsListProvider('root'));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFB),
@@ -62,7 +62,7 @@ class _InstitutionTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final branchesAsync = ref.watch(institutionsListProvider({'parentId': institution.id}));
+    final branchesAsync = ref.watch(institutionsListProvider('parentId=${institution.id}'));
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),

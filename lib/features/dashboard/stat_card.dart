@@ -24,7 +24,7 @@ class StatCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: color.withOpacity(0.08), width: 1.5),
@@ -49,26 +49,26 @@ class StatCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(icon, color: color, size: 24),
+                    child: Icon(icon, color: color, size: 20),
                   ),
-                  Icon(Icons.trending_up_rounded, color: color.withOpacity(0.4), size: 18),
+                  Icon(Icons.trending_up_rounded, color: color.withOpacity(0.4), size: 16),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 28,
+                    fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -1,
+                    letterSpacing: -0.5,
                     color: Color(0xFF1A1A1A),
                   ),
                 ),
@@ -77,10 +77,10 @@ class StatCard extends StatelessWidget {
               Text(
                 title.toUpperCase(),
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 9,
                   color: Colors.grey[600],
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 1.1,
+                  letterSpacing: 1.0,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

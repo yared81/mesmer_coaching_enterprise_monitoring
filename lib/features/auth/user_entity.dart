@@ -17,6 +17,24 @@ enum UserRole {
   @JsonValue('stakeholder') stakeholder
 }
 
+extension UserRoleX on UserRole {
+  String get snakeCase {
+    switch (this) {
+      case UserRole.superAdmin: return 'super_admin';
+      case UserRole.programManager: return 'program_manager';
+      case UserRole.regionalCoordinator: return 'regional_coordinator';
+      case UserRole.meOfficer: return 'me_officer';
+      case UserRole.dataVerifier: return 'data_verifier';
+      case UserRole.trainer: return 'trainer';
+      case UserRole.coach: return 'coach';
+      case UserRole.enumerator: return 'enumerator';
+      case UserRole.commsOfficer: return 'comms_officer';
+      case UserRole.enterprise: return 'enterprise_user';
+      case UserRole.stakeholder: return 'stakeholder';
+    }
+  }
+}
+
 class UserEntity {
   const UserEntity({
     required this.id,

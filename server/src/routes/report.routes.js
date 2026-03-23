@@ -5,7 +5,7 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 
 // Apply protection to all report routes
 router.use(protect);
-router.use(authorize('supervisor', 'admin'));
+router.use(authorize('supervisor', 'admin', 'super_admin'));
 
 /**
  * @route   GET /api/v1/reports/enterprise/:id/pdf

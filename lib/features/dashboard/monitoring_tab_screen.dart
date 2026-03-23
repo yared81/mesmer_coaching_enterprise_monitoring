@@ -10,50 +10,57 @@ class MonitoringTabScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        children: [
-          // Custom header that matches the blue app theme
-          Container(
-            color: AppColors.primary,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return DefaultTabController(
+          length: 2,
+          child: SizedBox(
+            height: constraints.maxHeight,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: Text(
-                    'Monitoring & Data',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                // Blue header matching app theme
+                Container(
+                  color: AppColors.primary,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Text(
+                          'Monitoring & Data',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
+                      ),
+                      TabBar(
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white60,
+                        indicatorColor: Colors.white,
+                        indicatorWeight: 3,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.fact_check_rounded), text: 'QC Queue'),
+                          Tab(icon: Icon(Icons.analytics_rounded), text: 'MERL Reports'),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                TabBar(
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white60,
-                  indicatorColor: Colors.white,
-                  indicatorWeight: 3,
-                  tabs: const [
-                    Tab(icon: Icon(Icons.fact_check_rounded), text: 'QC Queue'),
-                    Tab(icon: Icon(Icons.analytics_rounded), text: 'MERL Reports'),
-                  ],
+                // Tab content fills remainder
+                const Expanded(
+                  child: TabBarView(
+                    children: [
+                      QcDashboardScreen(hideAppBar: true),
+                      SupervisorReportsScreen(hideAppBar: true),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          // Tab content fills the rest of available space
-          const Expanded(
-            child: TabBarView(
-              children: [
-                QcDashboardScreen(hideAppBar: true),
-                SupervisorReportsScreen(hideAppBar: true),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

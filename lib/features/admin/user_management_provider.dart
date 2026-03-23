@@ -9,12 +9,25 @@ final userManagementRepositoryProvider = Provider<UserManagementRepository>((ref
   return UserManagementRepositoryImpl(dio);
 });
 
-final usersListProvider = FutureProvider.family<List<UserModel>, Map<String, String?>>((ref, filters) async {
+// ─── Filter State (avoids FutureProvider.family Map equality bug) ─────────────
+
+/// Holds the current filter values for the user list.
+/// Updating this invalidates [usersListProvider] automatically.
+final userFilterProvider = StateProvider<({String? role, String? institution, String? search})>(
+  (ref) => (role: null, institution: null, search: null),
+);
+
+// ─── Data Providers (simple, non-family — watch filter state) ─────────────────
+
+/// Fetches users based on current filter state.
+/// Non-family provider — no Map equality issues.
+final usersListProvider = FutureProvider<List<UserModel>>((ref) async {
   final repository = ref.watch(userManagementRepositoryProvider);
+  final filters = ref.watch(userFilterProvider);
   final result = await repository.getUsers(
-    role: filters['role'],
-    institutionId: filters['institution_id'],
-    search: filters['search'],
+    role: filters.role,
+    institutionId: filters.institution,
+    search: filters.search,
   );
   return result.fold(
     (l) => throw Exception(l),
@@ -22,17 +35,34 @@ final usersListProvider = FutureProvider.family<List<UserModel>, Map<String, Str
   );
 });
 
-final institutionsListProvider = FutureProvider.family<List<InstitutionModel>, Map<String, dynamic>>((ref, filters) async {
+/// Fetches institutions.
+/// Key format: "root" or "parentId=<id>"
+/// Using String (value equality) instead of Map to prevent infinite loops.
+final institutionsListProvider = FutureProvider.family<List<InstitutionModel>, String>((ref, key) async {
   final repository = ref.watch(userManagementRepositoryProvider);
+  
+  String? parentId;
+  bool? isRoot;
+  
+  if (key == 'root') {
+    isRoot = true;
+  } else if (key.startsWith('parentId=')) {
+    parentId = key.substring(9);
+  }
+  
+  // If key is 'all' or empty, both stay null and repository fetches all.
+  
   final result = await repository.getInstitutions(
-    parentId: filters['parentId'],
-    isRoot: filters['isRoot'],
+    parentId: parentId,
+    isRoot: isRoot,
   );
   return result.fold(
     (l) => throw Exception(l),
     (r) => r,
   );
 });
+
+// ─── Action Notifier ──────────────────────────────────────────────────────────
 
 class UserManagementNotifier extends StateNotifier<AsyncValue<void>> {
   final UserManagementRepository _repository;
@@ -63,7 +93,6 @@ class UserManagementNotifier extends StateNotifier<AsyncValue<void>> {
       },
     );
   }
-
 
   Future<void> createUser(Map<String, dynamic> userData) async {
     state = const AsyncValue.loading();

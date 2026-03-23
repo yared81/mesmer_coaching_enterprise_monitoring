@@ -26,7 +26,9 @@ class QcAuditModel extends QcAuditEntity {
       status: QcAuditStatus.values.byName(json['status'] as String),
       auditorComments: json['auditor_comments'] as String?,
       flagReason: json['flag_reason'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: DateTime.parse(
+        (json['createdAt'] ?? json['created_at'] ?? DateTime.now().toIso8601String()) as String,
+      ),
     );
   }
 

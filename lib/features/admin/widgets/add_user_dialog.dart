@@ -31,7 +31,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final institutionsAsync = ref.watch(institutionsListProvider(const {}));
+    final institutionsAsync = ref.watch(institutionsListProvider('all'));
     final actionState = ref.watch(userManagementActionProvider);
 
     return AlertDialog(
@@ -103,7 +103,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
     final data = {
       'name': _nameController.text,
       'email': _emailController.text,
-      'role': _selectedRole.toString().split('.').last,
+      'role': _selectedRole?.snakeCase,
       'institution_id': _selectedInstitution,
     };
 

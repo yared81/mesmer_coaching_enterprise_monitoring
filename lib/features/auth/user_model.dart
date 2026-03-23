@@ -8,6 +8,7 @@ class UserModel {
   final String institutionId;
   final String? institutionName;
   final String? enterpriseId;
+  final bool isActive;
   final CoachModel? coach;
 
   const UserModel({
@@ -16,6 +17,7 @@ class UserModel {
     required this.name,
     required this.role,
     required this.institutionId,
+    required this.isActive,
     this.institutionName,
     this.enterpriseId,
     this.coach,
@@ -28,10 +30,18 @@ class UserModel {
       name: json['name'] as String,
       role: _parseRole(json['role']),
       institutionId: json['institution_id'] as String,
-      institutionName: json['institution'] as String?,
+      isActive: json['is_active'] as bool? ?? true,
+      institutionName: _parseInstitution(json['institution']),
       enterpriseId: json['enterprise_id'] as String?,
       coach: json['coach'] != null ? CoachModel.fromJson(json['coach'] as Map<String, dynamic>) : null,
     );
+  }
+
+  static String? _parseInstitution(dynamic institution) {
+    if (institution == null) return null;
+    if (institution is String) return institution;
+    if (institution is Map) return institution['name'] as String?;
+    return null;
   }
 
   static UserRole _parseRole(dynamic role) {
