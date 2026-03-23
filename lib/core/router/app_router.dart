@@ -77,6 +77,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           AppRoutes.changePassword,
           '/settings',
           AppRoutes.chat,
+          AppRoutes.monitoring,
         ];
         
         if (!sharedPaths.contains(path)) {
@@ -114,7 +115,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CrossSectorAnalyticsScreen(),
           ),
           GoRoute(
-            path: '/monitoring',
+            path: AppRoutes.monitoring,
             builder: (context, state) => const MonitoringTabScreen(),
           ),
           GoRoute(

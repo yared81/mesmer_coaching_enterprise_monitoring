@@ -36,7 +36,7 @@ class DashboardMainScreen extends ConsumerWidget {
     if (userRole == UserRole.superAdmin) {
       if (location.startsWith(AppRoutes.userManagement)) currentIndex = 1;
       else if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 2;
-      else if (location.startsWith('/monitoring')) currentIndex = 3;
+      else if (location.startsWith(AppRoutes.monitoring)) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.coach) {
       if (location.startsWith('/enterprises')) currentIndex = 1;
@@ -156,7 +156,7 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 1: targetPath = AppRoutes.userManagement; break;
                 case 2: targetPath = AppRoutes.enterpriseList; break;
-                case 3: targetPath = '/monitoring'; break;
+                case 3: targetPath = AppRoutes.monitoring; break;
                 case 4: targetPath = '/settings'; break;
               }
             } else if (userRole == UserRole.regionalCoordinator) {

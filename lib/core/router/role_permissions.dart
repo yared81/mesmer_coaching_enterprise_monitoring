@@ -10,7 +10,7 @@ class RolePermissions {
       '/coaches',
       '/enterprises',
       '/sessions',
-      '/reports',
+      AppRoutes.monitoring,
       '/analytics',
       '/qc/history',
       '/profile',

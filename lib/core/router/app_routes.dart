@@ -39,8 +39,8 @@ abstract class AppRoutes {
   static const String enterpriseProfile = '/enterprise/profile';
 
   // Monitoring & Reports
-  static const String monitoring = '/monitoring';
-  static const String supervisorReports = '/monitoring'; // Map old to new for compatibility
+  static const String monitoring = '/monitoring-hub';
+  static const String supervisorReports = '/monitoring-hub'; 
   static const String diagnosis = '/diagnosis';
 
   // Templates
