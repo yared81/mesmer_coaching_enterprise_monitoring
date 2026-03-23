@@ -45,6 +45,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progres
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/cross_sector_analytics_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/monitoring_tab_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/regional_coordinator_dashboard_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/regional_enterprise_list_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -105,7 +106,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.enterpriseList,
-            builder: (context, state) => const EnterpriseListScreen(),
+            builder: (context, state) {
+              final role = ref.watch(authProvider).user?.role;
+              if (role == UserRole.regionalCoordinator) return const RegionalEnterpriseListScreen();
+              return const EnterpriseListScreen();
+            },
           ),
           GoRoute(
             path: AppRoutes.supervisorReports,

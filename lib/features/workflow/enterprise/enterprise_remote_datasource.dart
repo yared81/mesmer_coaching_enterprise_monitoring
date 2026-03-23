@@ -9,6 +9,7 @@ class EnterpriseRemoteDatasource {
     String? search,
     String? sector,
     String? status,
+    String? coachId,
   }) async {
     final response = await _dio.get(
       '${ApiConstants.baseUrl}/enterprises',
@@ -16,6 +17,7 @@ class EnterpriseRemoteDatasource {
         if (search != null) 'search': search,
         if (sector != null) 'sector': sector,
         if (status != null) 'status': status,
+        if (coachId != null) 'coach_id': coachId,
       },
     );
     

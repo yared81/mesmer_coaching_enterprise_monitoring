@@ -16,12 +16,14 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
     String? search,
     String? sector,
     String? status,
+    String? coachId,
   }) async {
     try {
       final models = await _remoteDatasource.getEnterprises(
         search: search,
         sector: sector,
         status: status,
+        coachId: coachId,
       );
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
     } catch (e) {

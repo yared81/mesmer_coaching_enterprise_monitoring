@@ -8,6 +8,7 @@ abstract class EnterpriseRepository {
     String? search,
     String? sector,
     String? status,
+    String? coachId,
   });
   
   Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id);

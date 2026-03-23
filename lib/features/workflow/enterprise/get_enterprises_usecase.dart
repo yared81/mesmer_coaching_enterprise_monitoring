@@ -11,7 +11,8 @@ class GetEnterprisesUseCase {
     String? search,
     String? sector,
     String? status,
+    String? coachId,
   }) async {
-    return _repository.getEnterprises(search: search, sector: sector, status: status);
+    return _repository.getEnterprises(search: search, sector: sector, status: status, coachId: coachId);
   }
 }
