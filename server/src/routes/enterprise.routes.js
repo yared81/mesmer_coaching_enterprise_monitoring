@@ -8,7 +8,7 @@ router.use(protect);
 
 router.post(
   '/', 
-  authorize('super_admin', 'admin', 'supervisor'), 
+  authorize('super_admin', 'admin', 'supervisor', 'program_manager'), 
   enterpriseController.register
 );
 
@@ -27,7 +27,7 @@ router.get(
 
 router.put(
   '/:id',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user', 'program_manager'),
   restrictToOwnEnterprise,
   enterpriseController.update
 );

@@ -38,6 +38,11 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 2;
       else if (location.startsWith(AppRoutes.monitoring)) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
+    } else if (userRole == UserRole.programManager) {
+      if (location.startsWith(AppRoutes.institutions)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.userManagement)) currentIndex = 2;
+      else if (location.startsWith(AppRoutes.monitoring)) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.coach) {
       if (location.startsWith('/enterprises')) currentIndex = 1;
       else if (location.startsWith('/sessions')) currentIndex = 2;
@@ -121,6 +126,24 @@ class DashboardMainScreen extends ConsumerWidget {
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
         label: 'Reports',
       ));
+    } else if (userRole == UserRole.programManager) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.location_city_outlined),
+        selectedIcon: Icon(Icons.location_city_rounded, color: Colors.blue),
+        label: 'Regions',
+      ));
+      
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.people_alt_outlined),
+        selectedIcon: Icon(Icons.people_alt_rounded, color: Colors.blue),
+        label: 'People',
+      ));
+
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.fact_check_outlined),
+        selectedIcon: Icon(Icons.fact_check_rounded, color: Colors.blue),
+        label: 'QC & Reports',
+      ));
     } else if (userRole == UserRole.enterprise) {
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.analytics_outlined),
@@ -156,6 +179,13 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 1: targetPath = AppRoutes.userManagement; break;
                 case 2: targetPath = AppRoutes.enterpriseList; break;
+                case 3: targetPath = AppRoutes.monitoring; break;
+                case 4: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.programManager) {
+              switch (index) {
+                case 1: targetPath = AppRoutes.institutions; break;
+                case 2: targetPath = AppRoutes.userManagement; break;
                 case 3: targetPath = AppRoutes.monitoring; break;
                 case 4: targetPath = '/settings'; break;
               }
