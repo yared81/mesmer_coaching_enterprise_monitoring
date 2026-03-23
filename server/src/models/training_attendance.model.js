@@ -24,10 +24,15 @@ const TrainingAttendance = sequelize.define('TrainingAttendance', {
     type: DataTypes.INTEGER,
     allowNull: true,
     validate: { min: 1, max: 5 }
+  },
+  trainer_insight: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   }
 }, {
   tableName: 'training_attendance',
   timestamps: true,
+  underscored: true,
 });
 
 module.exports = TrainingAttendance;

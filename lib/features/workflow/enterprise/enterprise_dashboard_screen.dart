@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
 import 'package:intl/intl.dart';
 import 'enterprise_provider.dart';
 import 'enterprise_dashboard_stats.dart';
@@ -64,6 +65,8 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
               _buildRadarChart(stats),
               const SizedBox(height: 24),
               _buildActionPlan(context, ref),
+              const SizedBox(height: 24),
+              _buildTrainingInsights(context, ref),
               const SizedBox(height: 24),
               _buildQuickStats(stats),
             ],
@@ -351,6 +354,73 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTrainingInsights(BuildContext context, WidgetRef ref) {
+    final attendanceAsync = ref.watch(myAttendanceProvider);
+
+    return attendanceAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (err, _) => const SizedBox.shrink(),
+      data: (list) {
+        final withInsights = list.where((a) => a.trainerInsight != null && a.trainerInsight!.isNotEmpty).toList();
+        if (withInsights.isEmpty) return const SizedBox.shrink();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Training & Workshop Insights', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 160,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: withInsights.length,
+                itemBuilder: (context, index) {
+                  final a = withInsights[index];
+                  return Container(
+                    width: 280,
+                    margin: const EdgeInsets.only(right: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.blue[100]!),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.psychology_outlined, size: 18, color: Colors.blue),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(a.enterpriseName ?? 'Workshop Feedback', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), overflow: TextOverflow.ellipsis)),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Text(
+                            a.trainerInsight!,
+                            style: const TextStyle(fontSize: 13, color: Color(0xFF374151), height: 1.4),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Feedback from Trainer',
+                          style: TextStyle(fontSize: 11, color: Colors.blue[700], fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

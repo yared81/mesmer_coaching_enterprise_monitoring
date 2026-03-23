@@ -56,5 +56,10 @@ abstract class AppRoutes {
   static const String coachCrm = '/coach/portfolio';
   static const String calendar = '/calendar';
   static const String scheduling = '/scheduling';
+  
+  // Training (Trainer Role)
+  static const String trainingDashboard = '/training';
+  static const String trainingCreate = '/training/new';
+  static const String trainingDetail = '/training/:id';
 }
 

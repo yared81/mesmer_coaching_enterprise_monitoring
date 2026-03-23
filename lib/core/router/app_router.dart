@@ -264,6 +264,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: AppRoutes.calendar,
             builder: (context, state) => const CalendarScreen(),
           ),
+          GoRoute(
+            path: AppRoutes.trainingDashboard,
+            builder: (context, state) => const TrainerDashboardScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.trainingCreate,
+            builder: (context, state) => const Scaffold(body: Center(child: Text('Create Training (Coming Soon)'))),
+          ),
+          GoRoute(
+            path: AppRoutes.trainingDetail,
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return Scaffold(body: Center(child: Text('Training Detail: $id')));
+            },
+          ),
         ],
       ),
     ],

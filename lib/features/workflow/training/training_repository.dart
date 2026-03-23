@@ -1,86 +1,103 @@
 import 'package:dio/dio.dart';
-import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_cache_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
+import '../../auth/auth_provider.dart';
+import '../../../core/errors/failure.dart';
 import 'training_entity.dart';
-import 'training_model.dart';
 
-abstract class TrainingRepository {
-  Future<Either<Failure, List<TrainingEntity>>> getMyTrainings();
-  Future<Either<Failure, TrainingEntity>> createTraining(TrainingEntity training);
-  Future<Either<Failure, void>> updateAttendance(String trainingId, List<Map<String, dynamic>> attendanceData);
-  Future<Either<Failure, int>> sendReminders(String trainingId);
-}
+final trainingRepositoryProvider = Provider<TrainingRepository>((ref) {
+  final dio = ref.watch(dioProvider);
+  return TrainingRepository(dio);
+});
 
-class TrainingRepositoryImpl implements TrainingRepository {
+class TrainingRepository {
   final Dio _dio;
-  final LocalCacheRepository _cache;
-  TrainingRepositoryImpl(this._dio, this._cache);
+  TrainingRepository(this._dio);
 
-  @override
-  Future<Either<Failure, List<TrainingEntity>>> getMyTrainings() async {
+  Future<Either<Failure, List<TrainingEntity>>> getSessions() async {
     try {
-      final response = await _dio.get('/api/v1/trainings');
-      final list = (response.data as List).map((j) => TrainingModel.fromJson(j)).toList();
-      // Update cache
-      await _cache.cacheTrainings(response.data as List<Map<String, dynamic>>);
+      final response = await _dio.get('/trainings');
+      final list = (response.data['data'] as List)
+          .map((json) => TrainingEntity.fromJson(json))
+          .toList();
       return Right(list);
     } on DioException catch (e) {
-      // Try cache
-      final cached = await _cache.getCachedTrainings();
-      if (cached.isNotEmpty) {
-        return Right(cached.map((j) => TrainingModel.fromJson(j)).toList());
-      }
-      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Fetch failed and no cache available'));
+      return Left(Failure(e.message ?? 'Failed to fetch training sessions'));
     }
   }
 
-  @override
-  Future<Either<Failure, TrainingEntity>> createTraining(TrainingEntity training) async {
-    final model = TrainingModel(
-      id: training.id,
-      title: training.title,
-      description: training.description,
-      trainerId: training.trainerId,
-      date: training.date,
-      location: training.location,
-    );
-
+  Future<Either<Failure, List<TrainingAttendanceEntity>>> getMyAttendance() async {
     try {
-      final response = await _dio.post('/api/v1/trainings', data: model.toJson());
-      return Right(TrainingModel.fromJson(response.data));
+      final response = await _dio.get('/trainings/my-attendance');
+      final list = (response.data['data'] as List)
+          .map((json) => TrainingAttendanceEntity.fromJson(json))
+          .toList();
+      return Right(list);
     } on DioException catch (e) {
-      // Offline -> Enqueue
-      if (e.type != DioExceptionType.badResponse) {
-        await _cache.enqueueSyncAction('POST', '/api/v1/trainings', model.toJson());
-        return Right(training); // Treat as success in UI
-      }
-      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Creation failed'));
+      return Left(Failure(e.message ?? 'Failed to fetch your training insights'));
     }
   }
 
-  @override
-  Future<Either<Failure, void>> updateAttendance(String trainingId, List<Map<String, dynamic>> attendanceData) async {
+  Future<Either<Failure, TrainingEntity>> getSessionById(String id) async {
     try {
-      await _dio.post('/api/v1/trainings/$trainingId/attendance', data: {'attendances': attendanceData});
-      return const Right(null);
+      final response = await _dio.get('/trainings/$id');
+      return Right(TrainingEntity.fromJson(response.data['data']));
     } on DioException catch (e) {
-      if (e.type != DioExceptionType.badResponse) {
-        await _cache.enqueueSyncAction('POST', '/api/v1/trainings/$trainingId/attendance', {'attendances': attendanceData});
-        return const Right(null);
-      }
-      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Attendance sync failed'));
+      return Left(Failure(e.message ?? 'Failed to fetch training details'));
     }
   }
 
-  @override
-  Future<Either<Failure, int>> sendReminders(String trainingId) async {
+  Future<Either<Failure, TrainingEntity>> createSession(TrainingEntity session) async {
     try {
-      final response = await _dio.post('/api/v1/trainings/$trainingId/remind');
-      return Right(response.data['count'] as int);
+      final response = await _dio.post('/trainings', data: session.toJson());
+      return Right(TrainingEntity.fromJson(response.data['data']));
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Reminder failed'));
+      return Left(Failure(e.message ?? 'Failed to create training session'));
+    }
+  }
+
+  Future<Either<Failure, TrainingEntity>> updateSession(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put('/trainings/$id', data: data);
+      return Right(TrainingEntity.fromJson(response.data['data']));
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? 'Failed to update training session'));
+    }
+  }
+
+  Future<Either<Failure, Unit>> deleteSession(String id) async {
+    try {
+      await _dio.delete('/trainings/$id');
+      return const Right(unit);
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? 'Failed to delete training session'));
+    }
+  }
+
+  Future<Either<Failure, Unit>> updateAttendance(String sessionId, List<Map<String, dynamic>> attendances) async {
+    try {
+      await _dio.post('/trainings/$sessionId/attendance', data: {'attendances': attendances});
+      return const Right(unit);
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? 'Failed to sync attendance'));
+    }
+  }
+
+  Future<Either<Failure, int>> sendReminders(String sessionId) async {
+    try {
+      final response = await _dio.post('/trainings/$sessionId/remind');
+      return Right(response.data['count'] ?? 0);
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? 'Failed to send reminders'));
+    }
+  }
+
+  Future<Either<Failure, TrainerStats>> getTrainerStats() async {
+    try {
+      final response = await _dio.get('/trainings/stats');
+      return Right(TrainerStats.fromJson(response.data['data']));
+    } on DioException catch (e) {
+      return Left(Failure(e.message ?? 'Failed to fetch your statistics'));
     }
   }
 }
-

@@ -16,6 +16,7 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
   // Map of enterpriseId -> (Attended, Score)
   final Map<String, bool> _attendance = {};
   final Map<String, int> _scores = {};
+  final Map<String, String> _insights = {};
   bool _isSubmitting = false;
 
   @override
@@ -25,6 +26,7 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
     for (var a in widget.training.attendances) {
       _attendance[a.enterpriseId] = a.attended;
       if (a.feedbackScore != null) _scores[a.enterpriseId] = a.feedbackScore!;
+      if (a.trainerInsight != null) _insights[a.enterpriseId] = a.trainerInsight!;
     }
   }
 
@@ -34,41 +36,47 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
     final List<Map<String, dynamic>> data = _attendance.keys.map((id) => {
       'enterprise_id': id,
       'attended': _attendance[id] ?? false,
-      'feedback_score': _scores[id],
+      'feedback_score': _scores[id] ?? 3,
+      'trainer_insight': _insights[id],
     }).toList();
 
-    try {
-      await ref.read(trainingsProvider.notifier).submitAttendance(widget.training.id, data);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Attendance synced successfully'), backgroundColor: Colors.green),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to sync: $e'), backgroundColor: Colors.red),
-        );
-      }
+    final result = await ref.read(trainingRepositoryProvider).updateAttendance(widget.training.id, data);
+    
+    if (mounted) {
+      result.fold(
+        (failure) {
+          setState(() => _isSubmitting = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to sync: ${failure.message}'), backgroundColor: Colors.red),
+          );
+        },
+        (_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Attendance synced successfully'), backgroundColor: Colors.green),
+          );
+          ref.read(trainingsProvider.notifier).fetch(); // Refresh list to update count
+          Navigator.pop(context);
+        },
+      );
     }
   }
 
   Future<void> _sendReminders() async {
-    try {
-      final count = await ref.read(trainingsProvider.notifier).sendReminders(widget.training.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sent reminders to $count enterprises'), backgroundColor: Colors.blue),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send: $e'), backgroundColor: Colors.red),
-        );
-      }
+    final result = await ref.read(trainingRepositoryProvider).sendReminders(widget.training.id);
+    
+    if (mounted) {
+      result.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to send: ${failure.message}'), backgroundColor: Colors.red),
+          );
+        },
+        (count) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Sent reminders to $count enterprises'), backgroundColor: Colors.blue),
+          );
+        },
+      );
     }
   }
 
@@ -80,7 +88,7 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Attendance: ${widget.training.title}'),
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: const Color(0xFF111827),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -95,39 +103,60 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
           children: [
             Expanded(
               child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 itemCount: enterprises.length,
                 itemBuilder: (context, index) {
                   final e = enterprises[index];
                   final attended = _attendance[e.id] ?? false;
                   final score = _scores[e.id] ?? 3;
+                  final insight = _insights[e.id] ?? '';
 
-                  return CheckboxListTile(
-                    title: Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: attended 
-                      ? Row(
-                          children: [
-                            const Text('Feedback: ', style: TextStyle(fontSize: 12)),
-                            ...List.generate(5, (i) => Icon(
-                              Icons.star, 
-                              size: 16, 
-                              color: (i < score) ? Colors.amber : Colors.grey[300],
-                            )),
-                            const Spacer(),
-                            DropdownButton<int>(
-                              value: score,
-                              items: [1, 2, 3, 4, 5].map((i) => DropdownMenuItem(value: i, child: Text('$i'))).toList(),
-                              onChanged: (val) => setState(() => _scores[e.id] = val ?? 3),
+                  return Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: attended 
+                          ? Row(
+                              children: [
+                                const Text('Score: ', style: TextStyle(fontSize: 12)),
+                                ...List.generate(5, (i) => Icon(
+                                  Icons.star, 
+                                  size: 16, 
+                                  color: (i < score) ? Colors.amber : Colors.grey[300],
+                                )),
+                                const Spacer(),
+                                DropdownButton<int>(
+                                  value: score,
+                                  items: [1, 2, 3, 4, 5].map((i) => DropdownMenuItem(value: i, child: Text('$i'))).toList(),
+                                  onChanged: (val) => setState(() => _scores[e.id] = val ?? 3),
+                                ),
+                              ],
+                            )
+                          : const Text('Not Attended', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        value: attended,
+                        onChanged: (val) => setState(() {
+                          _attendance[e.id] = val ?? false;
+                          if (val == true && !_scores.containsKey(e.id)) _scores[e.id] = 3;
+                        }),
+                        secondary: const Icon(Icons.business_center_outlined, color: Colors.blueGrey),
+                        activeColor: const Color(0xFF3D5AFE),
+                      ),
+                      if (attended)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 72, vertical: 8),
+                          child: TextField(
+                            onChanged: (val) => _insights[e.id] = val,
+                            controller: TextEditingController(text: insight)..selection = TextSelection.collapsed(offset: insight.length),
+                            decoration: const InputDecoration(
+                              labelText: 'Trainer Insight / Feedback',
+                              isDense: true,
+                              border: OutlineInputBorder(),
                             ),
-                          ],
-                        )
-                      : const Text('Not Attended', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                    value: attended,
-                    onChanged: (val) => setState(() {
-                      _attendance[e.id] = val ?? false;
-                      if (val == true && !_scores.containsKey(e.id)) _scores[e.id] = 3;
-                    }),
-                    secondary: const Icon(Icons.business_center_outlined, color: Colors.blueGrey),
-                    activeColor: const Color(0xFF3D5AFE),
+                            maxLines: 2,
+                          ),
+                        ),
+                      const Divider(),
+                    ],
                   );
                 },
               ),

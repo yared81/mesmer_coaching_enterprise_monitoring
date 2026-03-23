@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/training_attendance_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import '../features/workflow/training/training_provider.dart';
+import '../features/workflow/training/training_entity.dart';
+import '../../core/widgets/sync_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 
 class TrainerDashboardScreen extends ConsumerWidget {
   const TrainerDashboardScreen({super.key});
@@ -22,7 +22,7 @@ class TrainerDashboardScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF111827),
         foregroundColor: Colors.white,
         actions: [
-          SyncIndicator(),
+          const SyncIndicator(),
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
             onPressed: () => _showScheduleModal(context, ref),
@@ -31,19 +31,32 @@ class TrainerDashboardScreen extends ConsumerWidget {
         ],
       ),
       body: trainingsAsync.when(
-        data: (trainings) => trainings.isEmpty
-            ? _buildEmptyState(context, ref)
-            : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: trainings.length,
-                itemBuilder: (context, index) {
-                  final training = trainings[index];
+        data: (trainings) => RefreshIndicator(
+          onRefresh: () async {
+            ref.read(trainingsProvider.notifier).fetch();
+            ref.refresh(trainerStatsProvider);
+          },
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildStatsSummary(context, ref),
+              const SizedBox(height: 24),
+              const Text('Your Sessions', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              if (trainings.isEmpty)
+                _buildEmptyState(context, ref)
+              else
+                ...trainings.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final training = entry.value;
                   return _TrainingCard(training: training)
                       .animate(delay: (100 * index).ms)
                       .fadeIn(duration: 500.ms)
                       .moveY(begin: 16, end: 0, curve: Curves.easeOutCubic);
-                },
-              ),
+                }),
+            ],
+          ),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
@@ -72,6 +85,7 @@ class TrainerDashboardScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => const _ScheduleTrainingBottomSheet(),
     );
   }
@@ -86,7 +100,11 @@ class _ScheduleTrainingBottomSheet extends ConsumerStatefulWidget {
 class _ScheduleTrainingBottomSheetState extends ConsumerState<_ScheduleTrainingBottomSheet> {
   final _titleController = TextEditingController();
   final _locController = TextEditingController();
+  final _notesController = TextEditingController();
   DateTime _date = DateTime.now().add(const Duration(days: 1));
+  TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
+  TimeOfDay _endTime = const TimeOfDay(hour: 12, minute: 0);
+  TrainingModule _selectedModule = TrainingModule.bookkeeping;
 
   @override
   Widget build(BuildContext context) {
@@ -95,36 +113,89 @@ class _ScheduleTrainingBottomSheetState extends ConsumerState<_ScheduleTrainingB
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Schedule New Workshop', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Center(child: Text('Schedule New Workshop', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold))),
+            const SizedBox(height: 20),
+            TextField(controller: _titleController, decoration: const InputDecoration(labelText: 'Training Title', border: OutlineInputBorder())),
             const SizedBox(height: 16),
-            TextField(controller: _titleController, decoration: const InputDecoration(labelText: 'Training Title')),
-            TextField(controller: _locController, decoration: const InputDecoration(labelText: 'Location')),
+            DropdownButtonFormField<TrainingModule>(
+              value: _selectedModule,
+              decoration: const InputDecoration(labelText: 'Module', border: OutlineInputBorder()),
+              items: TrainingModule.values.map((m) => DropdownMenuItem(value: m, child: Text(m.name.replaceAll('_', ' ').toUpperCase()))).toList(),
+              onChanged: (v) => setState(() => _selectedModule = v!),
+            ),
             const SizedBox(height: 16),
-            ListTile(
-              title: Text('Date: ${DateFormat('MMM dd, yyyy').format(_date)}'),
-              trailing: const Icon(Icons.calendar_month),
-              onTap: () async {
-                final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime.now(), lastDate: DateTime(2030));
-                if (d != null) setState(() => _date = d);
-              },
+            TextField(controller: _locController, decoration: const InputDecoration(labelText: 'Location', border: OutlineInputBorder())),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: const Text('Date'),
+                    subtitle: Text(DateFormat('MMM dd, yyyy').format(_date)),
+                    trailing: const Icon(Icons.calendar_month),
+                    onTap: () async {
+                      final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime.now(), lastDate: DateTime(2030));
+                      if (d != null) setState(() => _date = d);
+                    },
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () async {
-                final training = TrainingEntity(
-                  id: '',
-                  title: _titleController.text,
-                  location: _locController.text,
-                  date: _date,
-                  trainerId: ref.read(authProvider).user!.id,
-                );
-                await ref.read(trainingsProvider.notifier).create(training);
-                if (mounted) Navigator.pop(context);
-              },
-              child: const Text('Schedule'),
+            Row(
+              children: [
+                Expanded(
+                  child: ListTile(
+                    title: const Text('Start'),
+                    subtitle: Text(_startTime.format(context)),
+                    onTap: () async {
+                      final t = await showTimePicker(context: context, initialTime: _startTime);
+                      if (t != null) setState(() => _startTime = t);
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListTile(
+                    title: const Text('End'),
+                    subtitle: Text(_endTime.format(context)),
+                    onTap: () async {
+                      final t = await showTimePicker(context: context, initialTime: _endTime);
+                      if (t != null) setState(() => _endTime = t);
+                    },
+                  ),
+                ),
+              ],
             ),
+            TextField(controller: _notesController, decoration: const InputDecoration(labelText: 'Trainer Notes', border: OutlineInputBorder()), maxLines: 2),
             const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF111827), foregroundColor: Colors.white),
+                onPressed: () async {
+                  final String startStr = '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}:00';
+                  final String endStr = '${_endTime.hour.toString().padLeft(2, '0')}:${_endTime.minute.toString().padLeft(2, '0')}:00';
+                  
+                  final training = TrainingEntity(
+                    id: '',
+                    title: _titleController.text,
+                    module: _selectedModule,
+                    location: _locController.text,
+                    date: _date,
+                    startTime: startStr,
+                    endTime: endStr,
+                    notes: _notesController.text,
+                    trainerId: '', // Set by backend from token
+                  );
+                  await ref.read(trainingsProvider.notifier).create(training);
+                  if (mounted) Navigator.pop(context);
+                },
+                child: const Text('Create Session'),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -143,55 +214,141 @@ class _TrainingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        title: Text(training.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(DateFormat('MMM dd, yyyy • hh:mm a').format(training.date), style: const TextStyle(color: Colors.grey, fontSize: 13)),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(training.location ?? 'TBD', style: const TextStyle(color: Colors.grey, fontSize: 13)),
-              ],
-            ),
-          ],
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: _getStatusColor(training.status).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: () => context.push(AppRoutes.trainingDetail.replaceAll(':id', training.id)),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(8)),
+                    child: Text(training.module.name.replaceAll('_', ' ').toUpperCase(), style: TextStyle(color: Colors.blue[800], fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                  _StatusBadge(status: training.status),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(training.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF111827))),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Text(DateFormat('EEE, MMM dd, yyyy').format(training.date), style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.access_time, size: 14, color: Colors.grey),
+                  const SizedBox(width: 4),
+                  Text('${training.startTime.substring(0, 5)} - ${training.endTime.substring(0, 5)}', style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.location_on_outlined, size: 14, color: Colors.grey),
+                  const SizedBox(width: 8),
+                  Text(training.location, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                ],
+              ),
+              const Divider(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.people_outline, size: 16, color: Colors.blue),
+                      const SizedBox(width: 8),
+                      Text('${training.attendeeCount} / ${training.capacity} Registered', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                  TextButton(
+                    onPressed: () => context.push(AppRoutes.trainingAttendance.replaceAll(':id', training.id), extra: training),
+                    child: const Text('Attendance'),
+                  ),
+                ],
+              ),
+            ],
           ),
-          child: Text(
-            training.status.name.toUpperCase(),
-            style: TextStyle(color: _getStatusColor(training.status), fontSize: 10, fontWeight: FontWeight.bold),
-          ),
         ),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => TrainingAttendanceScreen(training: training)));
-        },
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final TrainingStatus status;
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    switch (status) {
+      case TrainingStatus.completed: color = Colors.green; break;
+      case TrainingStatus.cancelled: color = Colors.red; break;
+      case TrainingStatus.scheduled: color = Colors.orange; break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+      child: Text(status.name.toUpperCase(), style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+    );
+  }
+}
+
+  Widget _buildStatsSummary(BuildContext context, WidgetRef ref) {
+    final statsAsync = ref.watch(trainerStatsProvider);
+
+    return statsAsync.when(
+      loading: () => const Center(child: LinearProgressIndicator()),
+      error: (err, _) => const SizedBox.shrink(),
+      data: (stats) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildStatCard('Sessions', stats.totalSessions.toString(), Icons.event_available, Colors.blue),
+              const SizedBox(width: 12),
+              _buildStatCard('Attendees', stats.totalAttendees.toString(), Icons.people, Colors.green),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildStatCard('Avg Score', '${stats.averageScore} / 5', Icons.star, Colors.amber),
+              const SizedBox(width: 12),
+              _buildStatCard('Completion', '${stats.completionRate}%', Icons.check_circle, Colors.teal),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Color _getStatusColor(TrainingStatus status) {
-    switch (status) {
-      case TrainingStatus.completed: return Colors.green;
-      case TrainingStatus.cancelled: return Colors.red;
-      case TrainingStatus.upcoming: return Colors.blue;
-    }
+  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 2))],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 8),
+            Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          ],
+        ),
+      ),
+    );
   }
 }

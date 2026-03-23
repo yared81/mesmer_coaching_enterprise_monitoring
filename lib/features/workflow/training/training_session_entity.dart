@@ -1,11 +1,11 @@
-// TrainingEntity — domain object for a training session
+// TrainingSessionEntity — domain object for a training session
 
 enum TrainingModule { bookkeeping, marketing, customer_service, business_planning, financial_management, other }
 
 enum TrainingStatus { scheduled, completed, cancelled }
 
-class TrainingEntity {
-  const TrainingEntity({
+class TrainingSessionEntity {
+  const TrainingSessionEntity({
     required this.id,
     required this.title,
     required this.module,
@@ -19,7 +19,6 @@ class TrainingEntity {
     this.notes,
     this.status = TrainingStatus.scheduled,
     this.attendeeCount = 0,
-    this.attendances = const [],
   });
 
   final String id;
@@ -35,10 +34,9 @@ class TrainingEntity {
   final String? notes;
   final TrainingStatus status;
   final int attendeeCount;
-  final List<TrainingAttendanceEntity> attendances;
 
-  factory TrainingEntity.fromJson(Map<String, dynamic> json) {
-    return TrainingEntity(
+  factory TrainingSessionEntity.fromJson(Map<String, dynamic> json) {
+    return TrainingSessionEntity(
       id: json['id'] ?? '',
       title: json['title'] ?? '',
       module: TrainingModule.values.firstWhere(
@@ -58,9 +56,6 @@ class TrainingEntity {
         orElse: () => TrainingStatus.scheduled,
       ),
       attendeeCount: (json['attendees'] as List?)?.length ?? 0,
-      attendances: (json['attendees'] as List?)
-          ?.map((a) => TrainingAttendanceEntity.fromJson(a))
-          .toList() ?? const [],
     );
   }
 
@@ -76,60 +71,5 @@ class TrainingEntity {
       'notes': notes,
       'status': status.name,
     };
-  }
-}
-
-class TrainingAttendanceEntity {
-  final String id;
-  final String trainingId;
-  final String enterpriseId;
-  final String? enterpriseName;
-  final bool attended;
-  final int? feedbackScore;
-  final String? trainerInsight;
-
-  const TrainingAttendanceEntity({
-    required this.id,
-    required this.trainingId,
-    required this.enterpriseId,
-    this.enterpriseName,
-    required this.attended,
-    this.feedbackScore,
-    this.trainerInsight,
-  });
-
-  factory TrainingAttendanceEntity.fromJson(Map<String, dynamic> json) {
-    return TrainingAttendanceEntity(
-      id: json['id'] ?? '',
-      trainingId: json['training_id'] ?? '',
-      enterpriseId: json['enterprise_id'] ?? '',
-      enterpriseName: json['enterprise']?['business_name'],
-      attended: json['attended'] ?? false,
-      feedbackScore: json['feedback_score'],
-      trainerInsight: json['trainer_insight'],
-    );
-  }
-}
-
-class TrainerStats {
-  final int totalSessions;
-  final int totalAttendees;
-  final double averageScore;
-  final int completionRate;
-
-  TrainerStats({
-    required this.totalSessions,
-    required this.totalAttendees,
-    required this.averageScore,
-    required this.completionRate,
-  });
-
-  factory TrainerStats.fromJson(Map<String, dynamic> json) {
-    return TrainerStats(
-      totalSessions: json['totalSessions'] ?? 0,
-      totalAttendees: json['totalAttendees'] ?? 0,
-      averageScore: double.tryParse(json['averageScore'].toString()) ?? 0.0,
-      completionRate: int.tryParse(json['completionRate'].toString()) ?? 0,
-    );
   }
 }

@@ -1,8 +1,7 @@
-
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
-const Training = sequelize.define('Training', {
+const TrainingSession = sequelize.define('TrainingSession', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -16,7 +15,7 @@ const Training = sequelize.define('Training', {
     type: DataTypes.ENUM('bookkeeping', 'marketing', 'customer_service', 'business_planning', 'financial_management', 'other'),
     allowNull: false,
   },
-  date: {
+  scheduled_date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
@@ -49,9 +48,9 @@ const Training = sequelize.define('Training', {
     defaultValue: 'scheduled',
   }
 }, {
-  tableName: 'trainings',
+  tableName: 'training_sessions',
   timestamps: true,
   underscored: true,
 });
 
-module.exports = Training;
+module.exports = TrainingSession;
