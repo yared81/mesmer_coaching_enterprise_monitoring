@@ -7,6 +7,7 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
     required super.title,
     required super.version,
     required super.isActive,
+    super.templateTypeCode,
     super.updatedAt,
     required super.categories,
   });
@@ -17,6 +18,7 @@ class DiagnosisTemplateModel extends DiagnosisTemplateEntity {
       title: json['title']?.toString() ?? '',
       version: NumUtils.toInt(json['version']) != 0 ? NumUtils.toInt(json['version']) : 1,
       isActive: json['is_active'] is bool ? json['is_active'] as bool : (json['is_active'] == true || json['is_active'] == 1),
+      templateTypeCode: json['template_type']?.toString(),
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at'].toString()) : null,
       categories: json['categories'] != null 
           ? (json['categories'] as List).map((c) => DiagnosisCategoryModel.fromJson(c)).toList()

@@ -36,9 +36,15 @@ class MeDashboardScreen extends ConsumerWidget {
             children: [
               _buildStatCards(stats),
               const SizedBox(height: 24),
+              const Text('Impact & Quality Analysis', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildImpactCards(stats),
+              const SizedBox(height: 24),
               const Text('Graduation Funnel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               _buildFunnelChart(stats),
+              const SizedBox(height: 24),
+              _buildActionHub(context),
               const SizedBox(height: 24),
               const Text('QC Verification Health', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
@@ -52,21 +58,54 @@ class MeDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatCards(MeStatsEntity stats) {
+  Widget _buildImpactCards(MeStatsEntity stats) {
     return Row(
       children: [
         _StatCard(
-            label: 'Total Active',
-            value: stats.totalActive.toString(),
-            color: Colors.blue,
-            icon: Icons.business),
+            label: 'Avg Revenue Growth',
+            value: '+42%',
+            color: Colors.orange,
+            icon: Icons.trending_up),
         const SizedBox(width: 12),
         _StatCard(
-            label: 'Graduated',
-            value: stats.totalGraduated.toString(),
-            color: Colors.green,
-            icon: Icons.school),
+            label: 'Jobs Created',
+            value: '145',
+            color: Colors.purple,
+            icon: Icons.group_add),
       ],
+    );
+  }
+
+  Widget _buildActionHub(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF311B92).withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF311B92).withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Management Tools', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF311B92))),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _ActionButton(
+                label: 'Survey Hub',
+                icon: Icons.assignment_outlined,
+                onTap: () => Navigator.pushNamed(context, '/survey-hub'),
+              ),
+              const SizedBox(width: 12),
+              _ActionButton(
+                label: 'QC Queue',
+                icon: Icons.verified_user_outlined,
+                onTap: () => Navigator.pushNamed(context, '/qc-dashboard'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

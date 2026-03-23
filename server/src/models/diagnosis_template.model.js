@@ -20,6 +20,11 @@ const DiagnosisTemplate = sequelize.define('DiagnosisTemplate', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  template_type: {
+    type: DataTypes.ENUM('baseline', 'midline', 'endline', 'training', 'general'),
+    allowNull: false,
+    defaultValue: 'general'
+  },
   institution_id: {
     type: DataTypes.UUID,
     allowNull: false,

@@ -10,6 +10,7 @@ class QcAuditEntity {
   final QcAuditStatus status;
   final String? auditorComments;
   final String? flagReason;
+  final String? targetName;
   final DateTime createdAt;
 
   const QcAuditEntity({
@@ -21,6 +22,7 @@ class QcAuditEntity {
     required this.status,
     this.auditorComments,
     this.flagReason,
+    this.targetName,
     required this.createdAt,
   });
 }

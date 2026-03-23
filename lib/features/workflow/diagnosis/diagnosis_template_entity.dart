@@ -5,6 +5,7 @@ class DiagnosisTemplateEntity extends Equatable {
   final String title;
   final int version;
   final bool isActive;
+  final String? templateTypeCode; // baseline, midline, endline, etc
   final DateTime? updatedAt;
   final List<DiagnosisCategoryEntity> categories;
 
@@ -13,12 +14,13 @@ class DiagnosisTemplateEntity extends Equatable {
     required this.title,
     required this.version,
     required this.isActive,
+    this.templateTypeCode,
     this.updatedAt,
     required this.categories,
   });
 
   @override
-  List<Object?> get props => [id, title, version, isActive, updatedAt, categories];
+  List<Object?> get props => [id, title, version, isActive, templateTypeCode, updatedAt, categories];
 }
 
 class DiagnosisCategoryEntity extends Equatable {

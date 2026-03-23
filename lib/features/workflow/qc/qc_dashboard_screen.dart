@@ -40,7 +40,7 @@ class QcDashboardScreen extends ConsumerWidget {
                           color: audit.targetType == QcTargetType.baseline ? Colors.blue : Colors.orange,
                         ),
                       ),
-                      title: Text('${audit.targetType.name.toUpperCase()} Audit'),
+                      title: Text(audit.targetName ?? '${audit.targetType.name.toUpperCase()} Audit'),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -72,7 +72,7 @@ class QcDashboardScreen extends ConsumerWidget {
                         ],
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => _showReviewDialog(context, ref, audit),
+                      onTap: () => context.go('/qc/detail/${audit.id}'),
                     ),
                   );
                 },

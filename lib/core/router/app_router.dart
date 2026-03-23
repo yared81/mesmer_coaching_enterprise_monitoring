@@ -34,6 +34,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_profile_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_history_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_record_detail_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/me_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/trainer_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/role_permissions.dart';
@@ -137,12 +138,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CrossSectorAnalyticsScreen(),
           ),
           GoRoute(
-            path: AppRoutes.monitoring,
-            builder: (context, state) => const MonitoringTabScreen(),
-          ),
-          GoRoute(
             path: '/qc/history',
             builder: (context, state) => const QcAuditHistoryScreen(),
+          ),
+          GoRoute(
+            path: '/qc/detail/:id',
+            builder: (context, state) => QcRecordDetailScreen(
+              auditId: state.pathParameters['id']!,
+            ),
           ),
           GoRoute(
             path: AppRoutes.profile,
@@ -151,6 +154,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.changePassword,
             builder: (context, state) => const ChangePasswordScreen(),
+          ),
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/survey_management_hub_screen.dart';
+
+...
+          GoRoute(
+            path: '/survey-hub',
+            builder: (context, state) => const SurveyManagementHubScreen(),
           ),
           GoRoute(
             path: '/settings',

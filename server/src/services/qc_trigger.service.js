@@ -5,18 +5,14 @@ class QcTriggerService {
    * Process and potentially trigger a QC audit for a new enterprise (Baseline)
    */
   async processBaseline(enterprise) {
-    const randomChance = 0.15; // 15% Statistical Sample
-    
-    if (Math.random() < randomChance) {
-      return await QcAudit.create({
-        target_type: 'baseline',
-        target_id: enterprise.id,
-        is_random_sample: true,
-        flag_reason: 'Random Statistical Sample (15%)',
-        status: 'pending'
-      });
-    }
-    return null;
+    // All baseline data enters the QC queue for M&E verification
+    return await QcAudit.create({
+      target_type: 'baseline',
+      target_id: enterprise.id,
+      is_random_sample: false, // It's mandatory
+      flag_reason: 'Mandatory Baseline Verification (100% Policy)',
+      status: 'pending'
+    });
   }
 
   /**
