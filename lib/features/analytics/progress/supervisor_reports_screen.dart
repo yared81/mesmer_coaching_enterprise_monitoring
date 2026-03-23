@@ -8,33 +8,15 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing
 import 'report_provider.dart';
 
 class SupervisorReportsScreen extends ConsumerWidget {
-  const SupervisorReportsScreen({super.key});
+  final bool hideAppBar;
+  const SupervisorReportsScreen({super.key, this.hideAppBar = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // We reuse enterpriseListProvider to get all enterprises
     final enterprisesAsync = ref.watch(enterpriseListProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
-      appBar: AppBar(
-        title: const Text('System Health & Reports'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: ActionChip(
-              avatar: const Icon(Icons.file_download_rounded, size: 16, color: Colors.blue),
-              label: const Text('Export System CSV', style: TextStyle(color: Colors.blue)),
-              backgroundColor: Colors.blue.withOpacity(0.05),
-              side: const BorderSide(color: Colors.blue),
-              onPressed: () => _handleSystemExport(context, ref),
-            ),
-          ),
-        ],
-      ),
-      body: enterprisesAsync.when(
+    final content = enterprisesAsync.when(
         data: (enterprises) => SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -53,7 +35,30 @@ class SupervisorReportsScreen extends ConsumerWidget {
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
+      );
+
+    if (hideAppBar) return content;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        title: const Text('MERL Reports'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ActionChip(
+              avatar: const Icon(Icons.file_download_rounded, size: 16, color: Colors.blue),
+              label: const Text('Export System CSV', style: TextStyle(color: Colors.blue)),
+              backgroundColor: Colors.blue.withOpacity(0.05),
+              side: const BorderSide(color: Colors.blue),
+              onPressed: () => _handleSystemExport(context, ref),
+            ),
+          ),
+        ],
       ),
+      body: content,
     );
   }
 

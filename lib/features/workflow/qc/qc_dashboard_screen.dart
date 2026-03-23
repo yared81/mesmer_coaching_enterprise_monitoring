@@ -4,27 +4,14 @@ import 'qc_audit_entity.dart';
 import 'qc_provider.dart';
 
 class QcDashboardScreen extends ConsumerWidget {
-  const QcDashboardScreen({super.key});
+  final bool hideAppBar;
+  const QcDashboardScreen({super.key, this.hideAppBar = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auditsAsync = ref.watch(pendingAuditsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('QC Verification Inbox'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history_rounded),
-            onPressed: () => Navigator.pushNamed(context, '/qc/history'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(pendingAuditsProvider.notifier).fetch(),
-          ),
-        ],
-      ),
-      body: auditsAsync.when(
+    final content = auditsAsync.when(
         data: (audits) => audits.isEmpty
             ? Center(
                 child: Column(
@@ -92,7 +79,25 @@ class QcDashboardScreen extends ConsumerWidget {
               ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
+      );
+
+    if (hideAppBar) return content;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('QC Verification Inbox'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history_rounded),
+            onPressed: () => Navigator.pushNamed(context, '/qc/history'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.read(pendingAuditsProvider.notifier).fetch(),
+          ),
+        ],
       ),
+      body: content,
     );
   }
 

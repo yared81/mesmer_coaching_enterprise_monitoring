@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
 
@@ -12,8 +13,13 @@ class MonitoringTabScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Monitoring & Data'),
-          bottom: const TabBar(
-            tabs: [
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          bottom: TabBar(
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
+            tabs: const [
               Tab(icon: Icon(Icons.fact_check_rounded), text: 'QC Queue'),
               Tab(icon: Icon(Icons.analytics_rounded), text: 'MERL Reports'),
             ],
@@ -21,8 +27,8 @@ class MonitoringTabScreen extends StatelessWidget {
         ),
         body: const TabBarView(
           children: [
-            QcDashboardScreen(),
-            SupervisorReportsScreen(),
+            QcDashboardScreen(hideAppBar: true),
+            SupervisorReportsScreen(hideAppBar: true),
           ],
         ),
       ),
