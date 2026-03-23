@@ -33,21 +33,26 @@ class DashboardMainScreen extends ConsumerWidget {
     // Determine current index based on location and role
     int currentIndex = 0;
     
-    if (userRole == UserRole.coach) {
+    if (userRole == UserRole.superAdmin) {
+      if (location.startsWith(AppRoutes.userManagement)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 2;
+      else if (location.startsWith('/monitoring')) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
+    } else if (userRole == UserRole.coach) {
       if (location.startsWith('/enterprises')) currentIndex = 1;
       else if (location.startsWith('/sessions')) currentIndex = 2;
-      else if (location.startsWith('/chat')) currentIndex = 0; // Chat is now accessed from Home
+      else if (location.startsWith('/chat')) currentIndex = 0;
       else if (location.contains('reports')) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.regionalCoordinator) {
       if (location.startsWith('/coaches')) currentIndex = 1;
       else if (location.startsWith('/enterprises')) currentIndex = 2;
-      else if (location.startsWith('/chat')) currentIndex = 0; // Chat opened from home quick action
+      else if (location.startsWith('/chat')) currentIndex = 0;
       else if (location.startsWith('/reports')) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
     } else if (userRole == UserRole.enterprise) {
       if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
-      else if (location.startsWith('/chat')) currentIndex = 0; // Chat opened from home header
+      else if (location.startsWith('/chat')) currentIndex = 0;
       else if (location.startsWith('/settings')) currentIndex = 2;
     } else {
       if (location.startsWith('/settings')) currentIndex = 1;
@@ -61,8 +66,26 @@ class DashboardMainScreen extends ConsumerWidget {
         label: 'Home',
       ),
     ];
+    
+    if (userRole == UserRole.superAdmin) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.people_alt_outlined),
+        selectedIcon: Icon(Icons.people_alt_rounded, color: Colors.blue),
+        label: 'Users',
+      ));
+      
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.storefront_outlined),
+        selectedIcon: Icon(Icons.storefront_rounded, color: Colors.blue),
+        label: 'Enterprises',
+      ));
 
-    if (userRole == UserRole.regionalCoordinator) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.analytics_outlined),
+        selectedIcon: Icon(Icons.analytics_rounded, color: Colors.blue),
+        label: 'Monitoring',
+      ));
+    } else if (userRole == UserRole.regionalCoordinator) {
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.group_outlined),
         selectedIcon: Icon(Icons.group_rounded, color: Colors.blue),
@@ -129,7 +152,14 @@ class DashboardMainScreen extends ConsumerWidget {
           onDestinationSelected: (index) {
             String targetPath = AppRoutes.dashboard;
             
-            if (userRole == UserRole.regionalCoordinator) {
+            if (userRole == UserRole.superAdmin) {
+              switch (index) {
+                case 1: targetPath = AppRoutes.userManagement; break;
+                case 2: targetPath = AppRoutes.enterpriseList; break;
+                case 3: targetPath = '/monitoring'; break;
+                case 4: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.regionalCoordinator) {
               switch (index) {
                 case 1: targetPath = '/coaches'; break;
                 case 2: targetPath = AppRoutes.enterpriseList; break;

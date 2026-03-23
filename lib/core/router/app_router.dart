@@ -43,6 +43,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_c
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/calendar_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/cross_sector_analytics_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/monitoring_tab_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -111,6 +112,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/analytics',
             builder: (context, state) => const CrossSectorAnalyticsScreen(),
+          ),
+          GoRoute(
+            path: '/monitoring',
+            builder: (context, state) => const MonitoringTabScreen(),
           ),
           GoRoute(
             path: '/qc/history',

@@ -38,8 +38,9 @@ abstract class AppRoutes {
   // Enterprise self (enterprise role)
   static const String enterpriseProfile = '/enterprise/profile';
 
-  // Reports
-  static const String supervisorReports = '/reports';
+  // Monitoring & Reports
+  static const String monitoring = '/monitoring';
+  static const String supervisorReports = '/monitoring'; // Map old to new for compatibility
   static const String diagnosis = '/diagnosis';
 
   // Templates

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/stat_card.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
@@ -112,10 +113,11 @@ class SupervisorReportsScreen extends ConsumerWidget {
             DataColumn(label: Text('Report')),
           ],
           rows: enterprises.map((ent) {
+            final enterprise = ent as EnterpriseEntity;
             return DataRow(cells: [
-              DataCell(Text(ent.name, style: const TextStyle(fontWeight: FontWeight.w600))),
-              DataCell(Text(ent.sector ?? 'General')),
-              DataCell(_buildStatusBadge(ent.status)),
+              DataCell(Text(enterprise.businessName, style: const TextStyle(fontWeight: FontWeight.w600))),
+              DataCell(Text(enterprise.sector.name.toUpperCase())),
+              DataCell(_buildStatusBadge(enterprise.status.name)),
               DataCell(
                 IconButton(
                   icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.blue),

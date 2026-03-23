@@ -108,8 +108,8 @@ class AdminDashboardScreen extends ConsumerWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 1.1,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 1.05,
                         children: [
                           StatCard(
                             title: 'Programs',
