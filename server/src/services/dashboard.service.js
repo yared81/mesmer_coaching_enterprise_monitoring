@@ -1,4 +1,4 @@
-const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, Notification, PhoneFollowupLog, sequelize } = require('../models');
+const { Institution, User, Enterprise, CoachingSession, DiagnosisReport, DiagnosisTemplate, Notification, PhoneFollowupLog, TrainingAttendance, QcAudit, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class DashboardService {
@@ -177,16 +177,14 @@ class DashboardService {
         col: 'enterprise_id',
         include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
       }),
-      // Funnel: Midline (has at least 2 reports)
-      DiagnosisReport.count({
+      // Funnel: Midline (has at least one session with a report)
+      CoachingSession.count({
         distinct: true,
-        col: 'CoachingSession.enterprise_id',
-        include: [{ 
-          model: CoachingSession, 
-          as: 'session', 
-          attributes: [],
-          include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
-        }]
+        col: 'enterprise_id',
+        include: [
+          { model: DiagnosisReport, as: 'diagnosisReport', required: true, attributes: [] },
+          ...(institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : [])
+        ]
       }),
       // QC Health
       QcAudit.count({ where: { status: 'passed' } }),

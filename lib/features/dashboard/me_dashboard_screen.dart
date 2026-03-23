@@ -5,6 +5,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provide
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:go_router/go_router.dart';
 
 class MeDashboardScreen extends ConsumerWidget {
   const MeDashboardScreen({super.key});
@@ -122,7 +124,7 @@ class MeDashboardScreen extends ConsumerWidget {
               _ActionButton(
                 label: 'QC Queue',
                 icon: Icons.verified_user_outlined,
-                onTap: () => Navigator.pushNamed(context, '/qc-dashboard'),
+                onTap: () => context.push(AppRoutes.qcDashboard),
               ),
             ],
           ),
@@ -263,6 +265,50 @@ class MeDashboardScreen extends ConsumerWidget {
       ),
     );
   }
+  Widget _buildRegionalQuality() {
+    final regions = [
+      {'name': 'Addis Ababa', 'score': 98.5, 'color': Colors.green},
+      {'name': 'Amhara', 'score': 94.2, 'color': Colors.green[400]},
+      {'name': 'Oromia', 'score': 88.7, 'color': Colors.orange},
+      {'name': 'Tigray', 'score': 82.1, 'color': Colors.red[300]},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+      ),
+      child: Column(
+        children: regions.map((r) => Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(r['name'] as String, style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text('${r['score']}% Quality', style: TextStyle(color: r['color'] as Color, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (r['score'] as double) / 100,
+                  backgroundColor: Colors.grey[100],
+                  color: r['color'] as Color,
+                  minHeight: 6,
+                ),
+              ),
+            ],
+          ),
+        )).toList(),
+      ),
+    );
+  }
 }
 
 class _StatCard extends StatelessWidget {
@@ -314,48 +360,46 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-  Widget _buildRegionalQuality() {
-    final regions = [
-      {'name': 'Addis Ababa', 'score': 98.5, 'color': Colors.green},
-      {'name': 'Amhara', 'score': 94.2, 'color': Colors.green[400]},
-      {'name': 'Oromia', 'score': 88.7, 'color': Colors.orange},
-      {'name': 'Tigray', 'score': 82.1, 'color': Colors.red[300]},
-    ];
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-      ),
-      child: Column(
-        children: regions.map((r) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF311B92).withOpacity(0.1)),
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(r['name'] as String, style: const TextStyle(fontWeight: FontWeight.w500)),
-                  Text('${r['score']}% Quality', style: TextStyle(color: r['color'] as Color, fontWeight: FontWeight.bold)),
-                ],
-              ),
+              Icon(icon, color: const Color(0xFF311B92), size: 24),
               const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: (r['score'] as double) / 100,
-                  backgroundColor: Colors.grey[100],
-                  color: r['color'] as Color,
-                  minHeight: 6,
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF311B92),
                 ),
               ),
             ],
           ),
-        )).toList(),
+        ),
       ),
     );
   }
+}
 

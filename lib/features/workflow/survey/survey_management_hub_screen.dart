@@ -10,7 +10,7 @@ class SurveyManagementHubScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final templatesAsync = ref.watch(diagnosisTemplatesProvider);
+    final templatesAsync = ref.watch(allTemplatesProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),

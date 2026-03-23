@@ -50,6 +50,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterpri
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/regional_coach_list_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/scheduling/scheduling_hub_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/regional_reports_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/survey_management_hub_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);

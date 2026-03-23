@@ -34,6 +34,9 @@ class RolePermissions {
     UserRole.meOfficer: [
       AppRoutes.dashboard,
       AppRoutes.qcDashboard,
+      AppRoutes.surveyHub,
+      AppRoutes.enterpriseList,
+      '/qc',
       '/enterprises/detail',
       '/profile',
       AppRoutes.changePassword,

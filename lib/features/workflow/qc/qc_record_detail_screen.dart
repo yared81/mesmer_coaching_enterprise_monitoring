@@ -87,10 +87,10 @@ class QcRecordDetailScreen extends ConsumerWidget {
           children: [
             _dataItem('Business Name', ent.businessName),
             _dataItem('Owner', ent.ownerName),
-            _dataItem('Sector', ent.sector),
+            _dataItem('Sector', ent.sector.name),
             _dataItem('Employees', ent.employeeCount.toString()),
-            _dataItem('Annual Revenue', '${ent.annualRevenue} ETB'),
-            _dataItem('Location', ent.locationName),
+            _dataItem('Baseline Revenue', '${ent.baselineRevenue} ETB'),
+            _dataItem('Location', ent.location),
           ],
         ),
         loading: () => const LinearProgressIndicator(),
@@ -103,14 +103,14 @@ class QcRecordDetailScreen extends ConsumerWidget {
           children: [
             _dataItem('Session Title', session.title),
             _dataItem('Session #', session.sessionNumber.toString()),
-            _dataItem('Type', session.followupType),
-            _dataItem('Status', session.status),
-            if (session.revenueGrowthPercent != null)
+            _dataItem('Type', session.followupType.name),
+            _dataItem('Status', session.status.name),
+            if (session.revenueGrowthPercent != 0.0)
               _dataItem('Revenue Growth', '${session.revenueGrowthPercent}%'),
-            if (session.currentEmployees != null)
+            if (session.currentEmployees != 0)
               _dataItem('Current Employees', session.currentEmployees.toString()),
             const SizedBox(height: 8),
-            Text('Scheduled: ${session.scheduledDate}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text('Scheduled: ${session.scheduledDate.toLocal()}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
         loading: () => const LinearProgressIndicator(),

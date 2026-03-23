@@ -60,6 +60,11 @@ class DashboardMainScreen extends ConsumerWidget {
       if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
       else if (location.startsWith('/chat')) currentIndex = 0;
       else if (location.startsWith('/settings')) currentIndex = 2;
+    } else if (userRole == UserRole.meOfficer) {
+      if (location.startsWith(AppRoutes.qcDashboard)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.surveyHub)) currentIndex = 2;
+      else if (location.startsWith(AppRoutes.enterpriseList)) currentIndex = 3;
+      else if (location.startsWith('/settings')) currentIndex = 4;
     } else {
       if (location.startsWith('/settings')) currentIndex = 1;
     }
@@ -157,6 +162,22 @@ class DashboardMainScreen extends ConsumerWidget {
         selectedIcon: Icon(Icons.analytics_rounded, color: Colors.blue),
         label: 'Progress',
       ));
+    } else if (userRole == UserRole.meOfficer) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.verified_user_outlined),
+        selectedIcon: Icon(Icons.verified_user_rounded, color: Colors.blue),
+        label: 'QC Queue',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.assignment_outlined),
+        selectedIcon: Icon(Icons.assignment_rounded, color: Colors.blue),
+        label: 'Survey Hub',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.business_outlined),
+        selectedIcon: Icon(Icons.business_rounded, color: Colors.blue),
+        label: 'Enterprises',
+      ));
     }
 
     navItems.add(const NavigationDestination(
@@ -215,6 +236,13 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 1: targetPath = AppRoutes.enterpriseProfile; break;
                 case 2: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.meOfficer) {
+              switch (index) {
+                case 1: targetPath = AppRoutes.qcDashboard; break;
+                case 2: targetPath = AppRoutes.surveyHub; break;
+                case 3: targetPath = AppRoutes.enterpriseList; break;
+                case 4: targetPath = '/settings'; break;
               }
             } else {
               if (index == 1) targetPath = '/settings';
