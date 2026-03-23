@@ -75,10 +75,10 @@ class DashboardMainScreen extends ConsumerWidget {
 
     // Dynamically build the screens and navigation items based on role
     List<NavigationDestination> navItems = [
-      const NavigationDestination(
-        icon: Icon(Icons.home_outlined),
-        selectedIcon: Icon(Icons.home_rounded, color: Colors.blue),
-        label: 'Home',
+      NavigationDestination(
+        icon: const Icon(Icons.home_outlined),
+        selectedIcon: const Icon(Icons.home_rounded, color: Colors.blue),
+        label: userRole == UserRole.dataVerifier ? 'QC Inbox' : 'Home',
       ),
     ];
     

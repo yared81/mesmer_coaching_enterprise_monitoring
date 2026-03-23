@@ -9,7 +9,7 @@ class QcAuditService {
         { model: Enterprise, as: 'enterprise', attributes: ['business_name'] },
         { model: CoachingSession, as: 'session', attributes: ['title'] }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['created_at', 'DESC']]
     });
   }
 
@@ -84,7 +84,7 @@ class QcAuditService {
         { model: Enterprise, as: 'enterprise', attributes: ['business_name'] },
         { model: CoachingSession, as: 'session', attributes: ['title'] }
       ],
-      order: [['updatedAt', 'DESC']]
+      order: [['updated_at', 'DESC']]
     });
   }
 }
