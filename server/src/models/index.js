@@ -87,13 +87,13 @@ CoachingSession.belongsTo(User, {
 
 // Document Associations
 Enterprise.hasMany(EnterpriseDocument, { foreignKey: 'enterprise_id', as: 'documents' });
-EnterpriseDocument.belongsTo(Enterprise, { foreignKey: 'enterprise_id' });
+EnterpriseDocument.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
 CoachingSession.hasMany(EnterpriseDocument, { foreignKey: 'session_id', as: 'attachments' });
-EnterpriseDocument.belongsTo(CoachingSession, { foreignKey: 'session_id' });
+EnterpriseDocument.belongsTo(CoachingSession, { foreignKey: 'session_id', as: 'session' });
 
 User.hasMany(EnterpriseDocument, { foreignKey: 'uploader_id', as: 'uploadedFiles' });
-EnterpriseDocument.belongsTo(User, { foreignKey: 'uploader_id' });
+EnterpriseDocument.belongsTo(User, { foreignKey: 'uploader_id', as: 'uploader' });
 
 // Link Session to Diagnosis Template
 CoachingSession.belongsTo(DiagnosisTemplate, {
