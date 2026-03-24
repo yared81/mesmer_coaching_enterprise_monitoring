@@ -246,11 +246,13 @@ class DashboardMainScreen extends ConsumerWidget {
       label: 'Settings',
     ));
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          boxShadow: [
+          boxShadow: isDark ? null : [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
               blurRadius: 20,
@@ -333,9 +335,9 @@ class DashboardMainScreen extends ConsumerWidget {
             
             context.go(targetPath);
           },
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).cardColor,
           elevation: 0,
-          indicatorColor: Theme.of(context).primaryColor.withOpacity(0.15),
+          indicatorColor: isDark ? const Color(0xFF3D5AFE).withOpacity(0.3) : Theme.of(context).primaryColor.withOpacity(0.15),
           labelBehavior: navItems.length > 3 
             ? NavigationDestinationLabelBehavior.onlyShowSelected 
             : NavigationDestinationLabelBehavior.alwaysShow,

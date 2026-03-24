@@ -16,8 +16,6 @@ class EnterpriseProgressScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Progress', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF1D4ED8),
-        foregroundColor: Colors.white,
       ),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),

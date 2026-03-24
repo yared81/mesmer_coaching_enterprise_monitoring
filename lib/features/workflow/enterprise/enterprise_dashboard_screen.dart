@@ -27,8 +27,6 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1D4ED8),
-        foregroundColor: Colors.white,
         title: const Text('Growth Hub'),
         actions: [
           IconButton(

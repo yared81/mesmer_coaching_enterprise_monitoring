@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/theme/theme_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -11,9 +12,11 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
+    final themeMode = ref.watch(themeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text(
           'Settings',
@@ -28,9 +31,9 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             // Header with user info
             Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
                 ),
@@ -85,19 +88,21 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8, bottom: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 8),
                     child: Text(
                       'Account Management',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+                        color: isDark ? Colors.grey[400] : Colors.grey,
                       ),
                     ),
                   ),
-                  _buildSettingsGroup([
+                  _buildSettingsGroup(context, isDark, [
                     _buildSettingsTile(
+                      context: context,
+                      isDark: isDark,
                       icon: Icons.person_outline_rounded,
                       title: 'My Profile',
                       subtitle: 'View your personal information',
@@ -106,6 +111,8 @@ class SettingsScreen extends ConsumerWidget {
                       },
                     ),
                     _buildSettingsTile(
+                      context: context,
+                      isDark: isDark,
                       icon: Icons.lock_outline_rounded,
                       title: 'Change Password',
                       subtitle: 'Update your account security',
@@ -117,19 +124,22 @@ class SettingsScreen extends ConsumerWidget {
                   ]),
                   
                   const SizedBox(height: 24),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8, bottom: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 8),
                     child: Text(
-                      'System',
+                      'System & Display',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+                        color: isDark ? Colors.grey[400] : Colors.grey,
                       ),
                     ),
                   ),
-                  _buildSettingsGroup([
+                  _buildSettingsGroup(context, isDark, [
+                    _buildThemeTile(context, ref, themeMode, isDark),
                     _buildSettingsTile(
+                      context: context,
+                      isDark: isDark,
                       icon: Icons.info_outline_rounded,
                       title: 'About App',
                       subtitle: 'Version 1.0.0',
@@ -196,12 +206,13 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSettingsGroup(List<Widget> children) {
+  Widget _buildSettingsGroup(BuildContext context, bool isDark, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
+        border: isDark ? Border.all(color: Colors.white.withOpacity(0.05)) : null,
+        boxShadow: isDark ? null : [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
@@ -215,7 +226,60 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildThemeTile(BuildContext context, WidgetRef ref, ThemeMode currentTheme, bool isDark) {
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              currentTheme == ThemeMode.light ? Icons.light_mode_rounded :
+              currentTheme == ThemeMode.dark ? Icons.dark_mode_rounded : Icons.brightness_auto_rounded,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
+          ),
+          title: const Text('Theme', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Adjust app appearance',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          trailing: DropdownButtonHideUnderline(
+            child: DropdownButton<ThemeMode>(
+              value: currentTheme,
+              icon: Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+              dropdownColor: Theme.of(context).cardColor,
+              items: const [
+                DropdownMenuItem(value: ThemeMode.system, child: Text('System')),
+                DropdownMenuItem(value: ThemeMode.light, child: Text('Light')),
+                DropdownMenuItem(value: ThemeMode.dark, child: Text('Dark')),
+              ],
+              onChanged: (ThemeMode? mode) {
+                if (mode != null) {
+                  ref.read(themeProvider.notifier).setTheme(mode);
+                }
+              },
+            ),
+          ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
   Widget _buildSettingsTile({
+    required BuildContext context,
+    required bool isDark,
     required IconData icon,
     required String title,
     String? subtitle,
@@ -230,10 +294,10 @@ class SettingsScreen extends ConsumerWidget {
           leading: Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.black87),
+            child: Icon(icon, color: isDark ? Colors.white : Colors.black87),
           ),
           title: Text(
             title,
@@ -242,11 +306,11 @@ class SettingsScreen extends ConsumerWidget {
           subtitle: subtitle != null
               ? Text(
                   subtitle,
-                  style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                  style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
                 )
               : null,
           trailing: showTrailing
-              ? Icon(Icons.chevron_right_rounded, color: Colors.grey[400])
+              ? Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey[600] : Colors.grey[400])
               : null,
           onTap: onTap,
         ),
@@ -254,7 +318,7 @@ class SettingsScreen extends ConsumerWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: Colors.grey[100],
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
             indent: 64,
             endIndent: 20,
           ),

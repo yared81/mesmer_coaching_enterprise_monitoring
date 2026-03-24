@@ -2,10 +2,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveStorage {
   static const String diagnosisDraftsBox = 'diagnosis_drafts';
+  static const String prefsBox = 'system_prefs';
 
   static Future<void> init() async {
     await Hive.initFlutter();
     await Hive.openBox(diagnosisDraftsBox);
+    await Hive.openBox(prefsBox);
   }
 
   static Future<void> saveDraft(String sessionId, Map<String, String> responses) async {
@@ -25,5 +27,16 @@ class HiveStorage {
   static Future<void> clearDraft(String sessionId) async {
     final box = Hive.box(diagnosisDraftsBox);
     await box.delete(sessionId);
+  }
+
+  // --- Theme Preferences ---
+  static Future<void> saveThemeMode(String mode) async {
+    final box = Hive.box(prefsBox);
+    await box.put('themeMode', mode);
+  }
+
+  static String? getThemeMode() {
+    final box = Hive.box(prefsBox);
+    return box.get('themeMode');
   }
 }

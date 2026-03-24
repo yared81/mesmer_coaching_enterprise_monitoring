@@ -17,8 +17,6 @@ class EnterpriseJourneyScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Journey', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF1D4ED8),
-        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: DefaultTabController(
@@ -26,7 +24,7 @@ class EnterpriseJourneyScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              color: const Color(0xFF1D4ED8),
+              color: Theme.of(context).appBarTheme.backgroundColor,
               child: const TabBar(
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.white70,
