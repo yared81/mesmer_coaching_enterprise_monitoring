@@ -9,7 +9,9 @@ import 'core/storage/hive_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/settings_provider.dart';
+import 'core/services/security_service.dart';
 import 'features/auth/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,14 +39,63 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
+  DateTime? _pausedTime;
+  bool _isAuthenticating = false;
+
   @override
   void initState() {
     super.initState();
-    // Check initial auth status on app start
+    WidgetsBinding.instance.addObserver(this);
+    
     Future.microtask(() async {
       await ref.read(authProvider.notifier).checkAuthStatus();
+      
+      // Initial Auth Check if biometrics are enabled globally
+      final isBiometricEnabled = ref.read(systemSettingsProvider).biometricEnabled;
+      if (isBiometricEnabled) {
+        _isAuthenticating = true;
+        final authenticated = await SecurityService.authenticate();
+        _isAuthenticating = false;
+        
+        if (!authenticated && mounted) {
+          // If they fail setup or cancel, boot them to login
+          ref.read(authProvider.notifier).logout();
+        }
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.paused) {
+      _pausedTime = DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      if (_pausedTime != null && !_isAuthenticating) {
+        final settings = ref.read(systemSettingsProvider);
+        
+        // Check timeout
+        if (settings.autoLockTimeout > 0) {
+          final difference = DateTime.now().difference(_pausedTime!);
+          if (difference.inMinutes >= settings.autoLockTimeout) {
+            _isAuthenticating = true;
+            final authenticated = await SecurityService.authenticate();
+            _isAuthenticating = false;
+
+            if (!authenticated && mounted) {
+               ref.read(authProvider.notifier).logout();
+            }
+          }
+        }
+      }
+      _pausedTime = null;
+    }
   }
 
   @override

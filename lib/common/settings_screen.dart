@@ -1,5 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/theme/settings_provider.dart';
@@ -546,11 +549,26 @@ class SettingsScreen extends ConsumerWidget {
         style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13, height: 1.3),
       ),
       trailing: TextButton(
-        onPressed: () {
-          // In a real app, clear paths from path_provider and Hive boxes.
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Local cache cleared successfully!')),
-          );
+        onPressed: () async {
+          // Clear Hive boxes logic
+          await HiveStorage.clearAllCache();
+          
+          // Clear physical temporary files (images, PDFs)
+          try {
+            final tempDir = await getTemporaryDirectory();
+            if (tempDir.existsSync()) {
+              tempDir.deleteSync(recursive: true);
+              tempDir.createSync();
+            }
+          } catch (e) {
+            // Silently ignore locked files
+          }
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Local cache cleared successfully!')),
+            );
+          }
         },
         style: TextButton.styleFrom(
           foregroundColor: Colors.red[400],

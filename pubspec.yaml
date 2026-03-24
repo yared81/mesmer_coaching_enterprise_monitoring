@@ -43,6 +43,7 @@ dependencies:
   # Networking & Auth
   dio: ^5.7.0
   flutter_secure_storage: ^9.2.4
+  local_auth: ^2.2.0
   dartz: ^0.10.1
   equatable: ^2.0.5
   fl_chart: ^0.70.2

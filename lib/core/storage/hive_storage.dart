@@ -29,6 +29,11 @@ class HiveStorage {
     await box.delete(sessionId);
   }
 
+  static Future<void> clearAllCache() async {
+    final box = Hive.box(diagnosisDraftsBox);
+    await box.clear();
+  }
+
   // --- Theme Preferences ---
   static Future<void> saveThemeMode(String mode) async {
     final box = Hive.box(prefsBox);
