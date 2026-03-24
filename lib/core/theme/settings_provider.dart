@@ -6,12 +6,16 @@ class SystemSettings {
   final bool highContrast;
   final String imageQuality; // 'low', 'medium', 'original'
   final bool syncWifiOnly;
+  final bool biometricEnabled;
+  final int autoLockTimeout; // 0, 5, 15, 30 (0 = disabled)
 
   SystemSettings({
     required this.textSize,
     required this.highContrast,
     required this.imageQuality,
     required this.syncWifiOnly,
+    required this.biometricEnabled,
+    required this.autoLockTimeout,
   });
 
   SystemSettings copyWith({
@@ -19,12 +23,16 @@ class SystemSettings {
     bool? highContrast,
     String? imageQuality,
     bool? syncWifiOnly,
+    bool? biometricEnabled,
+    int? autoLockTimeout,
   }) {
     return SystemSettings(
       textSize: textSize ?? this.textSize,
       highContrast: highContrast ?? this.highContrast,
       imageQuality: imageQuality ?? this.imageQuality,
       syncWifiOnly: syncWifiOnly ?? this.syncWifiOnly,
+      biometricEnabled: biometricEnabled ?? this.biometricEnabled,
+      autoLockTimeout: autoLockTimeout ?? this.autoLockTimeout,
     );
   }
 
@@ -45,6 +53,8 @@ class SystemSettingsNotifier extends StateNotifier<SystemSettings> {
     highContrast: false,
     imageQuality: 'medium',
     syncWifiOnly: true,
+    biometricEnabled: false,
+    autoLockTimeout: 15, // default 15 minutes
   )) {
     _loadSettings();
   }
@@ -54,12 +64,16 @@ class SystemSettingsNotifier extends StateNotifier<SystemSettings> {
     final savedContrast = HiveStorage.getHighContrast() ?? false;
     final savedImageQual = HiveStorage.getImageQuality() ?? 'medium';
     final savedWifi = HiveStorage.getSyncWifiOnly() ?? true;
+    final savedBiometric = HiveStorage.getBiometricEnabled() ?? false;
+    final savedLock = HiveStorage.getAutoLockTimeout() ?? 15;
     
     state = SystemSettings(
       textSize: savedSize, 
       highContrast: savedContrast,
       imageQuality: savedImageQual,
       syncWifiOnly: savedWifi,
+      biometricEnabled: savedBiometric,
+      autoLockTimeout: savedLock,
     );
   }
 
@@ -81,6 +95,16 @@ class SystemSettingsNotifier extends StateNotifier<SystemSettings> {
   Future<void> setSyncWifiOnly(bool wifiOnly) async {
     state = state.copyWith(syncWifiOnly: wifiOnly);
     await HiveStorage.saveSyncWifiOnly(wifiOnly);
+  }
+
+  Future<void> setBiometricEnabled(bool enabled) async {
+    state = state.copyWith(biometricEnabled: enabled);
+    await HiveStorage.saveBiometricEnabled(enabled);
+  }
+
+  Future<void> setAutoLockTimeout(int minutes) async {
+    state = state.copyWith(autoLockTimeout: minutes);
+    await HiveStorage.saveAutoLockTimeout(minutes);
   }
 }
 

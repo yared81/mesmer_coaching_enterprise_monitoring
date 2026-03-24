@@ -90,4 +90,32 @@ class HiveStorage {
     if (value?.toString() == 'false') return false;
     return null;
   }
+
+  // --- Security Preferences ---
+  static Future<void> saveBiometricEnabled(bool enabled) async {
+    final box = Hive.box(prefsBox);
+    await box.put('biometricEnabled', enabled);
+  }
+
+  static bool? getBiometricEnabled() {
+    final box = Hive.box(prefsBox);
+    final value = box.get('biometricEnabled');
+    if (value is bool) return value;
+    if (value?.toString() == 'true') return true;
+    if (value?.toString() == 'false') return false;
+    return null;
+  }
+
+  static Future<void> saveAutoLockTimeout(int minutes) async {
+    final box = Hive.box(prefsBox);
+    await box.put('autoLockTimeout', minutes);
+  }
+
+  static int? getAutoLockTimeout() {
+    final box = Hive.box(prefsBox);
+    final value = box.get('autoLockTimeout');
+    if (value is int) return value;
+    if (value != null) return int.tryParse(value.toString());
+    return null;
+  }
 }

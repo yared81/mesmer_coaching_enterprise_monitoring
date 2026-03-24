@@ -170,6 +170,23 @@ class SettingsScreen extends ConsumerWidget {
                     _buildClearCacheTile(context, isDark),
                   ]),
 
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 8),
+                    child: Text(
+                      'Security & Privacy',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.grey[400] : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildSettingsGroup(context, isDark, [
+                    _buildBiometricTile(context, ref, systemSettings.biometricEnabled, isDark),
+                    _buildAutoLockTile(context, ref, systemSettings.autoLockTimeout, isDark),
+                  ]),
+
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
@@ -539,6 +556,78 @@ class SettingsScreen extends ConsumerWidget {
           foregroundColor: Colors.red[400],
         ),
         child: const Text('CLEAR'),
+      ),
+    );
+  }
+
+  Widget _buildBiometricTile(BuildContext context, WidgetRef ref, bool biometricEnabled, bool isDark) {
+    return Column(
+      children: [
+        SwitchListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          value: biometricEnabled,
+          onChanged: (bool value) {
+            ref.read(systemSettingsProvider.notifier).setBiometricEnabled(value);
+          },
+          secondary: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.fingerprint_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('Biometric App Lock', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Require Fingerprint / Face ID to open app',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          activeColor: Theme.of(context).primaryColor,
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAutoLockTile(BuildContext context, WidgetRef ref, int currentTimeout, bool isDark) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(Icons.lock_clock_rounded, color: isDark ? Colors.white : Colors.black87),
+      ),
+      title: const Text('Auto-Lock Timeout', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+      subtitle: Text(
+        'Lock app after inactivity',
+        style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+      ),
+      trailing: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: currentTimeout,
+          icon: Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+          dropdownColor: Theme.of(context).cardColor,
+          items: const [
+            DropdownMenuItem(value: 0, child: Text('Never')),
+            DropdownMenuItem(value: 5, child: Text('5 minutes')),
+            DropdownMenuItem(value: 15, child: Text('15 minutes')),
+            DropdownMenuItem(value: 30, child: Text('30 minutes')),
+          ],
+          onChanged: (int? minutes) {
+            if (minutes != null) {
+              ref.read(systemSettingsProvider.notifier).setAutoLockTimeout(minutes);
+            }
+          },
+        ),
       ),
     );
   }
