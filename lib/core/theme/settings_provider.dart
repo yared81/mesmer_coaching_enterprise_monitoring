@@ -4,19 +4,27 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.
 class SystemSettings {
   final String textSize; // 'small', 'medium', 'large', 'xlarge'
   final bool highContrast;
+  final String imageQuality; // 'low', 'medium', 'original'
+  final bool syncWifiOnly;
 
   SystemSettings({
     required this.textSize,
     required this.highContrast,
+    required this.imageQuality,
+    required this.syncWifiOnly,
   });
 
   SystemSettings copyWith({
     String? textSize,
     bool? highContrast,
+    String? imageQuality,
+    bool? syncWifiOnly,
   }) {
     return SystemSettings(
       textSize: textSize ?? this.textSize,
       highContrast: highContrast ?? this.highContrast,
+      imageQuality: imageQuality ?? this.imageQuality,
+      syncWifiOnly: syncWifiOnly ?? this.syncWifiOnly,
     );
   }
 
@@ -32,14 +40,27 @@ class SystemSettings {
 }
 
 class SystemSettingsNotifier extends StateNotifier<SystemSettings> {
-  SystemSettingsNotifier() : super(SystemSettings(textSize: 'medium', highContrast: false)) {
+  SystemSettingsNotifier() : super(SystemSettings(
+    textSize: 'medium', 
+    highContrast: false,
+    imageQuality: 'medium',
+    syncWifiOnly: true,
+  )) {
     _loadSettings();
   }
 
   void _loadSettings() {
     final savedSize = HiveStorage.getTextSize() ?? 'medium';
     final savedContrast = HiveStorage.getHighContrast() ?? false;
-    state = SystemSettings(textSize: savedSize, highContrast: savedContrast);
+    final savedImageQual = HiveStorage.getImageQuality() ?? 'medium';
+    final savedWifi = HiveStorage.getSyncWifiOnly() ?? true;
+    
+    state = SystemSettings(
+      textSize: savedSize, 
+      highContrast: savedContrast,
+      imageQuality: savedImageQual,
+      syncWifiOnly: savedWifi,
+    );
   }
 
   Future<void> setTextSize(String size) async {
@@ -50,6 +71,16 @@ class SystemSettingsNotifier extends StateNotifier<SystemSettings> {
   Future<void> setHighContrast(bool value) async {
     state = state.copyWith(highContrast: value);
     await HiveStorage.saveHighContrast(value);
+  }
+
+  Future<void> setImageQuality(String quality) async {
+    state = state.copyWith(imageQuality: quality);
+    await HiveStorage.saveImageQuality(quality);
+  }
+
+  Future<void> setSyncWifiOnly(bool wifiOnly) async {
+    state = state.copyWith(syncWifiOnly: wifiOnly);
+    await HiveStorage.saveSyncWifiOnly(wifiOnly);
   }
 }
 

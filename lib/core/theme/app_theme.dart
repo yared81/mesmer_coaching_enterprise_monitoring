@@ -79,4 +79,54 @@ class AppTheme {
       brightness: Brightness.dark,
     ),
   );
+
+  static final ThemeData highContrastLight = lightTheme.copyWith(
+    scaffoldBackgroundColor: Colors.white, // Pure white instead of greyish
+    primaryColor: const Color(0xFF0000FF), // Pure blue
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF0000FF),
+      primary: const Color(0xFF0000FF),
+      brightness: Brightness.light,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF0000FF),
+      foregroundColor: Colors.white,
+      elevation: 4, // Higher shadow for contrast
+      centerTitle: false,
+    ),
+    cardTheme: CardThemeData(
+      color: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.black, width: 1.5), // Strong black border
+      ),
+    ),
+  );
+
+  static final ThemeData highContrastDark = darkTheme.copyWith(
+    scaffoldBackgroundColor: Colors.black, // Pure black
+    primaryColor: Colors.cyanAccent, // Highly visible cyan against black
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.cyanAccent,
+      primary: Colors.cyanAccent,
+      background: Colors.black,
+      surface: const Color(0xFF111111),
+      brightness: Brightness.dark,
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+      elevation: 4,
+      centerTitle: false,
+    ),
+    cardTheme: CardThemeData(
+      color: const Color(0xFF111111),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Colors.white, width: 1.5), // Strong white border
+      ),
+    ),
+  );
 }

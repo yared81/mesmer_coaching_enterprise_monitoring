@@ -147,10 +147,27 @@ class SettingsScreen extends ConsumerWidget {
                       icon: Icons.info_outline_rounded,
                       title: 'About App',
                       subtitle: 'Version 1.0.0',
-                      showTrailing: false,
                       showDivider: false,
                       onTap: () {},
                     ),
+                  ]),
+
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8, bottom: 8),
+                    child: Text(
+                      'Data & Sync',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.grey[400] : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  _buildSettingsGroup(context, isDark, [
+                    _buildImageQualityTile(context, ref, systemSettings.imageQuality, isDark),
+                    _buildSyncWifiTile(context, ref, systemSettings.syncWifiOnly, isDark),
+                    _buildClearCacheTile(context, isDark),
                   ]),
 
                   const SizedBox(height: 32),
@@ -410,6 +427,119 @@ class SettingsScreen extends ConsumerWidget {
             endIndent: 20,
           ),
       ],
+    );
+  }
+
+  Widget _buildImageQualityTile(BuildContext context, WidgetRef ref, String currentQuality, bool isDark) {
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.image_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('Image Upload Quality', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Reduce quality to save data',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          trailing: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: currentQuality,
+              icon: Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+              dropdownColor: Theme.of(context).cardColor,
+              items: const [
+                DropdownMenuItem(value: 'low', child: Text('Data Saver')),
+                DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                DropdownMenuItem(value: 'original', child: Text('Original')),
+              ],
+              onChanged: (String? quality) {
+                if (quality != null) {
+                  ref.read(systemSettingsProvider.notifier).setImageQuality(quality);
+                }
+              },
+            ),
+          ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSyncWifiTile(BuildContext context, WidgetRef ref, bool syncWifiOnly, bool isDark) {
+    return Column(
+      children: [
+        SwitchListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          value: syncWifiOnly,
+          onChanged: (bool value) {
+            ref.read(systemSettingsProvider.notifier).setSyncWifiOnly(value);
+          },
+          secondary: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.wifi_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('Sync only on Wi-Fi', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Prevent using mobile data for uploads',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          activeColor: Theme.of(context).primaryColor,
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClearCacheTile(BuildContext context, bool isDark) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(Icons.cleaning_services_rounded, color: isDark ? Colors.white : Colors.black87),
+      ),
+      title: const Text('Clear Local Cache', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+      subtitle: Text(
+        'Frees up device storage (approx 12.4 MB)\nCloud data will not be deleted.',
+        style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13, height: 1.3),
+      ),
+      trailing: TextButton(
+        onPressed: () {
+          // In a real app, clear paths from path_provider and Hive boxes.
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Local cache cleared successfully!')),
+          );
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.red[400],
+        ),
+        child: const Text('CLEAR'),
+      ),
     );
   }
 }

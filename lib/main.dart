@@ -59,6 +59,8 @@ class _MyAppState extends ConsumerState<MyApp> {
       routerConfig: router,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
+      highContrastTheme: AppTheme.highContrastLight,
+      highContrastDarkTheme: AppTheme.highContrastDark,
       themeMode: themeMode,
       builder: (context, child) {
         return MediaQuery(
