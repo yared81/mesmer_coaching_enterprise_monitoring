@@ -75,6 +75,11 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith(AppRoutes.enumeratorSubmissions)) currentIndex = 3;
       else if (location.startsWith('/settings')) currentIndex = 4;
       else if (location.startsWith(AppRoutes.intakeQueue) || location == AppRoutes.dashboard) currentIndex = 0;
+    } else if (userRole == UserRole.commsOfficer) {
+      if (location.startsWith(AppRoutes.graduationReady) || location.startsWith(AppRoutes.certificateManagement)) currentIndex = 0;
+      else if (location.startsWith(AppRoutes.successStories)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.commsReports)) currentIndex = 2;
+      else if (location.startsWith('/settings')) currentIndex = 3;
     } else {
       if (location.startsWith('/settings')) currentIndex = 1;
     }
@@ -128,6 +133,22 @@ class DashboardMainScreen extends ConsumerWidget {
       navItems.add(const NavigationDestination(
         icon: Icon(Icons.bar_chart_outlined),
         selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
+        label: 'Reports',
+      ));
+    } else if (userRole == UserRole.commsOfficer) {
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.workspace_premium_outlined),
+        selectedIcon: Icon(Icons.workspace_premium, color: Colors.blue),
+        label: 'Grad & Certs',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.description_outlined),
+        selectedIcon: Icon(Icons.description, color: Colors.blue),
+        label: 'Stories',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.analytics_outlined),
+        selectedIcon: Icon(Icons.analytics, color: Colors.blue),
         label: 'Reports',
       ));
     } else if (userRole == UserRole.coach) {
@@ -290,6 +311,13 @@ class DashboardMainScreen extends ConsumerWidget {
                 case 2: targetPath = AppRoutes.intakeSubmissions; break;
                 case 3: targetPath = AppRoutes.enumeratorSubmissions; break;
                 case 4: targetPath = '/settings'; break;
+              }
+            } else if (userRole == UserRole.commsOfficer) {
+              switch (index) {
+                case 0: targetPath = AppRoutes.graduationReady; break;
+                case 1: targetPath = AppRoutes.successStories; break;
+                case 2: targetPath = AppRoutes.commsReports; break;
+                case 3: targetPath = '/settings'; break;
               }
             } else {
               if (index == 1) targetPath = '/settings';

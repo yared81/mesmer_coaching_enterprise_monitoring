@@ -58,6 +58,10 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/i
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_assessment_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/enumerator_submissions_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_list_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/graduation_ready_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/certificate_management_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/success_story_editor_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/comms_reports_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -320,6 +324,23 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.enumeratorSubmissions,
             builder: (context, state) => const EnumeratorSubmissionsScreen(),
+          ),
+          // Comms Officer Routes
+          GoRoute(
+            path: AppRoutes.graduationReady,
+            builder: (context, state) => const GraduationReadyScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.certificateManagement,
+            builder: (context, state) => const CertificateManagementScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.successStories,
+            builder: (context, state) => const SuccessStoryEditorScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.commsReports,
+            builder: (context, state) => const CommsReportsScreen(),
           ),
         ],
       ),

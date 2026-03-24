@@ -49,8 +49,14 @@ abstract class AppRoutes {
   static const String intakeQueue = '/intake';
   static const String intakeRegister = '/intake/register';
   static const String intakeBaseline = '/intake/baseline/:id';
-  static const String intakeSubmissions = '/intake/baseline-list'; // Added this
-  static const String enumeratorSubmissions = '/intake/submissions';
+  static const String intakeSubmissions = '/intake/submissions';
+  static const String enumeratorSubmissions = '/intake/my-submissions';
+
+  // Comms Officer
+  static const String graduationReady = '/comms/graduation-ready';
+  static const String certificateManagement = '/comms/certificates';
+  static const String successStories = '/comms/stories';
+  static const String commsReports = '/comms/reports';
 
   // Templates
   static const String templateList = '/supervisor/templates';

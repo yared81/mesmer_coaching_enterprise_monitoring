@@ -72,6 +72,13 @@ class RolePermissions {
       AppRoutes.changePassword,
       '/settings',
     ],
+    UserRole.commsOfficer: [
+      AppRoutes.dashboard,
+      '/comms',
+      '/profile',
+      AppRoutes.changePassword,
+      '/settings',
+    ],
   };
 
   static bool canAccess(UserRole role, String path) {
