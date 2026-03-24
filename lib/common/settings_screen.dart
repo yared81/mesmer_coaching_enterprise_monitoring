@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/theme/settings_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/theme/theme_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 
@@ -13,6 +14,7 @@ class SettingsScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final user = authState.user;
     final themeMode = ref.watch(themeProvider);
+    final systemSettings = ref.watch(systemSettingsProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -137,6 +139,8 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   _buildSettingsGroup(context, isDark, [
                     _buildThemeTile(context, ref, themeMode, isDark),
+                    _buildTextSizeTile(context, ref, systemSettings.textSize, isDark),
+                    _buildHighContrastTile(context, ref, systemSettings.highContrast, isDark),
                     _buildSettingsTile(
                       context: context,
                       isDark: isDark,
@@ -265,6 +269,89 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextSizeTile(BuildContext context, WidgetRef ref, String currentSize, bool isDark) {
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.format_size_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('Text Size', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Adjust interface font size',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          trailing: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: currentSize,
+              icon: Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+              dropdownColor: Theme.of(context).cardColor,
+              items: const [
+                DropdownMenuItem(value: 'small', child: Text('Small')),
+                DropdownMenuItem(value: 'medium', child: Text('Medium')),
+                DropdownMenuItem(value: 'large', child: Text('Large')),
+                DropdownMenuItem(value: 'xlarge', child: Text('Extra Large')),
+              ],
+              onChanged: (String? size) {
+                if (size != null) {
+                  ref.read(systemSettingsProvider.notifier).setTextSize(size);
+                }
+              },
+            ),
+          ),
+        ),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+          indent: 64,
+          endIndent: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHighContrastTile(BuildContext context, WidgetRef ref, bool isHighContrast, bool isDark) {
+    return Column(
+      children: [
+        SwitchListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          value: isHighContrast,
+          onChanged: (bool value) {
+            ref.read(systemSettingsProvider.notifier).setHighContrast(value);
+          },
+          secondary: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.contrast_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('High Contrast', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Increase color separation',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13),
+          ),
+          activeColor: Theme.of(context).primaryColor,
         ),
         Divider(
           height: 1,

@@ -39,4 +39,24 @@ class HiveStorage {
     final box = Hive.box(prefsBox);
     return box.get('themeMode');
   }
+
+  static Future<void> saveTextSize(String size) async {
+    final box = Hive.box(prefsBox);
+    await box.put('textSize', size);
+  }
+
+  static String? getTextSize() {
+    final box = Hive.box(prefsBox);
+    return box.get('textSize');
+  }
+
+  static Future<void> saveHighContrast(bool value) async {
+    final box = Hive.box(prefsBox);
+    await box.put('highContrast', value);
+  }
+
+  static bool? getHighContrast() {
+    final box = Hive.box(prefsBox);
+    return box.get('highContrast');
+  }
 }

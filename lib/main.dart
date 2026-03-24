@@ -8,6 +8,7 @@ import 'core/router/app_router.dart';
 import 'core/storage/hive_storage.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
+import 'core/theme/settings_provider.dart';
 import 'features/auth/auth_provider.dart';
 
 void main() async {
@@ -50,6 +51,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeProvider);
+    final systemSettings = ref.watch(systemSettingsProvider);
 
     return MaterialApp.router(
       title: 'GrowthTrack Coaching',
@@ -58,6 +60,15 @@ class _MyAppState extends ConsumerState<MyApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(systemSettings.textScaleFactor),
+            highContrast: systemSettings.highContrast,
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }
