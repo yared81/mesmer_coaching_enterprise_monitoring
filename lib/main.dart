@@ -57,16 +57,15 @@ class _MyAppState extends ConsumerState<MyApp> {
       title: 'GrowthTrack Coaching',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      highContrastTheme: AppTheme.highContrastLight,
-      highContrastDarkTheme: AppTheme.highContrastDark,
+      theme: systemSettings.highContrast ? AppTheme.highContrastLight : AppTheme.lightTheme,
+      darkTheme: systemSettings.highContrast ? AppTheme.highContrastDark : AppTheme.darkTheme,
       themeMode: themeMode,
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
             textScaler: TextScaler.linear(systemSettings.textScaleFactor),
             highContrast: systemSettings.highContrast,
+            boldText: systemSettings.highContrast,
           ),
           child: child!,
         );
