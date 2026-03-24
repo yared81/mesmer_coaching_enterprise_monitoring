@@ -1296,39 +1296,47 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   }
 
   Widget _buildEquipmentTab(String enterpriseId) {
-    final assetsAsync = ref.watch(enterpriseEquipmentProvider(enterpriseId));
-
-    return assetsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
-      data: (assets) => Column(
-        children: [
-          if (assets.isEmpty)
-            Expanded(
-              child: Center(
+    return Consumer(
+      builder: (context, ref, _) {
+        final assetsAsync = ref.watch(enterpriseEquipmentProvider(enterpriseId));
+        return assetsAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[300]),
+                const SizedBox(height: 16),
+                const Text('Could not load equipment', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+          data: (assets) {
+            if (assets.isEmpty) {
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[300]),
+                    Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[300]),
                     const SizedBox(height: 16),
-                    const Text('No equipment recorded', style: TextStyle(color: Colors.grey)),
+                    const Text('No equipment recorded', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    const SizedBox(height: 8),
+                    Text('Program-provided tools or assets will appear here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
                   ],
                 ),
-              ),
-            )
-          else
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(20),
-                itemCount: assets.length,
-                itemBuilder: (context, index) {
-                  final asset = assets[index];
-                  return _AssetCard(asset: asset);
-                },
-              ),
-            ),
-        ],
-      ),
+              );
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(20),
+              itemCount: assets.length,
+              itemBuilder: (context, index) {
+                final asset = assets[index];
+                return _AssetCard(asset: asset);
+              },
+            );
+          },
+        );
+      },
     );
   }
 

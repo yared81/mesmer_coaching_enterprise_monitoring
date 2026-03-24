@@ -32,6 +32,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterpri
 import 'package:mesmer_coaching_enterprise_monitoring/features/communication/chat_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/phone_followup_log_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_profile_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_progress_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_journey_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_record_detail_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_history_screen.dart';
@@ -247,6 +249,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.enterpriseProfile,
             builder: (context, state) => const EnterpriseProfileScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.enterpriseProgress,
+            builder: (context, state) => const EnterpriseProgressScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.enterpriseJourney,
+            builder: (context, state) => const EnterpriseJourneyScreen(),
           ),
           GoRoute(
             path: AppRoutes.qcDashboard,

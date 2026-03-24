@@ -59,6 +59,8 @@ class RolePermissions {
     UserRole.enterprise: [
       AppRoutes.dashboard,
       AppRoutes.enterpriseProfile,
+      AppRoutes.enterpriseProgress,
+      AppRoutes.enterpriseJourney,
       AppRoutes.chat,
       '/profile',
       AppRoutes.changePassword,

@@ -19,6 +19,7 @@ class EquipmentRepositoryImpl implements EquipmentRepository {
   @override
   Future<Either<Failure, List<EquipmentEntity>>> getEnterpriseAssets(String enterpriseId) async {
     try {
+      final response = await _dio.get('/equipment/enterprise/$enterpriseId');
       final rawList = (response.data['data'] as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
       final list = rawList.map((j) => EquipmentModel.fromJson(j)).toList();
       await _cache.cacheEnterpriseEquipment(enterpriseId, rawList);

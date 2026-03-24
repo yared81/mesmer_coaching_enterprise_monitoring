@@ -57,9 +57,10 @@ class DashboardMainScreen extends ConsumerWidget {
       else if (location.startsWith(AppRoutes.supervisorReports)) currentIndex = 4;
       else if (location.startsWith('/settings')) currentIndex = 5;
     } else if (userRole == UserRole.enterprise) {
-      if (location.startsWith(AppRoutes.enterpriseProfile) || location.contains('progress')) currentIndex = 1;
-      else if (location.startsWith('/chat')) currentIndex = 0;
-      else if (location.startsWith('/settings')) currentIndex = 2;
+      if (location.startsWith(AppRoutes.enterpriseProgress)) currentIndex = 1;
+      else if (location.startsWith(AppRoutes.enterpriseJourney)) currentIndex = 2;
+      else if (location.startsWith('/settings')) currentIndex = 3;
+      else currentIndex = 0;
     } else if (userRole == UserRole.meOfficer) {
       if (location.startsWith(AppRoutes.qcDashboard)) currentIndex = 1;
       else if (location.startsWith(AppRoutes.surveyHub)) currentIndex = 2;
@@ -189,9 +190,14 @@ class DashboardMainScreen extends ConsumerWidget {
       ));
     } else if (userRole == UserRole.enterprise) {
       navItems.add(const NavigationDestination(
-        icon: Icon(Icons.analytics_outlined),
-        selectedIcon: Icon(Icons.analytics_rounded, color: Colors.blue),
+        icon: Icon(Icons.trending_up_outlined),
+        selectedIcon: Icon(Icons.trending_up, color: Colors.blue),
         label: 'Progress',
+      ));
+      navItems.add(const NavigationDestination(
+        icon: Icon(Icons.timeline_outlined),
+        selectedIcon: Icon(Icons.timeline, color: Colors.blue),
+        label: 'Journey',
       ));
     } else if (userRole == UserRole.meOfficer) {
       navItems.add(const NavigationDestination(
@@ -288,8 +294,10 @@ class DashboardMainScreen extends ConsumerWidget {
               }
             } else if (userRole == UserRole.enterprise) {
               switch (index) {
-                case 1: targetPath = AppRoutes.enterpriseProfile; break;
-                case 2: targetPath = '/settings'; break;
+                case 0: targetPath = AppRoutes.dashboard; break;
+                case 1: targetPath = AppRoutes.enterpriseProgress; break;
+                case 2: targetPath = AppRoutes.enterpriseJourney; break;
+                case 3: targetPath = '/settings'; break;
               }
             } else if (userRole == UserRole.meOfficer) {
               switch (index) {

@@ -37,6 +37,8 @@ abstract class AppRoutes {
   
   // Enterprise self (enterprise role)
   static const String enterpriseProfile = '/enterprise/profile';
+  static const String enterpriseProgress = '/enterprise/progress';
+  static const String enterpriseJourney = '/enterprise/journey';
 
   // Monitoring & Reports
   static const String surveyHub = '/survey-hub';
