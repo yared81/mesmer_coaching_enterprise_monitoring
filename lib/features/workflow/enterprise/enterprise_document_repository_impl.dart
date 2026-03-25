@@ -13,22 +13,20 @@ class EnterpriseDocumentRepositoryImpl implements EnterpriseDocumentRepository {
   Future<Either<Failure, EnterpriseDocumentEntity>> uploadDocument({
     required String enterpriseId,
     String? sessionId,
-    required String fileName,
-    required String fileUrl,
-    String? fileType,
+    required String filePath,
+    String? fileName,
     String documentType = 'evidence',
+    void Function(int, int)? onProgress,
   }) async {
     try {
-      final data = {
-        'enterprise_id': enterpriseId,
-        if (sessionId != null) 'session_id': sessionId,
-        'file_name': fileName,
-        'file_url': fileUrl,
-        'file_type': fileType,
-        'document_type': documentType,
-      };
-      
-      final result = await remoteDataSource.uploadDocument(data);
+      final result = await remoteDataSource.uploadDocument(
+        enterpriseId: enterpriseId,
+        sessionId: sessionId,
+        filePath: filePath,
+        fileName: fileName,
+        documentType: documentType,
+        onProgress: onProgress,
+      );
       return Right(result);
     } catch (e) {
       return Left(Failure.fromException(e));

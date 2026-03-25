@@ -10,27 +10,35 @@ class EnterpriseDocumentRemoteDataSource {
 
   EnterpriseDocumentRemoteDataSource(this._dio);
 
-  Future<EnterpriseDocumentModel> uploadDocument(Map<String, dynamic> data) async {
+  Future<EnterpriseDocumentModel> uploadDocument({
+    required String enterpriseId,
+    String? sessionId,
+    required String filePath,
+    String? fileName,
+    String? documentType,
+    void Function(int, int)? onProgress,
+  }) async {
     try {
-      final response = await _dio.post('${ApiConstants.baseUrl}/documents/upload', data: data);
-      final doc = EnterpriseDocumentModel.fromJson(response.data['data']);
-      _localDocs.add(doc);
-      return doc;
-    } catch (e) {
-      // Fallback for debugging
-      final newDoc = EnterpriseDocumentModel(
-        id: 'local-${DateTime.now().millisecondsSinceEpoch}',
-        enterpriseId: data['enterprise_id'],
-        sessionId: data['session_id'],
-        uploaderId: 'current-user',
-        fileName: data['file_name'],
-        fileUrl: data['file_url'],
-        fileType: data['file_type'],
-        documentType: data['document_type'] ?? 'evidence',
-        uploadedAt: DateTime.now(),
+      final formData = FormData.fromMap({
+        'enterprise_id': enterpriseId,
+        'session_id': sessionId,
+        'document_type': documentType ?? 'evidence',
+        'file_name': fileName ?? filePath.split('/').last,
+        'file': await MultipartFile.fromFile(
+          filePath,
+          filename: fileName ?? filePath.split('/').last,
+        ),
+      });
+
+      final response = await _dio.post(
+        '${ApiConstants.baseUrl}/documents/upload',
+        data: formData,
+        onSendProgress: onProgress,
       );
-      _localDocs.add(newDoc);
-      return newDoc;
+
+      return EnterpriseDocumentModel.fromJson(response.data['data']);
+    } catch (e) {
+      rethrow;
     }
   }
 

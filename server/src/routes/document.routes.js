@@ -7,10 +7,12 @@ const { protect } = require('../middleware/auth.middleware');
 // const multer = require('multer');
 // const upload = multer({ dest: 'uploads/' });
 
+const { upload } = require('../middleware/upload.middleware');
+
 router.use(protect);
 
 // Upload a document
-router.post('/upload', documentController.uploadDocument);
+router.post('/upload', upload.single('file'), documentController.uploadDocument);
 
 // Get all documents for an enterprise
 router.get('/enterprise/:enterpriseId', documentController.getEnterpriseDocuments);

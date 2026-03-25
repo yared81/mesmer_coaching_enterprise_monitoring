@@ -5,16 +5,31 @@ class DocumentController {
   // POST /api/v1/documents/upload
   uploadDocument = async (req, res, next) => {
     try {
-      const { enterprise_id, session_id, file_name, file_url, file_type, document_type } = req.body;
+      const { enterprise_id, session_id, document_type, file_name: manual_name } = req.body;
       
-      // Note: In a real app, file integration (like S3 upload) happens via Multer middleware
-      // and the S3 URL is passed here. For this hackathon scope, the flutter app will pass 
-      // a bas64 string or a mock URL, and we just save the record.
-      
+      let file_url = req.body.file_url;
+      let file_name = manual_name || req.body.file_name;
+      let file_type = req.body.file_type;
+
+      // If a file was uploaded via Multer
+      if (req.file) {
+        // Generating a relative URL that the static middleware can serve
+        // The middleware serves from 'src/uploads' (which is actually '../../uploads' relative to the middleware)
+        // server.js has: app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));
+        // But the middleware saves to: path.join(__dirname, '../../uploads/evidence')
+        // Let's make sure the path is correct.
+        
+        file_url = `/uploads/evidence/${req.file.filename}`;
+        file_name = manual_name || req.file.originalname;
+        file_type = req.file.mimetype;
+      }
+
+      const uploader_id = req.user.id || req.user.userId;
+
       const newDoc = await EnterpriseDocument.create({
         enterprise_id,
-        session_id: session_id || null, // Optional
-        uploader_id: req.user.userId,
+        session_id: session_id || null,
+        uploader_id,
         file_name,
         file_url,
         file_type,

@@ -24,7 +24,7 @@ abstract class AppRoutes {
   static const String sessionList = '/enterprises/:id/sessions';
   static const String sessionCreate = '/enterprises/:id/sessions/new';
   static const String phoneLogCreate = '/enterprises/:id/sessions/phone-log';
-  static const String evidenceUpload = '/sessions/:sessionId/evidence';
+  static const String evidenceUpload = '/sessions/:sessionId/evidence/:enterpriseId';
 
   // Coaches (Supervisor Management)
   static const String coachList = '/coaches';

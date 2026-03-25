@@ -6,10 +6,10 @@ abstract class EnterpriseDocumentRepository {
   Future<Either<Failure, EnterpriseDocumentEntity>> uploadDocument({
     required String enterpriseId,
     String? sessionId,
-    required String fileName,
-    required String fileUrl,
-    String? fileType,
+    required String filePath,
+    String? fileName,
     String documentType = 'evidence',
+    void Function(int, int)? onProgress,
   });
 
   Future<Either<Failure, List<EnterpriseDocumentEntity>>> getEnterpriseDocuments(String enterpriseId);

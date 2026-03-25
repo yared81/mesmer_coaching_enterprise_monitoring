@@ -143,6 +143,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(
+            path: AppRoutes.evidenceUpload,
+            builder: (context, state) {
+              final sessionId = state.pathParameters['sessionId']!;
+              final enterpriseId = state.pathParameters['enterpriseId']!;
+              return EvidenceUploadScreen(
+                sessionId: sessionId,
+                enterpriseId: enterpriseId,
+              );
+            },
+          ),
+          GoRoute(
             path: AppRoutes.reports,
             builder: (context, state) => const SupervisorReportsScreen(),
           ),

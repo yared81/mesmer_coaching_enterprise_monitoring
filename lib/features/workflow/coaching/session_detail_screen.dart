@@ -28,8 +28,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _revenueController;
   late TextEditingController _employeesController;
   bool _isSaving = false;
-  bool _isUploading = false;
-  final ImagePicker _picker = ImagePicker();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -102,41 +101,6 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     }
   }
 
-  Future<void> _pickAndUploadImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image == null) return;
-    
-    setState(() => _isUploading = true);
-    
-    try {
-      final repo = ref.read(enterpriseDocumentRepositoryProvider);
-      final result = await repo.uploadDocument(
-        enterpriseId: widget.session.enterpriseId,
-        sessionId: widget.session.id,
-        fileName: image.name,
-        fileUrl: image.path, // For hackathon, just using local path. Ideally send to S3
-        fileType: 'image/jpeg',
-      );
-      
-      if (mounted) {
-        setState(() => _isUploading = false);
-        result.fold(
-          (failure) => CustomToaster.show(context: context, message: failure.message, isError: true),
-          (success) {
-            CustomToaster.show(context: context, message: 'Attachment uploaded automatically');
-            // Refresh list
-            ref.invalidate(sessionDocumentsProvider(widget.session.id));
-            ref.invalidate(enterpriseDocumentsProvider(widget.session.enterpriseId));
-          }
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isUploading = false);
-        CustomToaster.show(context: context, message: 'Upload failed.', isError: true);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -309,9 +273,14 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             const SizedBox(height: 12),
             if (!isReadOnly)
               OutlinedButton.icon(
-                onPressed: _isUploading ? null : _pickAndUploadImage,
-                icon: _isUploading ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.add_photo_alternate_outlined),
-                label: Text(_isUploading ? 'Uploading...' : 'Add Photo / Document'),
+                onPressed: () {
+                  final path = AppRoutes.evidenceUpload
+                      .replaceAll(':sessionId', widget.session.id)
+                      .replaceAll(':enterpriseId', widget.session.enterpriseId);
+                  context.push(path);
+                },
+                icon: const Icon(Icons.add_photo_alternate_outlined),
+                label: const Text('Add Photo / Document'),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
