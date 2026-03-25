@@ -51,7 +51,14 @@ class EnterpriseCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    _SectorBadge(sector: enterprise.sector),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _SectorBadge(sector: enterprise.sector),
+                        const SizedBox(height: 4),
+                        _StatusBadge(status: enterprise.status),
+                      ],
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -116,6 +123,67 @@ class _SectorBadge extends StatelessWidget {
           fontWeight: FontWeight.bold,
           letterSpacing: 0.5,
         ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.status});
+  final EnterpriseStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    String text;
+    
+    switch (status) {
+      case EnterpriseStatus.graduated:
+        color = const Color(0xFF10B981); // Emerald
+        text = 'GRADUATED';
+        break;
+      case EnterpriseStatus.pilot:
+        color = const Color(0xFF3B82F6); // Blue
+        text = 'PILOT';
+        break;
+      case EnterpriseStatus.stalled:
+        color = const Color(0xFFF59E0B); // Amber
+        text = 'STALLED';
+        break;
+      case EnterpriseStatus.dropped:
+        color = const Color(0xFFEF4444); // Red
+        text = 'DROPPED';
+        break;
+      case EnterpriseStatus.active:
+      default:
+        color = const Color(0xFF6366F1); // Indigo
+        text = 'ACTIVE';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (status == EnterpriseStatus.graduated)
+            const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icon(Icons.school, size: 10, color: Colors.white),
+            ),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ],
       ),
     );
   }

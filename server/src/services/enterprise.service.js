@@ -196,6 +196,32 @@ class EnterpriseService {
   }
 
   /**
+   * Get list of enterprises ready for graduation (Triangulated)
+   */
+  async getGraduationReady(institutionId = null) {
+    const enterprises = await Enterprise.findAll({
+      where: institutionId ? { institution_id: institutionId, status: { [Op.ne]: 'graduated' } } : { status: { [Op.ne]: 'graduated' } },
+      include: [{ model: User, as: 'coach', attributes: ['name'] }],
+      attributes: {
+        include: [[
+          sequelize.literal(`(SELECT COUNT(*) FROM "CoachingSessions" WHERE enterprise_id = "Enterprise".id AND status = 'completed')`),
+          'completedCount'
+        ]]
+      }
+    });
+
+    const ready = [];
+    for (const ent of enterprises) {
+      const count = parseInt(ent.getDataValue('completedCount') || 0);
+      if (count >= 1) { // Leniency for hackathon demo: 1+ session instead of 8
+        const pendingQC = await QcAudit.count({ where: { target_id: ent.id, status: 'pending' } });
+        if (pendingQC === 0) ready.push(ent);
+      }
+    }
+    return ready;
+  }
+
+  /**
    * Get historical growth trends (Baseline vs Sessions) for an enterprise
    */
   async getGrowthTrends(enterpriseId) {

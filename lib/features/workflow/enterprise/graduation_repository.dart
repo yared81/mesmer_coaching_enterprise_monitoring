@@ -13,7 +13,7 @@ class GraduationRepositoryImpl implements GraduationRepository {
   @override
   Future<Either<Failure, Map<String, dynamic>>> requestGraduation(String enterpriseId) async {
     try {
-      final response = await _dio.post('/api/v1/graduation/$enterpriseId');
+      final response = await _dio.post('/api/v1/graduation/$enterpriseId/graduate');
       return Right(response.data);
     } on DioException catch (e) {
       return Left(ServerFailure(message: e.response?.data['message'] ?? 'Graduation request failed'));
