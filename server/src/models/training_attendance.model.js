@@ -20,10 +20,14 @@ const TrainingAttendance = sequelize.define('TrainingAttendance', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
-  feedback_score: {
+    feedback_score: {
     type: DataTypes.INTEGER,
     allowNull: true,
     validate: { min: 1, max: 5 }
+  },
+  evaluation_data: {
+    type: DataTypes.JSON,
+    allowNull: true
   },
   trainer_insight: {
     type: DataTypes.TEXT,

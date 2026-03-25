@@ -101,4 +101,16 @@ class TrainingRepository {
       return Left(Failure.fromException(e));
     }
   }
+  Future<Either<Failure, Unit>> submitFeedback(String trainingId, String enterpriseId, int score, Map<String, dynamic> data) async {
+    try {
+      await _dio.post('/trainings/$trainingId/feedback', data: {
+        'enterprise_id': enterpriseId,
+        'feedback_score': score,
+        'evaluation_data': data,
+      });
+      return Right(unit);
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
 }

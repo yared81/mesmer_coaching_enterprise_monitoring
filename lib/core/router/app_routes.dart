@@ -69,6 +69,7 @@ abstract class AppRoutes {
   static const String qcHistory = '/qc/history';
   static const String qcDetail = '/qc/detail/:id';
   static const String userManagement = '/admin/users';
+  static const String auditLogs = '/admin/audit-logs';
   static const String institutions = '/admin/organizations';
   static const String coachCrm = '/coach/portfolio';
   static const String calendar = '/calendar';

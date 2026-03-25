@@ -66,8 +66,15 @@ class TrainingController {
 
   markAttendance = async (req, res, next) => {
     try {
-      const att = await trainingService.markAttendance(req.params.attendanceId, req.body.attended, req.body.feedback_score);
+      const att = await trainingService.markAttendance(req.params.attendanceId, req.body.attended, req.body.feedback_score, req.body.trainer_insight, req.body.evaluation_data);
       res.status(200).json({ success: true, data: att });
+    } catch (error) { next(error); }
+  };
+
+  submitFeedback = async (req, res, next) => {
+    try {
+      await trainingService.submitFeedback(req.params.id, req.body.enterprise_id, req.body.feedback_score, req.body.evaluation_data);
+      res.status(200).json({ success: true, message: 'Feedback submitted' });
     } catch (error) { next(error); }
   };
 

@@ -99,19 +99,30 @@ class TrainingService {
     });
   }
 
-  async markAttendance(attendanceId, attended, feedback_score, trainer_insight) {
+  async markAttendance(attendanceId, attended, feedback_score, trainer_insight, evaluation_data) {
     const record = await TrainingAttendance.findByPk(attendanceId);
     if (!record) throw new Error('Attendance record not found');
-    return await record.update({ attended, feedback_score, trainer_insight });
+    return await record.update({ attended, feedback_score, trainer_insight, evaluation_data });
+  }
+
+  async submitFeedback(trainingId, enterpriseId, feedback_score, evaluation_data) {
+    const [record] = await TrainingAttendance.findOrCreate({
+      where: { training_id: trainingId, enterprise_id: enterpriseId }
+    });
+    return await record.update({ 
+      attended: true, 
+      feedback_score, 
+      evaluation_data 
+    });
   }
 
   async bulkUpdateAttendance(trainingId, attendanceList) {
     for (const item of attendanceList) {
-      const { enterprise_id, attended, feedback_score, trainer_insight } = item;
+      const { enterprise_id, attended, feedback_score, trainer_insight, evaluation_data } = item;
       const [record] = await TrainingAttendance.findOrCreate({
         where: { training_id: trainingId, enterprise_id: enterprise_id }
       });
-      await record.update({ attended, feedback_score, trainer_insight });
+      await record.update({ attended, feedback_score, trainer_insight, evaluation_data });
     }
     return true;
   }

@@ -55,6 +55,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/regiona
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/survey/survey_management_hub_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/training_attendance_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_evaluation_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/intake_queue_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/intake/baseline_assessment_screen.dart';
@@ -323,6 +324,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) {
               final training = state.extra as TrainingEntity;
               return TrainingAttendanceScreen(training: training);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.trainingEvaluation,
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              final enterpriseId = state.extra as String;
+              return TrainingEvaluationScreen(trainingId: id, enterpriseId: enterpriseId);
             },
           ),
           // Enumerator / Intake Routes
