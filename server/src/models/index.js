@@ -225,8 +225,27 @@ const db = {
 };
 
 // Global Audit Hooks for MERL Compliance
+sequelize.addHook('afterCreate', async (instance, options) => {
+  const tableName = instance.constructor.tableName || instance.constructor.name;
+  if (['audit_logs', 'notifications'].includes(tableName)) return;
+
+  try {
+    const current = instance.get();
+    const userId = options.userId || 'system_automated';
+
+    await AuditLog.create({
+      user_id: userId === 'system_automated' ? null : userId,
+      action: 'CREATE',
+      table_name: tableName,
+      record_id: instance.id,
+      new_data: current
+    });
+  } catch (error) {
+    console.error('Audit Log Hook Error (afterCreate):', error);
+  }
+});
+
 sequelize.addHook('afterUpdate', async (instance, options) => {
-  if (options.transaction) return;
   const tableName = instance.constructor.tableName || instance.constructor.name;
   if (['audit_logs', 'notifications'].includes(tableName)) return;
 
@@ -236,9 +255,10 @@ sequelize.addHook('afterUpdate', async (instance, options) => {
     const userId = options.userId || 'system_automated';
 
     await AuditLog.create({
-      user_id: userId,
-      action_type: 'UPDATE',
+      user_id: userId === 'system_automated' ? null : userId,
+      action: 'UPDATE',
       table_name: tableName,
+      record_id: instance.id,
       old_data: previous,
       new_data: current
     });
@@ -248,7 +268,6 @@ sequelize.addHook('afterUpdate', async (instance, options) => {
 });
 
 sequelize.addHook('afterDestroy', async (instance, options) => {
-  if (options.transaction) return;
   const tableName = instance.constructor.tableName || instance.constructor.name;
   if (['audit_logs', 'notifications'].includes(tableName)) return;
 
@@ -257,9 +276,10 @@ sequelize.addHook('afterDestroy', async (instance, options) => {
     const userId = options.userId || 'system_automated';
 
     await AuditLog.create({
-      user_id: userId,
-      action_type: 'DELETE',
+      user_id: userId === 'system_automated' ? null : userId,
+      action: 'DELETE',
       table_name: tableName,
+      record_id: instance.id,
       old_data: previous,
       new_data: null
     });

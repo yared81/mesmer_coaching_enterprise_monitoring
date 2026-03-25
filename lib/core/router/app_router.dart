@@ -366,7 +366,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.certificateManagement,
-            builder: (context, state) => const CertificateManagementScreen(),
+            builder: (context, state) {
+              final enterpriseId = state.extra as String?;
+              return CertificateManagementScreen(enterpriseId: enterpriseId);
+            },
           ),
           GoRoute(
             path: AppRoutes.successStories,
@@ -375,6 +378,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.commsReports,
             builder: (context, state) => const CommsReportsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.auditLogs,
+            builder: (context, state) => const AuditLogsScreen(),
           ),
         ],
       ),
