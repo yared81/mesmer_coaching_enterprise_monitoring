@@ -78,6 +78,14 @@ class TrainingController {
     } catch (error) { next(error); }
   };
 
+  generateQRToken = async (req, res, next) => {
+    try {
+      // In a real app, we'd sign this with JWT. For demo, we return a typed ID.
+      const token = `MESMER:TRAINING:${req.params.id}:${Date.now()}`;
+      res.status(200).json({ success: true, token });
+    } catch (error) { next(error); }
+  };
+
   sendReminders = async (req, res, next) => {
     try {
       const results = await smsService.sendTrainingReminders(req.params.id);

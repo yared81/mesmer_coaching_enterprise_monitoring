@@ -21,6 +21,7 @@ router.route('/:id')
 
 router.post('/:id/attendance', authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager'), trainingController.bulkUpdateAttendance);
 router.post('/:id/remind', authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager'), trainingController.sendReminders);
+router.get('/:id/qr-token', authorize('trainer', 'admin', 'super_admin', 'program_manager'), trainingController.generateQRToken);
 
 router.route('/attendance/:attendanceId')
   .put(authorize('super_admin', 'admin', 'trainer', 'me_officer', 'program_manager'), trainingController.markAttendance);

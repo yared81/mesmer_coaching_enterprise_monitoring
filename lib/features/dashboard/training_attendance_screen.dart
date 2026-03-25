@@ -5,6 +5,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_repository.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/qr_scanner_screen.dart';
 
 class TrainingAttendanceScreen extends ConsumerStatefulWidget {
   final TrainingEntity training;
@@ -140,7 +141,33 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
                           _attendance[e.id] = val ?? false;
                           if (val == true && !_scores.containsKey(e.id)) _scores[e.id] = 3;
                         }),
-                        secondary: const Icon(Icons.business_center_outlined, color: Colors.blueGrey),
+                        secondary: IconButton(
+                          icon: const Icon(Icons.qr_code_scanner, color: Colors.blueAccent),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QRScannerScreen(
+                                  onScan: (code) {
+                                    if (code.contains(widget.training.id)) {
+                                      setState(() {
+                                        _attendance[e.id] = true;
+                                        if (!_scores.containsKey(e.id)) _scores[e.id] = 3;
+                                      });
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Verified: ${e.businessName} is present')),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Invalid QR for this session'), backgroundColor: Colors.red),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                         activeColor: const Color(0xFF3D5AFE),
                       ),
                       if (attended)
