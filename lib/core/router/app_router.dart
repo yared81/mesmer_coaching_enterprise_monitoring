@@ -67,6 +67,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/su
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/comms_reports_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_gate.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_capture_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/evidence_upload_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/audit/audit_logs_screen.dart';
 
