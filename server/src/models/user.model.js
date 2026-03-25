@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
+const { encrypt, decrypt } = require('../utils/encryption.util');
 
 const User = sequelize.define('User', {
   id: {
@@ -21,8 +22,10 @@ const User = sequelize.define('User', {
     allowNull: false
   },
   name: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.STRING(128),
+    allowNull: false,
+    get() { return decrypt(this.getDataValue('name')); },
+    set(val) { this.setDataValue('name', encrypt(val)); }
   },
   role: {
     type: DataTypes.ENUM(
@@ -44,8 +47,10 @@ const User = sequelize.define('User', {
     defaultValue: true
   },
   phone: {
-    type: DataTypes.STRING(20),
-    allowNull: true
+    type: DataTypes.STRING(128),
+    allowNull: true,
+    get() { return decrypt(this.getDataValue('phone')); },
+    set(val) { this.setDataValue('phone', encrypt(val)); }
   },
   token_version: {
     type: DataTypes.INTEGER,

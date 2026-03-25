@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
+const { encrypt, decrypt } = require('../utils/encryption.util');
 
 const Enterprise = sequelize.define('Enterprise', {
   id: {
@@ -13,7 +14,9 @@ const Enterprise = sequelize.define('Enterprise', {
   },
   owner_name: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    get() { return decrypt(this.getDataValue('owner_name')); },
+    set(val) { this.setDataValue('owner_name', encrypt(val)); }
   },
   sector: {
     type: DataTypes.ENUM('agriculture', 'manufacturing', 'trade', 'services', 'construction', 'other'),
@@ -28,15 +31,20 @@ const Enterprise = sequelize.define('Enterprise', {
     allowNull: false
   },
   phone: {
-    type: DataTypes.STRING(20),
-    allowNull: false
+    type: DataTypes.STRING(128), // Increased for encrypted length
+    allowNull: false,
+    get() { return decrypt(this.getDataValue('phone')); },
+    set(val) { this.setDataValue('phone', encrypt(val)); }
   },
   email: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     validate: {
       isEmail: true
-    }
+    },
+    get() { return decrypt(this.getDataValue('email')); },
+    set(val) { this.setDataValue('email', encrypt(val)); }
   },
+ bitumen
   business_age: {
     type: DataTypes.INTEGER,
     allowNull: true,
