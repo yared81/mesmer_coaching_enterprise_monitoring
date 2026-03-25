@@ -19,6 +19,7 @@ const Training = require('./training.model');
 const TrainingAttendance = require('./training_attendance.model');
 const Equipment = require('./equipment.model');
 const QcAudit = require('./qc_audit.model');
+const ConsentRecord = require('./consent_record.model');
 
 // Institution <-> User (1:N)
 Institution.hasMany(User, {
@@ -192,6 +193,12 @@ QcAudit.belongsTo(CoachingSession, {
 Enterprise.hasMany(Equipment, { foreignKey: 'enterprise_id', as: 'equipment' });
 Equipment.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
 
+// Consent Record Associations
+Enterprise.hasMany(ConsentRecord, { foreignKey: 'enterprise_id', as: 'consentRecords' });
+ConsentRecord.belongsTo(Enterprise, { foreignKey: 'enterprise_id', as: 'enterprise' });
+User.hasMany(ConsentRecord, { foreignKey: 'recorded_by', as: 'consentRecords' });
+ConsentRecord.belongsTo(User, { foreignKey: 'recorded_by', as: 'recorder' });
+
 const db = {
   Institution,
   User,
@@ -213,6 +220,7 @@ const db = {
   TrainingAttendance,
   QcAudit,
   Equipment,
+  ConsentRecord,
   sequelize
 };
 

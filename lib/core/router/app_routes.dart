@@ -50,6 +50,7 @@ abstract class AppRoutes {
   // Enumerator / Intake Routes
   static const String intakeQueue = '/intake';
   static const String intakeRegister = '/intake/register';
+  static const String intakeConsent = '/intake/consent/:id';
   static const String intakeBaseline = '/intake/baseline/:id';
   static const String intakeSubmissions = '/intake/submissions';
   static const String enumeratorSubmissions = '/intake/my-submissions';

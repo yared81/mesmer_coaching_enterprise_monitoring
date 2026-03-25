@@ -73,6 +73,7 @@ const startServer = async () => {
     app.use('/api/v1/reports', require('./src/routes/report.routes'));
     app.use('/api/v1/analytics', require('./src/routes/analytics.routes'));
     app.use('/api/v1/audits', require('./src/routes/audit.routes'));
+    app.use('/api/v1/consent', require('./src/routes/consent.routes'));
 
 
 

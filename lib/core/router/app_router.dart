@@ -64,6 +64,9 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/gr
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/certificate_management_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/success_story_editor_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/comms/comms_reports_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_capture_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_gate.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -325,10 +328,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const BaselineListScreen(),
           ),
           GoRoute(
+            path: AppRoutes.intakeConsent,
+            builder: (context, state) {
+              final id = state.pathParameters['id'] ?? '';
+              return ConsentCaptureScreen(enterpriseId: id);
+            },
+          ),
+          GoRoute(
             path: AppRoutes.intakeBaseline,
             builder: (context, state) {
               final id = state.pathParameters['id'] ?? '';
-              return BaselineAssessmentScreen(enterpriseId: id);
+              return ConsentGate(
+                enterpriseId: id,
+                child: BaselineAssessmentScreen(enterpriseId: id),
+              );
             },
           ),
           GoRoute(
