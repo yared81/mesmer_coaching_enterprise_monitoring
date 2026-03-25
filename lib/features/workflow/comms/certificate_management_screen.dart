@@ -32,8 +32,8 @@ class _CertificateManagementScreenState extends ConsumerState<CertificateManagem
         data: (data) {
           setState(() => _isGraduating = false);
           CustomToaster.show(context: context, message: 'Enterprise successfully graduated!');
-          ref.invalidate(enterpriseProvider(enterpriseId));
-          ref.invalidate(enterprisesProvider);
+          ref.invalidate(enterpriseDetailProvider(enterpriseId));
+          ref.invalidate(enterpriseListProvider);
           // Navigator.pop(context);
         },
         loading: () {},
@@ -65,7 +65,7 @@ class _CertificateManagementScreenState extends ConsumerState<CertificateManagem
   }
 
   Widget _buildGeneratorView(String enterpriseId) {
-    final enterpriseAsync = ref.watch(enterpriseProvider(enterpriseId));
+    final enterpriseAsync = ref.watch(enterpriseDetailProvider(enterpriseId));
 
     return enterpriseAsync.when(
       data: (enterprise) {

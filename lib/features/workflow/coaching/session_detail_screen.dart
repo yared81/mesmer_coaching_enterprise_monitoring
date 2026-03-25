@@ -28,7 +28,6 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _revenueController;
   late TextEditingController _employeesController;
   bool _isSaving = false;
-  bool _isSaving = false;
 
   @override
   void initState() {
