@@ -7,6 +7,7 @@ class SecureStorage {
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _lastUserRoleKey = 'last_user_role';
+  static const _userProfileKey = 'user_profile';
 
   Future<void> saveTokens({required String accessToken, required String refreshToken}) async {
     await _storage.write(key: _accessTokenKey, value: accessToken);
@@ -24,6 +25,18 @@ class SecureStorage {
   Future<void> clearTokens() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+  }
+
+  Future<void> saveUserProfile(String userJson) async {
+    await _storage.write(key: _userProfileKey, value: userJson);
+  }
+
+  Future<String?> getUserProfile() async {
+    return await _storage.read(key: _userProfileKey);
+  }
+
+  Future<void> clearUserProfile() async {
+    await _storage.delete(key: _userProfileKey);
   }
 
   Future<void> saveLastUserRole(String role) async {

@@ -20,11 +20,17 @@ class AuthService {
       ]
     });
 
+    console.log(`[AUTH-DEBUG] Login attempt for: ${email}`);
     if (!user) {
+      const userAny = await User.findOne({ where: { email } });
+      console.log(`[AUTH-DEBUG] User found without is_active filter? ${!!userAny}`);
+      if (userAny) console.log(`[AUTH-DEBUG] User status: is_active=${userAny.is_active}`);
       throw new Error('Invalid credentials');
     }
 
     const isMatch = await user.comparePassword(password);
+    console.log(`[AUTH-DEBUG] Password match result: ${isMatch}`);
+    
     if (!isMatch) {
       throw new Error('Invalid credentials');
     }

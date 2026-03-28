@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { createConsent, getConsentByEnterprise, listConsents } = require('../controllers/consent.controller');
-const { authenticate, authorize } = require('../middleware/auth.middleware');
+const { protect, authorize } = require('../middleware/auth.middleware');
 
 // All routes require authentication
-router.use(authenticate);
+router.use(protect);
 
 // POST /api/v1/consent (enumerator, coach records consent)
 router.post('/', authorize(['enumerator', 'coach', 'supervisor', 'admin']), createConsent);
@@ -13,6 +13,6 @@ router.post('/', authorize(['enumerator', 'coach', 'supervisor', 'admin']), crea
 router.get('/', authorize(['supervisor', 'me_officer', 'admin', 'regional_coordinator']), listConsents);
 
 // GET /api/v1/consent/:enterprise_id (check if an enterprise has consent)
-router.get('/:enterprise_id', authenticate, getConsentByEnterprise);
+router.get('/:enterprise_id', protect, getConsentByEnterprise);
 
 module.exports = router;

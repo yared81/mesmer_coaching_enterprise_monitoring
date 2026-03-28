@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
@@ -34,6 +35,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       final userModel = UserModel.fromJson(userData as Map<String, dynamic>);
+      
+      // Cache the user for offline access
+      await _secureStorage.saveUserProfile(jsonEncode(userModel.toJson()));
+      
       return Right(userModel.toEntity());
     } catch (e) {
       return Left(Failure.fromException(e));
@@ -42,12 +47,20 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> logout() async {
+    // Clear local session first so the user can always log out offline
+    await _secureStorage.clearTokens();
+    await _secureStorage.clearUserProfile();
+
     try {
       await _remoteDatasource.logout();
-      await _secureStorage.clearTokens();
       return const Right(null);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      // If it's a network error, we don't care, we still consider the local logout successful
+      if (failure is NetworkFailure) {
+        return const Right(null);
+      }
+      return Left(failure);
     }
   }
 
@@ -55,9 +68,27 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> getCurrentUser() async {
     try {
       final userModel = await _remoteDatasource.getMe();
+      // Cache the user for offline access
+      await _secureStorage.saveUserProfile(jsonEncode(userModel.toJson()));
       return Right(userModel.toEntity());
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      
+      // If it's a network failure, try to load from offline cache
+      if (failure is NetworkFailure) {
+        try {
+          final cachedUserJson = await _secureStorage.getUserProfile();
+          if (cachedUserJson != null) {
+            final userMap = jsonDecode(cachedUserJson) as Map<String, dynamic>;
+            final cachedUserModel = UserModel.fromJson(userMap);
+            return Right(cachedUserModel.toEntity());
+          }
+        } catch (_) {
+          // If parsing fails, fall through to returning the original failure
+        }
+      }
+      
+      return Left(failure);
     }
   }
 
@@ -75,6 +106,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> updateProfile(String name, String email) async {
     try {
       final userModel = await _remoteDatasource.updateProfile(name, email);
+      
+      // Update the local cache
+      await _secureStorage.saveUserProfile(jsonEncode(userModel.toJson()));
+      
       return Right(userModel.toEntity());
     } catch (e) {
       return Left(Failure.fromException(e));

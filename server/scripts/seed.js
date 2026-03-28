@@ -22,7 +22,7 @@ async function seed() {
     });
     console.log('✅ Institution created.');
 
-    const passwordHash = await bcrypt.hash('password123', 10);
+    const passwordHash = await bcrypt.hash('123456', 10);
 
     // 2. Create Official 11 Roles
     const usersToCreate = [
@@ -81,7 +81,7 @@ async function seed() {
 
     console.log('✅ Sample Enterprise & Beneficiary created.');
     console.log('\n--- SEEDING COMPLETE (Strict 11 Roles) ---');
-    console.log('All passwords: password123');
+    console.log('All passwords: 123456');
     console.log('Super Admin: superadmin@mesmer.com');
     console.log('Program Manager: programmanager@mesmer.com');
     console.log('Regional Coordinator: regionalcoordinator@mesmer.com');

@@ -44,7 +44,6 @@ const Enterprise = sequelize.define('Enterprise', {
     get() { return decrypt(this.getDataValue('email')); },
     set(val) { this.setDataValue('email', encrypt(val)); }
   },
- bitumen
   business_age: {
     type: DataTypes.INTEGER,
     allowNull: true,

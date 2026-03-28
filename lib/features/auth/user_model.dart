@@ -78,6 +78,39 @@ class UserModel {
         enterpriseCount: enterpriseCount,
         sessionCount: sessionCount,
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'name': name,
+      'role': _roleToString(role),
+      'institution_id': institutionId,
+      'is_active': isActive,
+      'institution': institutionName,
+      'enterprise_id': enterpriseId,
+      'coach': coach?.toJson(),
+      'enterpriseCount': enterpriseCount,
+      'sessionCount': sessionCount,
+    };
+  }
+
+  static String _roleToString(UserRole role) {
+    switch (role) {
+      case UserRole.superAdmin: return 'super_admin';
+      case UserRole.programManager: return 'program_manager';
+      case UserRole.regionalCoordinator: return 'regional_coordinator';
+      case UserRole.meOfficer: return 'me_officer';
+      case UserRole.dataVerifier: return 'data_verifier';
+      case UserRole.trainer: return 'trainer';
+      case UserRole.coach: return 'coach';
+      case UserRole.enumerator: return 'enumerator';
+      case UserRole.commsOfficer: return 'comms_officer';
+      case UserRole.enterprise: return 'enterprise_user';
+      case UserRole.stakeholder: return 'stakeholder';
+      default: return 'unknown';
+    }
+  }
 }
 
 class CoachModel {
@@ -108,4 +141,13 @@ class CoachModel {
         email: email,
         phone: phone,
       );
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+    };
+  }
 }
