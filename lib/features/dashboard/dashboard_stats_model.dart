@@ -19,6 +19,16 @@ class ActivityModel extends ActivityEntity {
       type: json['type']?.toString() ?? 'unknown',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'timestamp': timestamp.toIso8601String(),
+      'type': type,
+    };
+  }
 }
 
 class AdminStatsModel extends AdminStatsEntity {
@@ -103,6 +113,19 @@ class CoachStatsModel extends CoachStatsEntity {
       recentActivity: recent,
       recentInteractions: interactions,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'stats': {
+        'totalEnterprises': totalEnterprises,
+        'totalSessions': totalSessions,
+        'pendingTasks': pendingTasks,
+        'avgAssessmentScore': avgAssessmentScore,
+      },
+      'recentActivity': recentActivity.map((e) => (e as ActivityModel).toJson()).toList(),
+      'recentInteractions': recentInteractions.map((e) => (e as ActivityModel).toJson()).toList(),
+    };
   }
 }
 

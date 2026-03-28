@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'enterprise_entity.dart';
 import 'enterprise_repository.dart';
@@ -25,9 +27,25 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
         status: status,
         coachId: coachId,
       );
+      
+      // Save full array to cache
+      final jsonList = models.map((m) => EnterpriseModel.fromJson(m).toJson()).toList();
+      await HiveStorage.cacheEnterprises('default_list', jsonEncode(jsonList));
+
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      if (failure is NetworkFailure) {
+        try {
+          final cachedString = HiveStorage.getCachedEnterprises('default_list');
+          if (cachedString != null) {
+            final List<dynamic> jsonList = jsonDecode(cachedString);
+            final cachedModels = jsonList.map((m) => EnterpriseModel.fromJson(m as Map<String, dynamic>)).toList();
+            return Right(cachedModels.map((m) => m.toEntity()).toList());
+          }
+        } catch (_) {}
+      }
+      return Left(failure);
     }
   }
 

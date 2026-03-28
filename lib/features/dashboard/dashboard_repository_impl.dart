@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_remote_datasource.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
@@ -33,9 +35,24 @@ class DashboardRepositoryImpl implements DashboardRepository {
   Future<Either<Failure, CoachStatsEntity>> getCoachStats() async {
     try {
       final stats = await remoteDataSource.getCoachStats();
+      
+      // Save full stats model to cache
+      await HiveStorage.cacheDashboardStats('coach_default', jsonEncode(stats.toJson()));
+
       return Right(stats);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      if (failure is NetworkFailure) {
+        try {
+          final cachedString = HiveStorage.getCachedDashboardStats('coach_default');
+          if (cachedString != null) {
+            final Map<String, dynamic> jsonMap = jsonDecode(cachedString);
+            final cachedStats = CoachStatsModel.fromJson(jsonMap);
+            return Right(cachedStats);
+          }
+        } catch (_) {}
+      }
+      return Left(failure);
     }
   }
 

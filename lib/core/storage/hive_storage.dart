@@ -3,11 +3,15 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveStorage {
   static const String diagnosisDraftsBox = 'diagnosis_drafts';
   static const String prefsBox = 'system_prefs';
+  static const String cachedEnterprisesBox = 'cached_enterprises';
+  static const String cachedDashboardsBox = 'cached_dashboards';
 
   static Future<void> init() async {
     await Hive.initFlutter();
     await Hive.openBox(diagnosisDraftsBox);
     await Hive.openBox(prefsBox);
+    await Hive.openBox(cachedEnterprisesBox);
+    await Hive.openBox(cachedDashboardsBox);
   }
 
   static Future<void> saveDraft(String sessionId, Map<String, String> responses) async {
@@ -30,8 +34,30 @@ class HiveStorage {
   }
 
   static Future<void> clearAllCache() async {
-    final box = Hive.box(diagnosisDraftsBox);
-    await box.clear();
+    await Hive.box(diagnosisDraftsBox).clear();
+    await Hive.box(cachedEnterprisesBox).clear();
+    await Hive.box(cachedDashboardsBox).clear();
+  }
+
+  // --- Offline Data Caching ---
+  static Future<void> cacheEnterprises(String roleKey, String jsonList) async {
+    final box = Hive.box(cachedEnterprisesBox);
+    await box.put(roleKey, jsonList);
+  }
+
+  static String? getCachedEnterprises(String roleKey) {
+    final box = Hive.box(cachedEnterprisesBox);
+    return box.get(roleKey)?.toString();
+  }
+
+  static Future<void> cacheDashboardStats(String roleKey, String jsonStats) async {
+    final box = Hive.box(cachedDashboardsBox);
+    await box.put(roleKey, jsonStats);
+  }
+
+  static String? getCachedDashboardStats(String roleKey) {
+    final box = Hive.box(cachedDashboardsBox);
+    return box.get(roleKey)?.toString();
   }
 
   // --- Theme Preferences ---

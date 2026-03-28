@@ -108,6 +108,34 @@ class EnterpriseModel {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'business_name': businessName,
+      'owner_name': ownerName,
+      'sector': sector,
+      'employee_count': employeeCount,
+      'location': location,
+      'phone': phone,
+      'email': email,
+      'business_age': businessAge,
+      'owner_gender': ownerGender,
+      'premise_type': premiseType,
+      'baseline_score': baselineScore,
+      'baseline_employees': baselineEmployees,
+      'baseline_revenue': baselineRevenue,
+      'record_keeping_system': recordKeepingSystem,
+      'challenges': challenges,
+      'loan_amount': loanAmount,
+      'consent_status': consentStatus,
+      'consent_date': consentDate?.toIso8601String(),
+      'status': status,
+      'coach_id': coachId,
+      'institution_id': institutionId,
+      'registered_at': registeredAt.toIso8601String(),
+    };
+  }
+
   static Sector _mapStringToSector(String sector) {
     return Sector.values.firstWhere(
       (s) => s.name == sector,
