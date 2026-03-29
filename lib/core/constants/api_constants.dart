@@ -39,6 +39,12 @@ abstract class ApiConstants {
   // Enterprise Dashboard
   static const String enterpriseDashboardStats = 'enterprise-dashboard/stats';
 
+  // Report Endpoints
+  static const String reports = 'reports';
+  static String enterpriseReportPdf(String id) => 'reports/enterprise/$id/pdf';
+  static const String systemCsv = 'reports/system/csv';
+  static const String weeklyReport = 'reports/weekly';
+
   // Session Endpoints
   static const String sessions = 'sessions';
   static const String phoneFollowups = 'phone-followups';

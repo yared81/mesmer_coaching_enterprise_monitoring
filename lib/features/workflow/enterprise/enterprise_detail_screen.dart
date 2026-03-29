@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:printing/printing.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
@@ -25,6 +27,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/equipmen
 import 'graduation_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import 'report_provider.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -114,6 +117,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     _showReassignCoachSheet(context, ref, enterprise);
                   } else if (value == 'graduate') {
                     _handleGraduationRequest(context, ref, enterprise);
+                  } else if (value == 'export_pdf') {
+                    await _exportEnterprisePdf(context, ref, enterprise.id);
                   }
                 },
                 itemBuilder: (context) {
@@ -138,6 +143,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     const PopupMenuItem(
                       value: 'graduate',
                       child: Row(children: [Icon(Icons.school_rounded, size: 18), SizedBox(width: 8), Text('Request Graduation')]),
+                    ),
+                    const PopupMenuItem(
+                      value: 'export_pdf',
+                      child: Row(children: [Icon(Icons.picture_as_pdf_rounded, color: Color(0xFFDC2626), size: 18), SizedBox(width: 8), Text('Export Progress PDF')]),
                     ),
                   ];
                 },
@@ -1418,6 +1427,72 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             SnackBar(content: Text('Graduation failed: $e'), backgroundColor: Colors.red),
           );
         }
+      }
+    }
+  }
+
+  Future<void> _exportEnterprisePdf(
+    BuildContext context,
+    WidgetRef ref,
+    String enterpriseId,
+  ) async {
+    // Show a progress snack bar while generating
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 16, height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            ),
+            SizedBox(width: 12),
+            Text('Generating PDF report…'),
+          ],
+        ),
+        duration: Duration(seconds: 30),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
+    try {
+      final notifier = ref.read(enterprisePdfDownloadProvider(enterpriseId).notifier);
+      await notifier.download();
+
+      final state = ref.read(enterprisePdfDownloadProvider(enterpriseId));
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      await state.when(
+        data: (bytes) async {
+          if (bytes == null) return;
+          await Printing.sharePdf(
+            bytes: Uint8List.fromList(bytes),
+            filename: 'MESMER_Enterprise_Report.pdf',
+          );
+          notifier.reset();
+        },
+        loading: () async {},
+        error: (e, _) async {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Export failed: $e'),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }
