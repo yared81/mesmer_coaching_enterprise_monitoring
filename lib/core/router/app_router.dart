@@ -70,6 +70,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_capture_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/evidence_upload_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/audit/audit_logs_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/report_center_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -139,11 +140,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.supervisorReports,
-            builder: (context, state) {
-              final role = ref.watch(authProvider).user?.role;
-              if (role == UserRole.regionalCoordinator) return const RegionalReportsScreen();
-              return const SupervisorReportsScreen();
-            },
+            builder: (context, state) => const ReportCenterScreen(),
           ),
           GoRoute(
             path: AppRoutes.evidenceUpload,
@@ -158,7 +155,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: AppRoutes.reports,
-            builder: (context, state) => const SupervisorReportsScreen(),
+            builder: (context, state) => const ReportCenterScreen(),
           ),
           GoRoute(
             path: AppRoutes.scheduling,

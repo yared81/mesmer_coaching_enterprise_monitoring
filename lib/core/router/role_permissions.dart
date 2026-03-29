@@ -47,6 +47,7 @@ class RolePermissions {
       '/profile',
       AppRoutes.changePassword,
       '/settings',
+      AppRoutes.reports,
     ],
 
     UserRole.trainer: [
