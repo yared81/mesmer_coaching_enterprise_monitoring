@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:math';
 import 'package:dartz/dartz.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_database.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'coaching_session_entity.dart';
 import 'coaching_repository.dart';
@@ -9,8 +13,16 @@ import 'phone_followup_model.dart';
 
 class CoachingRepositoryImpl implements CoachingRepository {
   final CoachingRemoteDataSource remoteDataSource;
+  final LocalDatabase localDatabase;
 
-  CoachingRepositoryImpl({required this.remoteDataSource});
+  CoachingRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDatabase,
+  });
+
+  String _generateOfflineId() {
+    return 'offline_\${DateTime.now().millisecondsSinceEpoch}_\${Random().nextInt(10000)}';
+  }
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> createSession(CoachingSessionEntity session) async {
@@ -37,7 +49,39 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.createSession(model);
       return Right(result);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      if (failure is NetworkFailure) {
+        // SPOOF OFFLINE ID
+        final finalId = session.id.isEmpty ? _generateOfflineId() : session.id;
+        final offlineModel = CoachingSessionModel(
+          id: finalId,
+          title: session.title,
+          enterpriseId: session.enterpriseId,
+          coachId: session.coachId,
+          scheduledDate: session.scheduledDate,
+          status: session.status,
+          sessionNumber: session.sessionNumber,
+          followupType: session.followupType,
+          revenueGrowthPercent: session.revenueGrowthPercent,
+          currentEmployees: session.currentEmployees,
+          jobsCreated: session.jobsCreated,
+          qcStatus: session.qcStatus,
+          templateId: session.templateId,
+          enterpriseName: session.enterpriseName,
+          problemsIdentified: session.problemsIdentified,
+          recommendations: session.recommendations,
+          notes: session.notes,
+        );
+
+        await localDatabase.enqueueSyncAction(
+          'POST',
+          ApiConstants.coachingSessions,
+          jsonEncode(offlineModel.toJson()),
+        );
+
+        return Right(offlineModel.toEntity());
+      }
+      return Left(failure);
     }
   }
 
@@ -86,7 +130,16 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.updateSession(model);
       return Right(result);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      if (failure is NetworkFailure) {
+        await localDatabase.enqueueSyncAction(
+          'PUT',
+          '\${ApiConstants.coachingSessions}/\${session.id}',
+          jsonEncode(model.toJson()),
+        );
+        return Right(model.toEntity());
+      }
+      return Left(failure);
     }
   }
 
@@ -106,7 +159,28 @@ class CoachingRepositoryImpl implements CoachingRepository {
       final result = await remoteDataSource.createPhoneFollowup(model);
       return Right(result);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      final failure = Failure.fromException(e);
+      if (failure is NetworkFailure) {
+        final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
+        final offlineModel = PhoneFollowupModel(
+          id: finalId,
+          enterpriseId: log.enterpriseId,
+          coachId: log.coachId,
+          date: log.date,
+          purpose: log.purpose,
+          issueAddressed: log.issueAddressed,
+          adviceGiven: log.adviceGiven,
+          nextAction: log.nextAction,
+        );
+
+        await localDatabase.enqueueSyncAction(
+          'POST',
+          'phone-followups',
+          jsonEncode(offlineModel.toJson()),
+        );
+        return Right(offlineModel.toEntity());
+      }
+      return Left(failure);
     }
   }
 

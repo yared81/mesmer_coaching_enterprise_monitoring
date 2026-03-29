@@ -108,4 +108,22 @@ class LocalDatabase {
     await db.delete('equipment');
     await db.delete('sync_queue');
   }
+
+  Future<void> enqueueSyncAction(String method, String endpoint, String jsonPayload) async {
+    final db = await database;
+    
+    // As per hackathon minimum requirements, inject local timestamp
+    // Device ID would ideally go here, using physical device lookup, but for now we append an offline flag
+    await db.insert(
+      'sync_queue',
+      {
+        'action_type': method,
+        'endpoint': endpoint,
+        'payload': jsonPayload,
+        'created_at': DateTime.now().toIso8601String(),
+        'status': 0, // 0 = pending
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 }
