@@ -19,5 +19,5 @@ abstract class EnterpriseRepository {
 
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats();
 
-  Future<Either<Failure, List<Map<String, dynamic>>>> getEnterpriseTrends(String id);
+  Future<Either<Failure, List<EnterpriseEntity>>> bulkRegister(List<Map<String, dynamic>> enterprises);
 }

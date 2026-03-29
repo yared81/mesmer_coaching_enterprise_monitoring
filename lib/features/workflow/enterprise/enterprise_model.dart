@@ -14,6 +14,8 @@ class EnterpriseModel {
     required this.institutionId,
     required this.registeredAt,
     this.email,
+    this.ownerAge,
+    this.businessActivity,
     this.businessAge,
     this.ownerGender,
     this.premiseType,
@@ -36,6 +38,8 @@ class EnterpriseModel {
   final String location;
   final String phone;
   final String? email;
+  final int? ownerAge;
+  final String? businessActivity;
   final int? businessAge;
   final String? ownerGender;
   final String? premiseType;
@@ -62,6 +66,8 @@ class EnterpriseModel {
       location: json['location'] as String,
       phone: json['phone'] as String,
       email: json['email'] as String?,
+      ownerAge: json['owner_age'] != null ? NumUtils.toInt(json['owner_age']) : null,
+      businessActivity: json['business_activity'] as String?,
       businessAge: json['business_age'] != null ? NumUtils.toInt(json['business_age']) : null,
       ownerGender: json['owner_gender'] as String?,
       premiseType: json['premise_type'] as String?,
@@ -80,6 +86,36 @@ class EnterpriseModel {
     );
   }
 
+  factory EnterpriseModel.fromEntity(EnterpriseEntity entity) {
+    return EnterpriseModel(
+      id: entity.id,
+      businessName: entity.businessName,
+      ownerName: entity.ownerName,
+      sector: entity.sector.name,
+      employeeCount: entity.employeeCount,
+      location: entity.location,
+      phone: entity.phone,
+      email: entity.email,
+      ownerAge: entity.ownerAge,
+      businessActivity: entity.businessActivity,
+      businessAge: entity.businessAge,
+      ownerGender: entity.ownerGender?.name,
+      premiseType: entity.premiseType?.name,
+      baselineScore: entity.baselineScore,
+      baselineEmployees: entity.baselineEmployees,
+      baselineRevenue: entity.baselineRevenue,
+      recordKeepingSystem: entity.recordKeepingSystem?.name,
+      challenges: entity.challenges,
+      loanAmount: entity.loanAmount,
+      consentStatus: entity.consentStatus,
+      consentDate: entity.consentDate,
+      status: entity.status.name,
+      coachId: entity.coachId,
+      institutionId: entity.institutionId,
+      registeredAt: entity.registeredAt,
+    );
+  }
+
   EnterpriseEntity toEntity() {
     return EnterpriseEntity(
       id: id,
@@ -90,6 +126,8 @@ class EnterpriseModel {
       location: location,
       phone: phone,
       email: email,
+      ownerAge: ownerAge,
+      businessActivity: businessActivity,
       businessAge: businessAge,
       ownerGender: _mapStringToGender(ownerGender),
       premiseType: _mapStringToPremiseType(premiseType),
@@ -118,6 +156,8 @@ class EnterpriseModel {
       'location': location,
       'phone': phone,
       'email': email,
+      'owner_age': ownerAge,
+      'business_activity': businessActivity,
       'business_age': businessAge,
       'owner_gender': ownerGender,
       'premise_type': premiseType,

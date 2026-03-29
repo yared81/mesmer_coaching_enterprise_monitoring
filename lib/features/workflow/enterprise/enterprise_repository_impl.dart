@@ -90,6 +90,16 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
   }
 
   @override
+  Future<Either<Failure, List<EnterpriseEntity>>> bulkRegister(List<Map<String, dynamic>> enterprises) async {
+    try {
+      final result = await _remoteDatasource.bulkCreateEnterprises(enterprises);
+      return Right(result.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
+    } catch (e) {
+      return Left(Failure.fromException(e));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<Map<String, dynamic>>>> getEnterpriseTrends(String id) async {
     try {
       final data = await _remoteDatasource.getEnterpriseTrends(id);

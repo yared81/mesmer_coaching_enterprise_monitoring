@@ -36,6 +36,37 @@ class EnterpriseController {
   };
 
   /**
+   * @route POST /api/v1/enterprises/bulk
+   */
+  bulkRegister = async (req, res, next) => {
+    try {
+      const { enterprises } = req.body;
+      if (!Array.isArray(enterprises)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Payload must contain an "enterprises" array'
+        });
+      }
+ 
+      const { userId, institutionId } = req.user;
+      
+      const results = await enterpriseService.bulkRegisterEnterprises(
+        enterprises, 
+        userId, 
+        institutionId
+      );
+ 
+      res.status(201).json({
+        success: true,
+        count: results.length,
+        data: results
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * @route GET /api/v1/enterprises
    */
   list = async (req, res, next) => {

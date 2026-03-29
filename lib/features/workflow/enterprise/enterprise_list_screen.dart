@@ -10,6 +10,10 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dar
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
 import 'enterprise_filter_sheet.dart';
+import 'package:file_picker/file_picker.dart';
+import 'csv_import_service.dart';
+import 'dart:io';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
 
 class EnterpriseListScreen extends ConsumerStatefulWidget {
   const EnterpriseListScreen({super.key});
@@ -42,6 +46,50 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     );
   }
 
+  Future<void> _importCsv() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+    );
+
+    if (result == null || result.files.single.path == null) return;
+
+    try {
+      final file = File(result.files.single.path!);
+      final content = await file.readAsString();
+      
+      final auth = ref.read(authProvider);
+      final coachId = auth.user?.id ?? '';
+      final institutionId = auth.user?.institutionId ?? '';
+
+      final enterprises = CsvImportService.parseEnterpriseCsv(
+        content, 
+        coachId: coachId, 
+        institutionId: institutionId,
+      );
+
+      if (enterprises.isEmpty) {
+        if (mounted) CustomToaster.show(context: context, message: 'No valid enterprises found in CSV', isError: true);
+        return;
+      }
+
+      final data = enterprises.map((e) => EnterpriseModel.fromEntity(e).toJson()).toList();
+      
+      final repo = ref.read(enterpriseRepositoryProvider);
+      final response = await repo.bulkRegister(data);
+
+      response.fold(
+        (failure) => CustomToaster.show(context: context, message: failure.message, isError: true),
+        (list) {
+          CustomToaster.show(context: context, message: 'Successfully imported ${list.length} enterprises');
+          _onSearch();
+        },
+      );
+    } catch (e) {
+      if (mounted) CustomToaster.show(context: context, message: 'Error importing CSV: $e', isError: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final enterpriseList = ref.watch(enterpriseListProvider);
@@ -56,6 +104,11 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
             elevation: 0,
             title: const Text('Enterprises', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             actions: [
+               IconButton(
+                tooltip: 'Bulk Import CSV',
+                icon: const Icon(Icons.file_upload_outlined),
+                onPressed: _importCsv,
+              ),
                IconButton(
                 icon: const Icon(Icons.refresh_rounded),
                 onPressed: _onSearch,

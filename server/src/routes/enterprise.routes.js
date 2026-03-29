@@ -12,6 +12,12 @@ router.post(
   enterpriseController.register
 );
 
+router.post(
+  '/bulk',
+  authorize('super_admin', 'admin', 'supervisor', 'program_manager'),
+  enterpriseController.bulkRegister
+);
+
 router.get(
   '/', 
   authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator'),

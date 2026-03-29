@@ -44,6 +44,66 @@ class EnterpriseService {
   }
 
   /**
+   * Bulk register enterprises and create corresponding user accounts
+   */
+  async bulkRegisterEnterprises(enterprisesData, coachId, institutionId) {
+    const transaction = await sequelize.transaction();
+    const createdEnterprises = [];
+    const { AuditLog } = require('../models');
+
+    try {
+      const defaultPassword = '123456';
+      const hashedPassword = await User.hashPassword(defaultPassword);
+
+      for (const data of enterprisesData) {
+        // 1. Create the User account
+        const user = await User.create({
+          email: data.email,
+          name: data.owner_name,
+          password_hash: hashedPassword,
+          role: 'enterprise_user',
+          institution_id: institutionId,
+          is_active: true
+        }, { transaction });
+
+        // 2. Create the Enterprise
+        const enterprise = await Enterprise.create({
+          ...data,
+          coach_id: coachId,
+          institution_id: institutionId,
+          user_id: user.id
+        }, { transaction });
+
+        createdEnterprises.push(enterprise);
+      }
+
+      // 3. Batch Audit Logging
+      await AuditLog.create({
+        user_id: coachId,
+        action: 'CREATE',
+        table_name: 'enterprises',
+        record_id: createdEnterprises[0]?.id || '00000000-0000-0000-0000-000000000000',
+        new_data: { bulk: true, count: createdEnterprises.length, ids: createdEnterprises.map(e => e.id) }
+      }, { transaction });
+
+      await transaction.commit();
+
+      // 4. Trigger QC Baseline (Post-transaction)
+      const qcTriggerService = require('./qc_trigger.service');
+      for (const ent of createdEnterprises) {
+        await qcTriggerService.processBaseline(ent).catch(err => 
+          console.error(`Failed to trigger QC for ${ent.id}:`, err)
+        );
+      }
+
+      return createdEnterprises;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  /**
    * Count the total number of enterprises for pilot mode capability
    */
   async countEnterprises() {

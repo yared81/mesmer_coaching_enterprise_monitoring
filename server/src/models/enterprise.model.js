@@ -44,6 +44,14 @@ const Enterprise = sequelize.define('Enterprise', {
     get() { return decrypt(this.getDataValue('email')); },
     set(val) { this.setDataValue('email', encrypt(val)); }
   },
+  owner_age: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  business_activity: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   business_age: {
     type: DataTypes.INTEGER,
     allowNull: true,

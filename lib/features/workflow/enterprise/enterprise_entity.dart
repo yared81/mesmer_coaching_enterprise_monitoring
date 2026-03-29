@@ -17,6 +17,8 @@ class EnterpriseEntity {
     required this.institutionId,
     required this.registeredAt,
     this.email,
+    this.ownerAge,
+    this.businessActivity,
     this.businessAge,
     this.ownerGender,
     this.premiseType,
@@ -39,6 +41,8 @@ class EnterpriseEntity {
   final String location;
   final String phone;
   final String? email;
+  final int? ownerAge;
+  final String? businessActivity;
   final int? businessAge;
   final OwnerGender? ownerGender;
   final PremiseType? premiseType;
@@ -64,6 +68,8 @@ class EnterpriseEntity {
     String? location,
     String? phone,
     String? email,
+    int? ownerAge,
+    String? businessActivity,
     int? businessAge,
     OwnerGender? ownerGender,
     PremiseType? premiseType,
@@ -89,6 +95,8 @@ class EnterpriseEntity {
       location: location ?? this.location,
       phone: phone ?? this.phone,
       email: email ?? this.email,
+      ownerAge: ownerAge ?? this.ownerAge,
+      businessActivity: businessActivity ?? this.businessActivity,
       businessAge: businessAge ?? this.businessAge,
       ownerGender: ownerGender ?? this.ownerGender,
       premiseType: premiseType ?? this.premiseType,

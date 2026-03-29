@@ -45,6 +45,12 @@ class EnterpriseRemoteDatasource {
     return response.data['data'];
   }
 
+  Future<List<Map<String, dynamic>>> bulkCreateEnterprises(List<Map<String, dynamic>> data) async {
+    final response = await _dio.post('${ApiConstants.enterprises}/bulk', data: {'enterprises': data});
+    final List<dynamic> result = response.data['data'];
+    return result.map((e) => e as Map<String, dynamic>).toList();
+  }
+
   Future<List<dynamic>> getEnterpriseTrends(String id) async {
     final response = await _dio.get('${ApiConstants.baseUrl}/enterprises/$id/trends');
     return response.data['data'];
