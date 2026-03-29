@@ -76,7 +76,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
         await localDatabase.enqueueSyncAction(
           'POST',
           'coaching-sessions',
-          offlineModel.toJson(),
+          jsonEncode(offlineModel.toJson()),
         );
 
         return Right(offlineModel);
@@ -134,7 +134,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
         await localDatabase.enqueueSyncAction(
           'PUT',
           'coaching-sessions/\${session.id}',
-          model.toJson(),
+          jsonEncode(model.toJson()),
         );
         return Right(model);
       }
@@ -175,7 +175,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
         await localDatabase.enqueueSyncAction(
           'POST',
           'phone-followups',
-          offlineModel.toJson(),
+          jsonEncode(offlineModel.toJson()),
         );
         return Right(offlineModel);
       }
