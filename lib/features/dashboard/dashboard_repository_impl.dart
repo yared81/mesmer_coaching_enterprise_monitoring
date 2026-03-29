@@ -4,6 +4,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.
 import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_remote_datasource.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_model.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_repository.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
