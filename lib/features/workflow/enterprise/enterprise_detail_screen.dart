@@ -1000,33 +1000,28 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             Row(
               children: [
                 Icon(Icons.calendar_today_rounded, size: 12, color: accentColor),
-                const SizedBox(width: 6),
-                Text(
-                  DateFormat('MMM dd, yyyy').format(s.scheduledDate),
-                  style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 11),
-                ),
-                const Spacer(),
-                if (s.id.startsWith('offline_'))
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(Icons.sync_rounded, color: Colors.grey, size: 12),
-                        const SizedBox(width: 4),
-                        const Text('Pending Sync', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  )
-                else
-                  Icon(s.status == SessionStatus.completed ? Icons.check_circle_rounded : Icons.edit_note_rounded,
-                      size: 14, color: accentColor),
-              ],
-            ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(s.title, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 ),
+                const SizedBox(width: 8),
+                Text(DateFormat('MMM dd, yyyy').format(s.scheduledDate),
+                  style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (s.notes != null && s.notes!.isNotEmpty)
+              Text(
+                s.notes!,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey[600], fontSize: 11),
+              ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
@@ -1034,34 +1029,31 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    isCompleted ? 'Done' : 'Draft',
+                     s.id.startsWith('offline_') ? 'Pending Sync...' : (isCompleted ? 'Completed' : 'Draft'),
                     style: TextStyle(color: accentColor, fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(width: 6),
-                Text(DateFormat('MMM dd').format(s.scheduledDate), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                if (s.id.startsWith('offline_'))
+                  const Icon(Icons.sync_rounded, color: Colors.grey, size: 14)
+                else
+                  Icon(isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded,
+                      size: 14, color: accentColor),
               ],
             ),
-            const SizedBox(height: 6),
-            Text(s.notes?.isNotEmpty == true ? s.notes! : 'Tap to add session notes or problems identified.', 
-              style: TextStyle(color: s.notes?.isNotEmpty == true ? const Color(0xFF424242) : Colors.grey[400], fontSize: 13, fontStyle: s.notes?.isNotEmpty == true ? FontStyle.normal : FontStyle.italic),
-              maxLines: 2, overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () => context.push(AppRoutes.diagnosis, extra: s.id),
-                  icon: const Icon(Icons.assessment_outlined, size: 16),
-                  label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: accentColor,
-                    side: BorderSide(color: accentColor),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
+            if (!isCompleted) ...[
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => context.push(AppRoutes.diagnosis, extra: s.id),
+                icon: const Icon(Icons.assessment_outlined, size: 16),
+                label: const Text('Diagnose', style: TextStyle(fontSize: 12)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: accentColor,
+                  side: BorderSide(color: accentColor),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
-              ],
-            ),
+              ),
+            ]
           ],
         ),
       ),
@@ -1112,6 +1104,27 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ],
               ),
             ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  log.id.startsWith('offline_') ? 'Pending Sync' : 'Logged',
+                  style: TextStyle(color: accentColor, fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+              ),
+              if (log.id.startsWith('offline_'))
+                const Icon(Icons.sync_rounded, color: Colors.grey, size: 14)
+              else
+                Icon(Icons.check_circle_rounded, size: 14, color: accentColor),
+            ],
+          ),
         ],
       ),
     );
