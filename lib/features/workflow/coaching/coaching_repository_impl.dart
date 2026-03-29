@@ -75,11 +75,11 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
         await localDatabase.enqueueSyncAction(
           'POST',
-          ApiConstants.coachingSessions,
-          jsonEncode(offlineModel.toJson()),
+          'coaching-sessions',
+          offlineModel.toJson(),
         );
 
-        return Right(offlineModel.toEntity());
+        return Right(offlineModel);
       }
       return Left(failure);
     }
@@ -107,8 +107,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> updateSession(CoachingSessionEntity session) async {
-    try {
-      final model = CoachingSessionModel(
+    final model = CoachingSessionModel(
         id: session.id,
         title: session.title,
         enterpriseId: session.enterpriseId,
@@ -125,8 +124,8 @@ class CoachingRepositoryImpl implements CoachingRepository {
         enterpriseName: session.enterpriseName,
         problemsIdentified: session.problemsIdentified,
         recommendations: session.recommendations,
-        notes: session.notes,
       );
+    try {
       final result = await remoteDataSource.updateSession(model);
       return Right(result);
     } catch (e) {
@@ -134,10 +133,10 @@ class CoachingRepositoryImpl implements CoachingRepository {
       if (failure is NetworkFailure) {
         await localDatabase.enqueueSyncAction(
           'PUT',
-          '\${ApiConstants.coachingSessions}/\${session.id}',
-          jsonEncode(model.toJson()),
+          'coaching-sessions/\${session.id}',
+          model.toJson(),
         );
-        return Right(model.toEntity());
+        return Right(model);
       }
       return Left(failure);
     }
@@ -176,9 +175,9 @@ class CoachingRepositoryImpl implements CoachingRepository {
         await localDatabase.enqueueSyncAction(
           'POST',
           'phone-followups',
-          jsonEncode(offlineModel.toJson()),
+          offlineModel.toJson(),
         );
-        return Right(offlineModel.toEntity());
+        return Right(offlineModel);
       }
       return Left(failure);
     }
