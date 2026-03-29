@@ -918,8 +918,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         final item = combined[i];
                         if (item is CoachingSessionEntity) {
                           final isCompleted = item.status == SessionStatus.completed;
-                          final dotColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
-                          final accentColor = isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A);
+                          final isPendingSync = item.id.startsWith('offline_');
+                          final dotColor = isPendingSync ? Colors.grey : (isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A));
+                          final accentColor = isPendingSync ? Colors.grey : (isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A));
                           
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -931,8 +932,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           );
                         } else {
                           final log = item as PhoneFollowupEntity;
-                          const accentColor = Colors.orange;
-                          const dotColor = Colors.orange;
+                          final isPendingSync = log.id.startsWith('offline_');
+                          final accentColor = isPendingSync ? Colors.grey : Colors.orange;
+                          final dotColor = isPendingSync ? Colors.grey : Colors.orange;
                           
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -998,6 +1000,28 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             Row(
               children: [
                 Icon(Icons.calendar_today_rounded, size: 12, color: accentColor),
+                const SizedBox(width: 6),
+                Text(
+                  DateFormat('MMM dd, yyyy').format(s.scheduledDate),
+                  style: TextStyle(color: accentColor, fontWeight: FontWeight.bold, fontSize: 11),
+                ),
+                const Spacer(),
+                if (s.id.startsWith('offline_'))
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.sync_rounded, color: Colors.grey, size: 12),
+                        const SizedBox(width: 4),
+                        const Text('Pending Sync', style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  )
+                else
+                  Icon(s.status == SessionStatus.completed ? Icons.check_circle_rounded : Icons.edit_note_rounded,
+                      size: 14, color: accentColor),
+              ],
+            ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(s.title, style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold),

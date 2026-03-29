@@ -94,12 +94,25 @@ class _SessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isCompleted = session.status == SessionStatus.completed;
-    
+    final isPendingSync = session.id.startsWith('offline_');
+
     // Theme colors based on status
-    final themeColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
-    final lightBg = isCompleted ? const Color(0xFFEFF6FF) : const Color(0xFFF0FDF4);
-    final statusLabel = isCompleted ? 'Completed' : 'Draft';
-    final statusIcon = isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded;
+    final Color themeColor;
+    final Color lightBg;
+    final String statusLabel;
+    final IconData statusIcon;
+
+    if (isPendingSync) {
+      themeColor = Colors.grey[700]!;
+      lightBg = Colors.grey[200]!;
+      statusLabel = 'Pending Sync ...';
+      statusIcon = Icons.hourglass_empty_rounded;
+    } else {
+      themeColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
+      lightBg = isCompleted ? const Color(0xFFEFF6FF) : const Color(0xFFF0FDF4);
+      statusLabel = isCompleted ? 'Completed' : 'Draft';
+      statusIcon = isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded;
+    }
 
     return Card(
       elevation: 0,
@@ -144,6 +157,10 @@ class _SessionCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(statusLabel, 
                           style: TextStyle(color: themeColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                        if (!isPendingSync && isCompleted) ...[
+                          const SizedBox(width: 4),
+                          const Icon(Icons.cloud_done_rounded, size: 11, color: Color(0xFF1E3A8A)),
+                        ],
                       ],
                     ),
                   ),

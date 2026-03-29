@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_database.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
 
 final syncStatusProvider = StateProvider<bool>((ref) => false);
 
@@ -47,6 +48,8 @@ class SyncService {
         return;
       }
 
+      bool syncOccurred = false;
+
       for (final action in actions) {
         final id = action['id'] as int;
         final type = action['action_type'] as String;
@@ -78,9 +81,18 @@ class SyncService {
 
         if (success) {
           await _db.markSyncActionComplete(id);
+          syncOccurred = true;
         } else {
           await _db.markSyncActionFailed(id, 'Network or Auth failure');
         }
+      }
+
+      if (syncOccurred) {
+        // Force refresh all session lists so ghost IDs are replaced
+        _ref.invalidate(coachingSessionsProvider);
+        _ref.invalidate(enterpriseSessionsProvider);
+        _ref.invalidate(phoneFollowupListProvider);
+        _ref.invalidate(enterprisePhoneFollowupsProvider);
       }
     } finally {
       _processing = false;
