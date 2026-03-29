@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -124,6 +125,38 @@ class LocalDatabase {
         'status': 0, // 0 = pending
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getPendingSyncActions() async {
+    final db = await database;
+    final maps = await db.query(
+      'sync_queue', 
+      where: 'status = ?', 
+      whereArgs: [0], 
+      orderBy: 'id ASC'
+    );
+    return maps.map((m) => {
+      'id': m['id'],
+      'action_type': m['action_type'],
+      'endpoint': m['endpoint'],
+      'payload': jsonDecode(m['payload'] as String),
+      'created_at': m['created_at'],
+    }).toList();
+  }
+
+  Future<void> markSyncActionComplete(int id) async {
+    final db = await database;
+    await db.delete('sync_queue', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> markSyncActionFailed(int id, String errorMessage) async {
+    final db = await database;
+    await db.update(
+      'sync_queue', 
+      {'status': -1, 'error_message': errorMessage}, 
+      where: 'id = ?', 
+      whereArgs: [id]
     );
   }
 }
