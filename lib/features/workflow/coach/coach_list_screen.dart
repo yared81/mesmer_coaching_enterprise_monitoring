@@ -31,8 +31,6 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
             floating: true,
             pinned: true,
             elevation: 0,
-            backgroundColor: const Color(0xFF3D5AFE),
-            foregroundColor: Colors.white,
             title: const Text('Coaches', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             actions: [
               IconButton(

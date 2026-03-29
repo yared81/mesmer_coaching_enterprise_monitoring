@@ -16,8 +16,6 @@ class AssessmentProfileListScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
         title: const Text('Assessment Profiles', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
         centerTitle: true,
       ),
       body: templatesAsync.when(

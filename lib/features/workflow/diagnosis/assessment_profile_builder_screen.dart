@@ -272,8 +272,6 @@ class _AssessmentProfileBuilderScreenState extends ConsumerState<AssessmentProfi
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
         title: const Text('Profile Builder', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
         actions: [
           if (_isSaving)
             const Padding(padding: EdgeInsets.all(16.0), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)))

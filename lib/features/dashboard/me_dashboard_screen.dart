@@ -20,8 +20,6 @@ class MeDashboardScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: Text('${user?.role == UserRole.programManager ? "Program" : "M&E"} Dashboard'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(

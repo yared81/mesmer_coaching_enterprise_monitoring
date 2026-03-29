@@ -70,8 +70,6 @@ class AdminDashboardScreen extends ConsumerWidget {
                 floating: true,
                 pinned: true,
                 elevation: 0,
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
                 centerTitle: true,
                 title: const Text(
                   'Admin Dashboard',

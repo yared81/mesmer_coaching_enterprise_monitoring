@@ -69,8 +69,6 @@ class _RegionalEnterpriseListScreenState extends ConsumerState<RegionalEnterpris
       backgroundColor: const Color(0xFFF4F6FB),
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

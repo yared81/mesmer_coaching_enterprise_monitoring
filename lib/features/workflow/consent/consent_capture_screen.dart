@@ -56,8 +56,6 @@ class _ConsentCaptureScreenState extends ConsumerState<ConsentCaptureScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Digital Consent & Compliance'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.lg),

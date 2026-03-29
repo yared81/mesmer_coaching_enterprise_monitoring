@@ -19,8 +19,6 @@ class TrainerDashboardScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('Trainer Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
         actions: [
           const SyncIndicator(),
           IconButton(

@@ -191,35 +191,24 @@ class CoachDashboardScreen extends ConsumerWidget {
       floating: false,
       pinned: true,
       elevation: 0,
-      backgroundColor: const Color(0xFF3D5AFE),
       flexibleSpace: FlexibleSpaceBar(
         titlePadding: const EdgeInsets.only(left: 20, bottom: 12),
         title: const Text(
           'Coach Dashboard',
           style: TextStyle(
-            color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 16,
             letterSpacing: -0.5,
           ),
         ),
-        background: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
-            ),
-          ),
-        ),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+          icon: const Icon(Icons.notifications_none_rounded),
           onPressed: () => _showNotificationsSheet(context, ref),
         ),
         IconButton(
-          icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.white),
+          icon: const Icon(Icons.chat_bubble_outline_rounded),
           onPressed: () => context.go(AppRoutes.chat),
         ),
         const SizedBox(width: 8),

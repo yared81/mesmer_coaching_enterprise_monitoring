@@ -54,8 +54,6 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
             floating: true,
             pinned: true,
             elevation: 0,
-            backgroundColor: const Color(0xFF3D5AFE),
-            foregroundColor: Colors.white,
             title: const Text('Enterprises', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             actions: [
                IconButton(

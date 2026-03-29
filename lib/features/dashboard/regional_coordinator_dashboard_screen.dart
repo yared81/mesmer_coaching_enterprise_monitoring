@@ -35,8 +35,6 @@ class RegionalCoordinatorDashboardScreen extends ConsumerWidget {
               ),
           ],
         ),
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
         actions: [
           SyncIndicator(),
           IconButton(

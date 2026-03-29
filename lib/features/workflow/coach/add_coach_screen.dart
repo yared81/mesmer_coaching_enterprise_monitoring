@@ -65,11 +65,8 @@ class _AddCoachScreenState extends ConsumerState<AddCoachScreen> {
     final isLoading = regState is AsyncLoading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Add New Coach', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(

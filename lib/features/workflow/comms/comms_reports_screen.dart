@@ -11,8 +11,6 @@ class CommsReportsScreen extends StatelessWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Program Reports', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
