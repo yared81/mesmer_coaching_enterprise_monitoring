@@ -8,6 +8,7 @@ import '../../../core/router/app_routes.dart';
 import '../enterprise/enterprise_document_provider.dart';
 import '../enterprise/enterprise_document_entity.dart';
 import '../../../core/constants/api_constants.dart';
+import '../diagnosis/diagnosis_provider.dart';
 
 class QcRecordDetailScreen extends ConsumerWidget {
   final String auditId;
@@ -106,6 +107,8 @@ class QcRecordDetailScreen extends ConsumerWidget {
       );
     } else {
       final sessionAsync = ref.watch(coachingSessionProvider(audit.targetId));
+      final reportAsync = ref.watch(existingDiagnosisReportProvider(audit.targetId));
+      
       return sessionAsync.when(
         data: (session) => session == null ? const Text('Session not found.') : Column(
           children: [
@@ -117,6 +120,22 @@ class QcRecordDetailScreen extends ConsumerWidget {
               _dataItem('Revenue Growth', '${session.revenueGrowthPercent}%'),
             if (session.currentEmployees != 0)
               _dataItem('Current Employees', session.currentEmployees.toString()),
+              
+            reportAsync.when(
+              data: (report) => report == null ? const SizedBox() : Column(
+                children: [
+                  const Divider(height: 16),
+                  _dataItem('Diagnosis Score', '${report['total_score']} / 5.0'),
+                  _dataItem('Health %', '${report['health_percentage']}%'),
+                ],
+              ),
+              loading: () => const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0),
+                child: LinearProgressIndicator(),
+              ),
+              error: (_, __) => const SizedBox(),
+            ),
+
             const SizedBox(height: 8),
             Text('Scheduled: ${session.scheduledDate.toLocal()}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
           ],

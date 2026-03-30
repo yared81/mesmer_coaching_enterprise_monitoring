@@ -491,6 +491,39 @@ class DiagnosisService {
         console.error('Failed to create diagnosis notification:', e);
       }
 
+      // 6. Phase 6 Conflict Resolution (Anomaly Detection)
+      try {
+        const { Op } = require('sequelize');
+        const previousReports = await DiagnosisReport.findAll({
+          include: [{
+            model: CoachingSession,
+            as: 'session',
+            where: { enterprise_id: finalReport.session.enterprise.id },
+            attributes: ['id', 'scheduled_date']
+          }],
+          where: { id: { [Op.ne]: report.id } },
+          order: [[{ model: CoachingSession, as: 'session' }, 'scheduled_date', 'DESC']],
+          limit: 1,
+          transaction: t
+        });
+
+        if (previousReports.length > 0) {
+          const previousScore = previousReports[0].total_score;
+          if ((previousScore - overallScore) >= 1.0) {
+            const { QcAudit } = require('../models');
+            await QcAudit.create({
+              target_id: session_id,
+              target_type: 'session',
+              status: 'pending',
+              is_random_sample: false,
+              flag_reason: `Conflict Anomaly: Health score plummeted from ${previousScore} down to ${overallScore}. Requires Data Verifier review.`,
+            }, { transaction: t });
+          }
+        }
+      } catch (e) {
+        console.error('Failed to execute anomaly detection conflict check:', e);
+      }
+
       return report;
     });
   }
