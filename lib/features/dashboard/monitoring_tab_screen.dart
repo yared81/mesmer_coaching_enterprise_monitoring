@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/assessment_profile_list_screen.dart';
 
-/// Monitoring hub: QC Queue + MERL Reports in a tabbed layout.
+/// Monitoring hub: QC Queue + MERL Reports + Screening in a tabbed layout.
 /// NOTE: No Scaffold here — the outer DashboardMainScreen already provides one.
 class MonitoringTabScreen extends StatelessWidget {
   const MonitoringTabScreen({super.key});
@@ -13,7 +14,7 @@ class MonitoringTabScreen extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return DefaultTabController(
-          length: 2,
+          length: 3,
           child: SizedBox(
             height: constraints.maxHeight,
             child: Column(
@@ -42,6 +43,7 @@ class MonitoringTabScreen extends StatelessWidget {
                         tabs: const [
                           Tab(icon: Icon(Icons.fact_check_rounded), text: 'QC Queue'),
                           Tab(icon: Icon(Icons.analytics_rounded), text: 'MERL Reports'),
+                          Tab(icon: Icon(Icons.article_rounded), text: 'Screening'),
                         ],
                       ),
                     ],
@@ -53,6 +55,7 @@ class MonitoringTabScreen extends StatelessWidget {
                     children: [
                       QcDashboardScreen(hideAppBar: true),
                       SupervisorReportsScreen(hideAppBar: true),
+                      AssessmentProfileListScreen(hideAppBar: true),
                     ],
                   ),
                 ),

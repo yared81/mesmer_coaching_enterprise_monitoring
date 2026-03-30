@@ -139,6 +139,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(
+            path: AppRoutes.monitoring,
+            builder: (context, state) => const MonitoringTabScreen(),
+          ),
+          GoRoute(
             path: AppRoutes.supervisorReports,
             builder: (context, state) => const ReportCenterScreen(),
           ),

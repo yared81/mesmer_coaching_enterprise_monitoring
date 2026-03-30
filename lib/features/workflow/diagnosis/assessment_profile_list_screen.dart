@@ -6,7 +6,8 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dar
 import 'diagnosis_provider.dart';
 
 class AssessmentProfileListScreen extends ConsumerWidget {
-  const AssessmentProfileListScreen({super.key});
+  final bool hideAppBar;
+  const AssessmentProfileListScreen({super.key, this.hideAppBar = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,7 +15,7 @@ class AssessmentProfileListScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
-      appBar: AppBar(
+      appBar: hideAppBar ? null : AppBar(
         title: const Text('Assessment Profiles', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
