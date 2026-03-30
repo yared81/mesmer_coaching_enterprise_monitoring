@@ -71,6 +71,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/evidence_upload_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/audit/audit_logs_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/report_center_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
@@ -102,6 +103,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           AppRoutes.dashboard, // Home is handled by _DashboardHome
           AppRoutes.profile,
           AppRoutes.changePassword,
+          AppRoutes.notifications,
           '/settings',
           AppRoutes.chat,
           AppRoutes.monitoring,
@@ -394,6 +396,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.auditLogs,
             builder: (context, state) => const AuditLogsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.notifications,
+            builder: (context, state) => const NotificationScreen(),
           ),
         ],
       ),

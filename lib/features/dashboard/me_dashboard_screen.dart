@@ -7,6 +7,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboa
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
 
 class MeDashboardScreen extends ConsumerWidget {
   const MeDashboardScreen({super.key});
@@ -25,6 +26,7 @@ class MeDashboardScreen extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.refresh(meStatsProvider),
           ),
+          const NotificationBell(),
         ],
       ),
       body: statsAsync.when(

@@ -7,6 +7,7 @@ abstract class AppRoutes {
   static const String forgotPassword = '/forgot-password';
   static const String profile = '/profile';
   static const String changePassword = '/change-password';
+  static const String notifications = '/notifications';
 
   // Dashboard (role-based, same route — screen differs by role)
   static const String dashboard = '/dashboard';

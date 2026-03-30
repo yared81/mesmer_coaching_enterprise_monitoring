@@ -36,6 +36,15 @@ class EnterpriseService {
       const qcTriggerService = require('./qc_trigger.service');
       await qcTriggerService.processBaseline(enterprise);
 
+      // 3. Notify Coach
+      const notificationService = require('./notification.service');
+      await notificationService.createNotification({
+        userId: coachId,
+        title: 'New Enterprise Assigned',
+        message: `Enterprise "${enterprise.business_name}" has been registered and assigned to you.`,
+        type: 'info'
+      });
+
       return enterprise;
     } catch (error) {
       await transaction.rollback();
@@ -246,6 +255,16 @@ class EnterpriseService {
       status: 'graduated',
       graduation_date: new Date(),
       verification_code: verificationCode
+    });
+
+    // 3. Notify Comm Officer & Coach
+    const notificationService = require('./notification.service');
+    // Notify Coach
+    await notificationService.createNotification({
+      userId: enterprise.coach_id,
+      title: 'Enterprise Graduated!',
+      message: `Congratulations! "${enterprise.business_name}" has successfully graduated from the program.`,
+      type: 'success'
     });
 
     return {

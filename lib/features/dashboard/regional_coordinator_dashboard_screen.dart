@@ -9,6 +9,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicato
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
 
 class RegionalCoordinatorDashboardScreen extends ConsumerWidget {
   const RegionalCoordinatorDashboardScreen({super.key});
@@ -37,10 +38,7 @@ class RegionalCoordinatorDashboardScreen extends ConsumerWidget {
         ),
         actions: [
           SyncIndicator(),
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded),
-            onPressed: () {},
-          ),
+          const NotificationBell(),
           const SizedBox(width: 8),
         ],
       ),
