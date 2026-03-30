@@ -46,8 +46,6 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Baseline Assessment'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -73,7 +71,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
   Widget _buildStepHeader() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
           Row(
@@ -92,7 +90,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
           const SizedBox(height: 12),
           LinearProgressIndicator(
             value: _progress,
-            backgroundColor: Colors.grey[200],
+            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
             color: AppColors.primary,
             borderRadius: BorderRadius.circular(4),
           ),
@@ -117,9 +115,9 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.green[50],
+              color: Colors.green.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green[100]!),
+              border: Border.all(color: Colors.green.withOpacity(0.2)),
             ),
             child: const Row(
               children: [
@@ -300,9 +298,9 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
+        border: Border.all(color: Theme.of(context).dividerColor),
       ),
       child: Row(
         children: [
@@ -324,7 +322,7 @@ class _BaselineAssessmentScreenState extends ConsumerState<BaselineAssessmentScr
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))],
       ),
       child: Row(

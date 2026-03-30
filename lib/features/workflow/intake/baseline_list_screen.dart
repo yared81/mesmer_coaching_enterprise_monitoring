@@ -20,8 +20,6 @@ class BaselineListScreen extends ConsumerWidget {
             Text('Enterprises Pending Assessment', style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal)),
           ],
         ),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
@@ -30,9 +28,9 @@ class BaselineListScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             margin: const EdgeInsets.only(bottom: AppSpacing.lg),
             decoration: BoxDecoration(
-              color: Colors.blue[50],
+              color: Colors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.blue[100]!),
+              border: Border.all(color: Colors.blue.withOpacity(0.2)),
             ),
             child: const Row(
               children: [
@@ -90,7 +88,7 @@ class BaselineListScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(AppSpacing.md),

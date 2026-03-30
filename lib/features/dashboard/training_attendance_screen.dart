@@ -88,11 +88,8 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
     final enterprisesAsync = ref.watch(enterpriseListProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text('Attendance: ${widget.training.title}'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.sms_outlined),
@@ -125,7 +122,7 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
                                 ...List.generate(5, (i) => Icon(
                                   Icons.star, 
                                   size: 16, 
-                                  color: (i < score) ? Colors.amber : Colors.grey[300],
+                                  color: (i < score) ? Colors.amber : Theme.of(context).disabledColor,
                                 )),
                                 const Spacer(),
                                 DropdownButton<int>(
@@ -135,7 +132,7 @@ class _TrainingAttendanceScreenState extends ConsumerState<TrainingAttendanceScr
                                 ),
                               ],
                             )
-                          : const Text('Not Attended', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          : Text('Not Attended', style: TextStyle(color: Theme.of(context).disabledColor, fontSize: 12)),
                         value: attended,
                         onChanged: (val) => setState(() {
                           _attendance[e.id] = val ?? false;

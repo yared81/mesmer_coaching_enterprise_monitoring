@@ -14,17 +14,12 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
         backgroundColor: AppColors.background,
         appBar: AppBar(
           title: const Text('My Submissions', style: TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: const Color(0xFF111827),
-          foregroundColor: Colors.white,
           bottom: const TabBar(
             tabs: [
               Tab(text: 'RECENT'),
               Tab(text: 'PENDING QC'),
               Tab(text: 'CORRECTIONS'),
             ],
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.grey,
-            indicatorColor: AppColors.primary,
           ),
         ),
         body: TabBarView(
@@ -42,7 +37,13 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
-        const Text('RECENT SUBMISSIONS (Last 7 days)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(
+          'RECENT SUBMISSIONS (Last 7 days)',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
         const SizedBox(height: AppSpacing.md),
         _buildSubmissionCard(
           name: 'ABC Hardware - Baseline',
@@ -107,7 +108,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -134,13 +135,19 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.timer_outlined, size: 14, color: Colors.blue),
                     const SizedBox(width: 4),
-                    Text('Edit window: $hoursLeft hours remaining', style: const TextStyle(fontSize: 11, color: Colors.blue, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Edit window: \$hoursLeft hours remaining',
+                      style: TextStyle(fontSize: 11, color: Colors.blue, fontWeight: FontWeight.bold),
+                    ),
                   ],
                 ),
               ),

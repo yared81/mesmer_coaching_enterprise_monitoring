@@ -129,18 +129,15 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Attach Evidence', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
           if (_isUploading)
             LinearProgressIndicator(
               value: _uploadProgress,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
               color: AppColors.primary,
             ),
           Expanded(
@@ -159,11 +156,11 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.cloud_upload_outlined, size: 80, color: Colors.grey[300]),
+          Icon(Icons.cloud_upload_outlined, size: 80, color: Theme.of(context).disabledColor),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No files selected',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).disabledColor),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -194,8 +191,8 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-                color: Colors.grey[50],
+                border: Border.all(color: Theme.of(context).dividerColor),
+                color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
@@ -239,8 +236,14 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(24, 16, 24, MediaQuery.of(context).padding.bottom + 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -298,7 +301,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[200]!),
+            border: Border.all(color: Theme.of(context).dividerColor),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(

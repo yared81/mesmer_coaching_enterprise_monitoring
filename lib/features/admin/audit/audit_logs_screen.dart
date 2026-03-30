@@ -22,8 +22,6 @@ class AuditLogsScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('System Audit Logs', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -56,7 +54,7 @@ class AuditLogsScreen extends ConsumerWidget {
   Widget _buildFilters() {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: Row(
         children: [
           Expanded(
@@ -74,7 +72,7 @@ class AuditLogsScreen extends ConsumerWidget {
             icon: const Icon(Icons.filter_list),
             onPressed: () {},
             style: IconButton.styleFrom(
-              backgroundColor: Colors.grey[100],
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
@@ -139,16 +137,22 @@ class AuditLogsScreen extends ConsumerWidget {
                       ),
                       Text(
                         DateFormat('HH:mm | MMM dd').format(timestamp),
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   RichText(
                     text: TextSpan(
-                      style: const TextStyle(color: Colors.black87, fontSize: 13),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        fontSize: 13,
+                      ),
                       children: [
-                        TextSpan(text: action, style: TextStyle(color: actionColor, fontWeight: FontWeight.w900, fontSize: 11)),
+                        TextSpan(
+                          text: action,
+                          style: TextStyle(color: actionColor, fontWeight: FontWeight.w900, fontSize: 11),
+                        ),
                         TextSpan(text: ' in '),
                         TextSpan(text: tableName, style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
@@ -175,9 +179,9 @@ class AuditLogsScreen extends ConsumerWidget {
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [

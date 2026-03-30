@@ -20,8 +20,6 @@ class IntakeQueueScreen extends ConsumerWidget {
             Text('Pending Registration', style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal)),
           ],
         ),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download_outlined),
@@ -37,7 +35,13 @@ class IntakeQueueScreen extends ConsumerWidget {
           children: [
             _buildHeader(),
             const SizedBox(height: AppSpacing.lg),
-            const Text('PENDING OUTREACH (8)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            Text(
+              'PENDING OUTREACH (8)',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: AppSpacing.md),
             _buildEnterpriseCard(
               context,
@@ -89,12 +93,18 @@ class IntakeQueueScreen extends ConsumerWidget {
             backgroundColor: AppColors.primary,
             child: Icon(Icons.person, color: Colors.white),
           ),
-          SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacing.md),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Alemitu Tadesse', style: TextStyle(fontWeight: FontWeight.bold)),
-              Text('Region: Addis Ababa', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text('Alemitu Tadesse', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                'Region: Addis Ababa',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ],
@@ -115,7 +125,7 @@ class IntakeQueueScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -138,10 +148,16 @@ class IntakeQueueScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(status, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                  child: Text(
+                    status,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
                 const Spacer(),
                 TextButton.icon(
