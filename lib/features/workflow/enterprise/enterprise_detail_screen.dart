@@ -133,6 +133,13 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     super.dispose();
   }
 
+  final List<_Task> _tasks = [
+    _Task('Complete Digital Health Assessment', true),
+    _Task('Review Growth KPIs with M&E Officer', false),
+    _Task('Update Business Profile Contact Info', false),
+    _Task('Upload Recent Financial Statement', false),
+  ];
+
   // Health helpers now derived from real diagnosis data when available
   Color _healthColorForPercentage(double percentage) {
     if (percentage >= 80) return Colors.green;
@@ -392,10 +399,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         body: TabBarView(
           controller: _tabController,
           children: views,
-        ),
-      ),
-    );
-  }
         ),
       ),
     );

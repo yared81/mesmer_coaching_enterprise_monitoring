@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_template_entity.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 
 class SurveyManagementHubScreen extends ConsumerWidget {
