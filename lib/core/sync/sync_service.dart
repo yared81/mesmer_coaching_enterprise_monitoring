@@ -4,21 +4,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../db/local_database.dart';
 import '../providers/core_providers.dart';
 
+final syncStatusProvider = StateProvider<bool>((ref) => false);
+
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(
     ref.watch(localDatabaseProvider),
     ref.watch(dioProvider),
+    ref,
   );
 });
 
 class SyncService {
   final LocalDatabase _db;
   final Dio _dio;
+  final Ref _ref;
 
-  SyncService(this._db, this._dio);
+  SyncService(this._db, this._dio, this._ref);
+
+  Future<void> processQueue() async {
+    // Alias for syncQueue to fix UI binding compilation error.
+    return syncQueue();
+  }
 
   Future<void> syncQueue() async {
-    final pendingActions = await _db.getPendingSyncActions();
+    _ref.read(syncStatusProvider.notifier).state = true;
+    
+    try {
+      final pendingActions = await _db.getPendingSyncActions();
     
     for (final action in pendingActions) {
       final id = action['id'] as int;
@@ -45,6 +57,9 @@ class SyncService {
       } catch (e) {
         await _db.markSyncActionFailed(id, e.toString());
       }
+    }
+    } finally {
+      _ref.read(syncStatusProvider.notifier).state = false;
     }
   }
 }
