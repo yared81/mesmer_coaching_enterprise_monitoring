@@ -17,7 +17,6 @@ class MeDashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(meStatsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: Text('${user?.role == UserRole.programManager ? "Program" : "M&E"} Dashboard'),
         elevation: 0,

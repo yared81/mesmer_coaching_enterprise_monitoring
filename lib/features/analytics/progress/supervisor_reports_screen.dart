@@ -38,11 +38,8 @@ class SupervisorReportsScreen extends ConsumerWidget {
     if (hideAppBar) return body;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('MERL Reports'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.download_rounded),
@@ -106,7 +103,9 @@ class SupervisorReportsScreen extends ConsumerWidget {
               const Expanded(
                 child: Text(
                   'Enterprise Review',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
               TextButton.icon(
@@ -195,7 +194,7 @@ class _EnterpriseReviewCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -211,11 +210,9 @@ class _EnterpriseReviewCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       enterprise.businessName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: Color(0xFF111827),
-                      ),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),

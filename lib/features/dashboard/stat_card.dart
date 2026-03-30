@@ -27,17 +27,12 @@ class StatCard extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: color.withOpacity(0.08), width: 1.5),
+            border: Border.all(color: color.withOpacity(0.15), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.06),
+                color: color.withOpacity(0.04),
                 blurRadius: 24,
                 offset: const Offset(0, 12),
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.01),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -51,12 +46,12 @@ class StatCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
+                      color: color.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(icon, color: color, size: 20),
                   ),
-                  Icon(Icons.trending_up_rounded, color: color.withOpacity(0.4), size: 16),
+                  Icon(Icons.trending_up_rounded, color: color.withOpacity(0.3), size: 16),
                 ],
               ),
               const SizedBox(height: 8),
@@ -65,23 +60,20 @@ class StatCard extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                    color: Color(0xFF1A1A1A),
-                  ),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 title.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 9,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.0,
-                ),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),

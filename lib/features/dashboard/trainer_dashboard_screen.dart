@@ -16,7 +16,6 @@ class TrainerDashboardScreen extends ConsumerWidget {
     final trainingsAsync = ref.watch(trainingsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('Trainer Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
@@ -284,7 +283,12 @@ class _TrainingCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              Text(training.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF111827))),
+              Text(
+                training.title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
               const SizedBox(height: 8),
               Row(
                 children: [

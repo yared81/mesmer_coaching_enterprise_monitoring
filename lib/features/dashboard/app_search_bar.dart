@@ -83,10 +83,9 @@ class _AppSearchBarState extends ConsumerState<AppSearchBar> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 12,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.grey[600],
+          color: Theme.of(context).colorScheme.primary,
           letterSpacing: 1.2,
         ),
       ),
@@ -96,8 +95,8 @@ class _AppSearchBarState extends ConsumerState<AppSearchBar> {
   Widget _buildCoachTile(CoachEntity coach) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Colors.blue[50],
-        child: Text(coach.name[0], style: const TextStyle(color: Colors.blue)),
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        child: Text(coach.name[0], style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer)),
       ),
       title: Text(coach.name),
       subtitle: Text(coach.email),
@@ -113,10 +112,10 @@ class _AppSearchBarState extends ConsumerState<AppSearchBar> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.amber[50],
+          color: Theme.of(context).colorScheme.secondaryContainer,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(Icons.storefront_rounded, color: Colors.amber[800], size: 20),
+        child: Icon(Icons.storefront_rounded, color: Theme.of(context).colorScheme.onSecondaryContainer, size: 20),
       ),
       title: Text(enterprise.businessName),
       subtitle: Text(enterprise.sector.name),

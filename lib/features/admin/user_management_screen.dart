@@ -49,12 +49,8 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     final currentFilters = ref.watch(userFilterProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('User Management'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add),
@@ -100,8 +96,14 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+        color: Theme.of(context).colorScheme.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -255,7 +257,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           margin: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey[200]!),
+            side: BorderSide(color: Theme.of(context).dividerColor),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -285,7 +287,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                       const SizedBox(height: 2),
                       Text(
                         user.email,
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),

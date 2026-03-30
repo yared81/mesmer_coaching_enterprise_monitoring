@@ -36,11 +36,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final sessionsAsync = ref.watch(coachSessionsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('Coaching Calendar'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: sessionsAsync.when(
         data: (sessions) => Column(

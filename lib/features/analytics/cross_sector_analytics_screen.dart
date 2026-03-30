@@ -13,11 +13,8 @@ class CrossSectorAnalyticsScreen extends ConsumerWidget {
     final regionsAsync = ref.watch(regionalAnalyticsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('Cross-Sector Insights'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),

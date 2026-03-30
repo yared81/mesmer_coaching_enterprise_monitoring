@@ -51,9 +51,11 @@ class MonitoringTabScreen extends ConsumerWidget {
             height: constraints.maxHeight,
             child: Column(
               children: [
-                // Blue header matching app theme
+                // Theme-aware header
                 Container(
-                  color: AppColors.primary,
+                  color: Theme.of(context).brightness == Brightness.light 
+                      ? AppColors.primary 
+                      : Theme.of(context).colorScheme.surface,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -62,15 +64,23 @@ class MonitoringTabScreen extends ConsumerWidget {
                         child: Text(
                           'Monitoring & Data',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: Colors.white,
+                                color: Theme.of(context).brightness == Brightness.light 
+                                    ? Colors.white 
+                                    : Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                       ),
                       TabBar(
-                        labelColor: Colors.white,
-                        unselectedLabelColor: Colors.white60,
-                        indicatorColor: Colors.white,
+                        labelColor: Theme.of(context).brightness == Brightness.light 
+                            ? Colors.white 
+                            : Theme.of(context).colorScheme.primary,
+                        unselectedLabelColor: Theme.of(context).brightness == Brightness.light 
+                            ? Colors.white60 
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                        indicatorColor: Theme.of(context).brightness == Brightness.light 
+                            ? Colors.white 
+                            : Theme.of(context).colorScheme.primary,
                         indicatorWeight: 3,
                         tabs: tabs,
                       ),

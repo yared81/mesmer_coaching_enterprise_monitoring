@@ -14,7 +14,6 @@ class AdminDashboardScreen extends ConsumerWidget {
   void _showNotificationsSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -59,7 +58,6 @@ class AdminDashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(adminStatsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFBFBFD),
       body: statsAsync.when(
         data: (stats) => RefreshIndicator(
           onRefresh: () => ref.refresh(adminStatsProvider.future),
@@ -93,14 +91,12 @@ class AdminDashboardScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'System Statistics',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF1A1A1A),
-                          letterSpacing: -0.5,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
                       ),
                       const SizedBox(height: 20),
                       GridView.count(

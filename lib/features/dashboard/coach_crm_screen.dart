@@ -12,11 +12,8 @@ class CoachCrmScreen extends ConsumerWidget {
     final portfolioAsync = ref.watch(coachPortfolioProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         title: const Text('My Enterprise Portfolio'),
-        backgroundColor: const Color(0xFF111827),
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
