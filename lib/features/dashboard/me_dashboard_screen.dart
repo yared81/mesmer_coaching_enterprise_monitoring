@@ -8,6 +8,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboa
 import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/program_funnel_widget.dart';
 
 class MeDashboardScreen extends ConsumerWidget {
   const MeDashboardScreen({super.key});
@@ -43,7 +44,7 @@ class MeDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               const Text('Graduation Funnel', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              _buildFunnelChart(stats),
+              const ProgramFunnelWidget(),
               const SizedBox(height: 24),
               _buildActionHub(context),
               const SizedBox(height: 24),
@@ -132,82 +133,6 @@ class MeDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFunnelChart(MeStatsEntity stats) {
-    final funnel = stats.graduationFunnel;
-    final maxVal = [
-      funnel['baseline'] ?? 1,
-      funnel['training'] ?? 0,
-      funnel['coaching'] ?? 0,
-      funnel['midline'] ?? 0,
-      funnel['graduated'] ?? 0
-    ].reduce((a, b) => a > b ? a : b).toDouble();
-
-    return Container(
-      height: 220,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-      ),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxVal > 0 ? maxVal * 1.2 : 100,
-          barGroups: [
-            _makeGroupData(0, (funnel['baseline'] ?? 0).toDouble()),
-            _makeGroupData(1, (funnel['training'] ?? 0).toDouble()),
-            _makeGroupData(2, (funnel['coaching'] ?? 0).toDouble()),
-            _makeGroupData(3, (funnel['midline'] ?? 0).toDouble()),
-            _makeGroupData(4, (funnel['graduated'] ?? 0).toDouble()),
-          ],
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  const titles = ['Base', 'Train', 'Coach', 'Mid', 'Grad'];
-                  if (value.toInt() >= titles.length) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(titles[value.toInt()],
-                        style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
-                  );
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 30,
-                getTitlesWidget: (value, meta) => Text(value.toInt().toString(),
-                    style: TextStyle(fontSize: 10, color: Colors.grey)),
-              ),
-            ),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          ),
-          gridData: FlGridData(show: true, drawVerticalLine: false),
-          borderData: FlBorderData(show: false),
-        ),
-      ),
-    );
-  }
-
-  BarChartGroupData _makeGroupData(int x, double y) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: y,
-          color: const Color(0xFF3D5AFE),
-          width: 20,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-        ),
-      ],
-    );
-  }
 
   Widget _buildQcPieChart(MeStatsEntity stats) {
     final passed = stats.qcStats['passed'] ?? 0;

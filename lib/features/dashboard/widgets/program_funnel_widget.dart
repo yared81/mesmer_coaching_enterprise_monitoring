@@ -34,92 +34,145 @@ class ProgramFunnelWidget extends ConsumerWidget {
 
   Widget _buildFunnelChart(MeStatsEntity stats) {
     final funnel = stats.graduationFunnel;
-    final maxVal = [
-      funnel['baseline'] ?? 1,
-      funnel['training'] ?? 0,
-      funnel['coaching'] ?? 0,
-      funnel['midline'] ?? 0,
-      funnel['graduated'] ?? 0
-    ].reduce((a, b) => a > b ? a : b).toDouble();
+    final stages = [
+      {'key': 'outreach', 'label': 'Outreach', 'color': const Color(0xFF6366F1)},
+      {'key': 'baseline', 'label': 'Baseline', 'color': const Color(0xFF4F46E5)},
+      {'key': 'training', 'label': 'Training', 'color': const Color(0xFF4338CA)},
+      {'key': 'coaching', 'label': 'Coaching', 'color': const Color(0xFF3730A3)},
+      {'key': 'midline', 'label': 'Midline', 'color': const Color(0xFF312E81)},
+      {'key': 'graduated', 'label': 'Graduated', 'color': const Color(0xFF10B981)},
+    ];
 
     return Container(
-      height: 220,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           )
         ],
       ),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.spaceAround,
-          maxY: maxVal > 0 ? maxVal * 1.2 : 100,
-          barGroups: [
-            _makeGroupData(0, (funnel['baseline'] ?? 0).toDouble()),
-            _makeGroupData(1, (funnel['training'] ?? 0).toDouble()),
-            _makeGroupData(2, (funnel['coaching'] ?? 0).toDouble()),
-            _makeGroupData(3, (funnel['midline'] ?? 0).toDouble()),
-            _makeGroupData(4, (funnel['graduated'] ?? 0).toDouble()),
-          ],
-          titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (value, meta) {
-                  const titles = ['Base', 'Train', 'Coach', 'Mid', 'Grad'];
-                  if (value.toInt() >= titles.length) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      titles[value.toInt()],
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
-                },
+      child: Column(
+        children: List.generate(stages.length, (index) {
+          final stage = stages[index];
+          final count = funnel[stage['key']] ?? 0;
+          final prevCount = index > 0 ? (funnel[stages[index - 1]['key']] ?? 0) : count;
+          final conversion = prevCount > 0 ? (count / prevCount * 100).round() : 0;
+          final isFirst = index == 0;
+
+          // Width calculation: relative to first stage
+          final firstCount = funnel['outreach'] ?? 1;
+          final widthFactor = firstCount > 0 ? (count / firstCount).clamp(0.4, 1.0) : 1.0;
+
+          return Column(
+            children: [
+              if (!isFirst)
+                _buildConversionArrow(conversion),
+              _buildFunnelStep(
+                label: stage['label'] as String,
+                count: count,
+                color: stage['color'] as Color,
+                widthFactor: widthFactor,
               ),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildFunnelStep({
+    required String label,
+    required int count,
+    required Color color,
+    required double widthFactor,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 2),
+      child: FractionallySizedBox(
+        widthFactor: widthFactor,
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withOpacity(0.8)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 30,
-                getTitlesWidget: (value, meta) => Text(
-                  value.toInt().toString(),
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
-            ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  count.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
           ),
-          gridData: const FlGridData(show: true, drawVerticalLine: false),
-          borderData: FlBorderData(show: false),
         ),
       ),
     );
   }
 
-  BarChartGroupData _makeGroupData(int x, double y) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: y,
-          color: const Color(0xFF3D5AFE),
-          width: 20,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-        ),
-      ],
+  Widget _buildConversionArrow(int percentage) {
+    return Container(
+      height: 30,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 2,
+            color: Colors.grey.withOpacity(0.2),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            ),
+            child: Text(
+              '$percentage%',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: percentage > 80 ? Colors.green : Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  BarChartGroupData _makeGroupData(int x, double y) {
+    // Keep for potential legacy use or remove if sure
+    return BarChartGroupData(x: x);
   }
 }

@@ -4,7 +4,7 @@ abstract class ApiConstants {
   // Base URL — set from .env or build config using --dart-define-from-file
   static const String _rawBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/api/v1',
+    defaultValue: 'http://10.17.107.100:3000/api/v1',
   );
 
   // For manual string concatenations: '${ApiConstants.baseUrl}/path' (Guarantees NO trailing slash)

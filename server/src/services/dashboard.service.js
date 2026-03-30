@@ -137,7 +137,7 @@ class DashboardService {
       stats: {
         totalEnterprises,
         totalSessions,
-        pendingTasks: 0, 
+        pendingTasks: 0,
         avgAssessmentScore: avgReport ? parseFloat(parseFloat(avgReport.avgHealth || 0).toFixed(1)) : 0
       },
       recentActivity,
@@ -154,6 +154,7 @@ class DashboardService {
     const [
       totalActive,
       totalGraduated,
+      outreachCount,
       baselineCount,
       trainingCount,
       coachingCount,
@@ -163,21 +164,23 @@ class DashboardService {
     ] = await Promise.all([
       Enterprise.count({ where: { ...enterpriseFilter, status: 'active' } }),
       Enterprise.count({ where: { ...enterpriseFilter, status: 'graduated' } }),
-      // Funnel: Baseline (has score)
+      // Funnel Stage 1: Outreach (Total registered)
+      Enterprise.count({ where: enterpriseFilter }),
+      // Funnel Stage 2: Baseline (has score)
       Enterprise.count({ where: { ...enterpriseFilter, baseline_score: { [Op.gt]: 0 } } }),
-      // Funnel: Training (attended at least one)
+      // Funnel Stage 3: Training (attended at least one)
       TrainingAttendance.count({ 
         distinct: true, 
         col: 'enterprise_id',
         include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
       }),
-      // Funnel: Coaching (had at least one session)
+      // Funnel Stage 4: Coaching (had at least one session)
       CoachingSession.count({ 
         distinct: true, 
         col: 'enterprise_id',
         include: institutionId ? [{ model: Enterprise, as: 'enterprise', where: enterpriseFilter, attributes: [] }] : []
       }),
-      // Funnel: Midline (has at least one session with a report)
+      // Funnel Stage 5: Midline (has at least one session with a report)
       CoachingSession.count({
         distinct: true,
         col: 'enterprise_id',
@@ -197,6 +200,7 @@ class DashboardService {
         totalGraduated,
       },
       graduationFunnel: {
+        outreach: outreachCount,
         baseline: baselineCount,
         training: trainingCount,
         coaching: coachingCount,
