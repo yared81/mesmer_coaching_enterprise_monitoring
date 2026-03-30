@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/login_screen.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/features/auth/splash_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/common/profile_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/common/change_password_screen.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_main_screen.dart';
@@ -77,13 +78,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: AppRoutes.login,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
+      final isSplashing = state.matchedLocation == AppRoutes.splash;
       
-      // 1. If not authenticated and not on login page, redirect to login
-      if (authState.status == AuthStatus.unauthenticated && !isLoggingIn) {
+      // 1. If not authenticated and not on login or splash, redirect to login
+      if (authState.status == AuthStatus.unauthenticated && !isLoggingIn && !isSplashing) {
         return AppRoutes.login;
       }
 
@@ -99,6 +101,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         
         // Skip check for basic shared paths
         final sharedPaths = [
+          AppRoutes.splash, // Allow splash to play its animation
           AppRoutes.login,
           AppRoutes.dashboard, // Home is handled by _DashboardHome
           AppRoutes.profile,
@@ -121,6 +124,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
