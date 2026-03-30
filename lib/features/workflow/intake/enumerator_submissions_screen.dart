@@ -26,7 +26,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           children: [
             _buildRecentList(context),
             _buildStatsList('Pending QC'),
-            _buildCorrectionsList(),
+            _buildCorrectionsList(context),
           ],
         ),
       ),
@@ -45,6 +45,11 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
+        _buildSubmissionCard(
+          name: 'ABC Hardware - Baseline',
+          date: 'Mar 23, 2025, 10:30 AM',
+          status: 'Pending QC',
+          statusColor: Colors.orange,
           canEdit: true,
           hoursLeft: 47,
           context: context,
@@ -74,7 +79,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
     return Center(child: Text('$status view coming soon'));
   }
 
-  Widget _buildCorrectionsList() {
+  Widget _buildCorrectionsList(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
@@ -87,6 +92,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           statusColor: Colors.red,
           canEdit: true,
           note: 'Correction needed: Missing consent form\nDeadline: Mar 25, 2025',
+          context: context,
         ),
       ],
     );
