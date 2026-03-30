@@ -11,6 +11,7 @@ import 'stat_card.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/metric_swiper.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/performance_chart.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/sync/sync_service.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_navigation_provider.dart';
@@ -203,6 +204,19 @@ class CoachDashboardScreen extends ConsumerWidget {
         ),
       ),
       actions: [
+        IconButton(
+          icon: const Icon(Icons.cloud_sync_rounded),
+          tooltip: 'Sync Offline Data',
+          onPressed: () async {
+            try {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Syncing offline data...')));
+              await ref.read(syncServiceProvider).syncQueue();
+              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sync completed successfully.')));
+            } catch (e) {
+              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
+            }
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.notifications_none_rounded),
           onPressed: () => _showNotificationsSheet(context, ref),

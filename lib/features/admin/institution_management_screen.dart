@@ -1,146 +1,177 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/user_management_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/widgets/add_institution_dialog.dart';
+
+final institutionsProvider = FutureProvider<List<InstitutionModel>>((ref) async {
+  final dio = ref.watch(dioProvider);
+  final response = await dio.get('/api/v1/users/institutions');
+  if (response.statusCode == 200) {
+    final data = response.data['data'] as List;
+    return data.map((json) => InstitutionModel.fromJson(json)).toList();
+  }
+  throw Exception('Failed to load institutions');
+});
 
 class InstitutionManagementScreen extends ConsumerWidget {
   const InstitutionManagementScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Fetch only root institutions (parent_id is null)
-    final rootsAsync = ref.watch(institutionsListProvider('root'));
+    final asyncInst = ref.watch(institutionsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
-        title: const Text('Organizations & Branches'),
-        backgroundColor: const Color(0xFF111827),
+        title: const Text('Admin: Institutions & Branches'),
+        backgroundColor: const Color(0xFF1E3A8A),
         foregroundColor: Colors.white,
+      ),
+      body: asyncInst.when(
+        data: (institutions) {
+          final roots = institutions.where((i) => i.parentId == null).toList();
+          if (roots.isEmpty) {
+            return const Center(child: Text('No institutions found.'));
+          }
+          return RefreshIndicator(
+            onRefresh: () async => ref.refresh(institutionsProvider.future),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: roots.length,
+              itemBuilder: (context, index) {
+                return _InstitutionNode(
+                  institution: roots[index],
+                  allInstitutions: institutions,
+                  ref: ref,
+                );
+              },
+            ),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Error: $e')),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddInstitutionDialog(context, ref, null),
+        backgroundColor: const Color(0xFF1E3A8A),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Future<void> _showAddInstitutionDialog(BuildContext context, WidgetRef ref, String? parentId) async {
+    final nameCtrl = TextEditingController();
+    final regionCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(parentId == null ? 'Add Root Institution' : 'Add Branch'),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Name'),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              TextFormField(
+                controller: regionCtrl,
+                decoration: const InputDecoration(labelText: 'Region'),
+              ),
+              TextFormField(
+                controller: emailCtrl,
+                decoration: const InputDecoration(labelText: 'Contact Email'),
+              ),
+            ],
+          ),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_business),
-            onPressed: () => _showAddDialog(context, ref),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(ctx, true);
+              }
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
-      body: rootsAsync.when(
-        data: (roots) => _buildRootList(context, ref, roots),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
-      ),
     );
-  }
 
-  Widget _buildRootList(BuildContext context, WidgetRef ref, List<InstitutionModel> roots) {
-    if (roots.isEmpty) {
-      return const Center(child: Text('No organizations registered.'));
+    if (confirmed == true && context.mounted) {
+      try {
+        final dio = ref.read(dioProvider);
+        await dio.post('/api/v1/users/institutions', data: {
+          'name': nameCtrl.text.trim(),
+          'region': regionCtrl.text.trim(),
+          'contact_email': emailCtrl.text.trim(),
+          if (parentId != null) 'parent_id': parentId,
+        });
+        ref.invalidate(institutionsProvider);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Institution created successfully.')));
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        }
+      }
     }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: roots.length,
-      itemBuilder: (context, index) {
-        final root = roots[index];
-        return _InstitutionTile(institution: root);
-      },
-    );
-  }
-
-  void _showAddDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) => const AddInstitutionDialog(),
-    );
   }
 }
 
-class _InstitutionTile extends ConsumerWidget {
+class _InstitutionNode extends StatelessWidget {
   final InstitutionModel institution;
-  const _InstitutionTile({required this.institution});
+  final List<InstitutionModel> allInstitutions;
+  final WidgetRef ref;
+
+  const _InstitutionNode({
+    required this.institution, 
+    required this.allInstitutions,
+    required this.ref,
+  });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final branchesAsync = ref.watch(institutionsListProvider('parentId=${institution.id}'));
+  Widget build(BuildContext context) {
+    final children = allInstitutions.where((i) => i.parentId == institution.id).toList();
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 8),
       child: ExpansionTile(
-        leading: const Icon(Icons.business, color: Colors.blue),
-        title: Text(institution.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            Text(institution.region ?? 'Global', style: const TextStyle(fontSize: 12)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _buildKpiBadge('Active', Colors.green),
-                const SizedBox(width: 8),
-                _buildKpiBadge('92% Health', Colors.blue),
-                const SizedBox(width: 8),
-                _buildKpiBadge('15 Branches', Colors.orange),
-              ],
-            ),
+            Icon(institution.parentId == null ? Icons.account_balance : Icons.account_tree, color: const Color(0xFF1E3A8A)),
+            const SizedBox(width: 8),
+            Expanded(child: Text(institution.name, style: const TextStyle(fontWeight: FontWeight.bold))),
           ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.add_circle_outline, size: 20),
-          onPressed: () => _showAddBranchDialog(context, institution.id),
+        subtitle: Text('Region: ${institution.region ?? 'N/A'} | Branches: ${children.length}'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, color: Colors.green),
+              onPressed: () {
+                // To keep it simple, we recreate the dialog call here 
+                // Normally this would be handled better but fits the UI structure.
+                (context.findAncestorWidgetOfExactType<InstitutionManagementScreen>() as InstitutionManagementScreen?)
+                  ?._showAddInstitutionDialog(context, ref, institution.id);
+              },
+            ),
+            const Icon(Icons.expand_more),
+          ],
         ),
-        children: [
-          branchesAsync.when(
-            data: (branches) => branches.isEmpty
-                ? const Padding(padding: EdgeInsets.all(16), child: Text('No branches found.', style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic)))
-                : Column(
-                    children: branches.map((b) => ListTile(
-                      contentPadding: const EdgeInsets.only(left: 48, right: 16),
-                      leading: const Icon(Icons.account_tree, size: 16, color: Colors.grey),
-                      title: Text(b.name, style: const TextStyle(fontSize: 14)),
-                      subtitle: Text(b.contactEmail ?? '', style: const TextStyle(fontSize: 11)),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.edit, size: 16),
-                        onPressed: () => _showEditDialog(context, b),
-                      ),
-                    )).toList(),
-                  ),
-            loading: () => const LinearProgressIndicator(),
-            error: (err, stack) => Text('Error: $err'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddBranchDialog(BuildContext context, String parentId) {
-    showDialog(
-      context: context,
-      builder: (context) => AddInstitutionDialog(parentId: parentId),
-    );
-  }
-
-  void _showEditDialog(BuildContext context, InstitutionModel inst) {
-    showDialog(
-      context: context,
-      builder: (context) => AddInstitutionDialog(institution: inst),
-    );
-  }
-
-  Widget _buildKpiBadge(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+        children: children.map((child) => Padding(
+          padding: const EdgeInsets.only(left: 16.0),
+          child: _InstitutionNode(institution: child, allInstitutions: allInstitutions, ref: ref),
+        )).toList(),
       ),
     );
   }
 }
-
