@@ -100,7 +100,7 @@ class SupervisorReportsScreen extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 12, 8),
           child: Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Enterprise Review',
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(

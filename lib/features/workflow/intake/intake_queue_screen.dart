@@ -33,7 +33,7 @@ class IntakeQueueScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'PENDING OUTREACH (8)',
@@ -79,7 +79,7 @@ class IntakeQueueScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -87,9 +87,9 @@ class IntakeQueueScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.primary.withOpacity(0.2)),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             backgroundColor: AppColors.primary,
             child: Icon(Icons.person, color: Colors.white),
           ),

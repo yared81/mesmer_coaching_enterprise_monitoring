@@ -25,7 +25,7 @@ class AuditLogsScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          _buildFilters(),
+          _buildFilters(context),
           Expanded(
             child: logsAsync.when(
               data: (logs) {
@@ -51,7 +51,7 @@ class AuditLogsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       color: Theme.of(context).colorScheme.surface,

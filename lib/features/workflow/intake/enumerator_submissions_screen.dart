@@ -24,7 +24,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
         ),
         body: TabBarView(
           children: [
-            _buildRecentList(),
+            _buildRecentList(context),
             _buildStatsList('Pending QC'),
             _buildCorrectionsList(),
           ],
@@ -33,7 +33,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentList() {
+  Widget _buildRecentList(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
@@ -45,13 +45,9 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        _buildSubmissionCard(
-          name: 'ABC Hardware - Baseline',
-          date: 'Mar 23, 2025, 10:30 AM',
-          status: 'Pending QC',
-          statusColor: Colors.orange,
           canEdit: true,
           hoursLeft: 47,
+          context: context,
         ),
         _buildSubmissionCard(
           name: 'Tesfa Bakery - Baseline',
@@ -60,6 +56,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           statusColor: Colors.red,
           canEdit: true,
           note: 'Verifier: "Missing storefront photo"',
+          context: context,
         ),
         _buildSubmissionCard(
           name: 'Kebede Traders - Baseline',
@@ -67,6 +64,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
           status: 'Verified ✓',
           statusColor: Colors.green,
           canEdit: false,
+          context: context,
         ),
       ],
     );
@@ -100,6 +98,7 @@ class EnumeratorSubmissionsScreen extends ConsumerWidget {
     required String status,
     required Color statusColor,
     required bool canEdit,
+    required BuildContext context,
     int? hoursLeft,
     String? note,
   }) {
