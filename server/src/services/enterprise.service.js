@@ -241,17 +241,42 @@ class EnterpriseService {
     const randomHex = crypto.randomBytes(2).toString('hex').toUpperCase();
     const verificationCode = `MES-${new Date().getFullYear()}-${randomHex}`;
 
-    // Update Status
+    // Update Status and Graduation Metadata
     await enterprise.update({
       status: 'graduated',
-      // Store the certificate/verification data inside note or a future dedicated column
+      graduation_date: new Date(),
+      verification_code: verificationCode
     });
 
     return {
       message: 'Graduation Triangulation Passed successfully.',
       enterpriseId: enterprise.id,
       verificationCode: verificationCode,
+      graduationDate: enterprise.graduation_date,
       approvedBy: approverId
+    };
+  }
+
+  /**
+   * Verify a graduation certificate by its unique code
+   */
+  async verifyCertificate(code) {
+    const enterprise = await Enterprise.findOne({
+      where: { verification_code: code },
+      include: [
+        { model: Institution, as: 'institution', attributes: ['name'] }
+      ]
+    });
+
+    if (!enterprise) throw new Error('NOT_FOUND: No valid certificate found for this code.');
+
+    return {
+      businessName: enterprise.business_name,
+      ownerName: enterprise.owner_name,
+      sector: enterprise.sector,
+      graduationDate: enterprise.graduation_date,
+      institution: enterprise.institution?.name,
+      status: enterprise.status
     };
   }
 

@@ -28,6 +28,7 @@ import 'graduation_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_audit_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
 import 'report_provider.dart';
+import 'widgets/certificate_generator.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -220,7 +221,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                                     ),
                                   ),
                                   _EmployeesChip(enterprise: enterprise),
-                                  const _GraduationEligibilityBadge(eligible: false),
+                                  if (enterprise.status == EnterpriseStatus.graduated)
+                                    _GraduationEligibilityBadge(eligible: true, enterprise: enterprise)
+                                  else
+                                    _GraduationEligibilityBadge(eligible: false, enterprise: enterprise),
                                 ],
                               );
                             }
@@ -239,7 +243,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                               children: [
                                 _HealthBadge(score: healthPct.toInt(), label: label, color: color),
                                 _EmployeesChip(enterprise: enterprise),
-                                if (isEligible) const _GraduationEligibilityBadge(eligible: true),
+                                if (enterprise.status == EnterpriseStatus.graduated)
+                                  _GraduationEligibilityBadge(eligible: true, enterprise: enterprise)
+                                else if (isEligible)
+                                  _GraduationEligibilityBadge(eligible: true, enterprise: enterprise),
                               ],
                             );
                           },
@@ -1960,35 +1967,44 @@ class _HealthBadge extends StatelessWidget {
 
 class _GraduationEligibilityBadge extends StatelessWidget {
   final bool eligible;
-  const _GraduationEligibilityBadge({required this.eligible});
+  final EnterpriseEntity? enterprise;
+  const _GraduationEligibilityBadge({required this.eligible, this.enterprise});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: eligible ? Colors.amber.withOpacity(0.2) : Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: eligible ? Colors.amber.withOpacity(0.5) : Colors.white.withOpacity(0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            eligible ? Icons.school_rounded : Icons.lock_outline_rounded, 
-            size: 14, 
-            color: eligible ? Colors.amber[100] : Colors.white70
-          ),
-          const SizedBox(width: 6),
-          Text(
-            eligible ? 'Graduation Eligible' : 'In Progress',
-            style: TextStyle(
-              color: eligible ? Colors.amber[100] : Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+    final isGraduated = enterprise?.status == EnterpriseStatus.graduated;
+    
+    return InkWell(
+      onTap: isGraduated ? () {
+        GraduationCertificateGenerator.printCertificate(enterprise!);
+      } : null,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: isGraduated ? Colors.green.withOpacity(0.2) : (eligible ? Colors.amber.withOpacity(0.2) : Colors.white.withOpacity(0.15)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isGraduated ? Colors.green.withOpacity(0.5) : (eligible ? Colors.amber.withOpacity(0.5) : Colors.white.withOpacity(0.3))),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isGraduated ? Icons.workspace_premium : (eligible ? Icons.school_rounded : Icons.lock_outline_rounded), 
+              size: 14, 
+              color: isGraduated ? Colors.greenAccent : (eligible ? Colors.amber[100] : Colors.white70)
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              isGraduated ? 'Graduated - View Cert' : (eligible ? 'Graduation Eligible' : 'In Progress'),
+              style: TextStyle(
+                color: isGraduated ? Colors.white : (eligible ? Colors.amber[100] : Colors.white),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -28,6 +28,8 @@ class EnterpriseModel {
     this.consentStatus = false,
     this.consentDate,
     this.status = 'active',
+    this.graduationDate,
+    this.verificationCode,
   });
 
   final String id;
@@ -52,6 +54,8 @@ class EnterpriseModel {
   final bool consentStatus;
   final DateTime? consentDate;
   final String status;
+  final DateTime? graduationDate;
+  final String? verificationCode;
   final String coachId;
   final String institutionId;
   final DateTime registeredAt;
@@ -80,6 +84,8 @@ class EnterpriseModel {
       consentStatus: json['consent_status'] == true,
       consentDate: json['consent_date'] != null ? DateTime.parse(json['consent_date'] as String) : null,
       status: json['status'] as String? ?? 'active',
+      graduationDate: json['graduation_date'] != null ? DateTime.parse(json['graduation_date'] as String) : null,
+      verificationCode: json['verification_code'] as String?,
       coachId: json['coach_id'] as String? ?? '',
       institutionId: json['institution_id'] as String? ?? '',
       registeredAt: DateTime.parse(json['registered_at'] as String),
@@ -110,6 +116,8 @@ class EnterpriseModel {
       consentStatus: entity.consentStatus,
       consentDate: entity.consentDate,
       status: entity.status.name,
+      graduationDate: entity.graduationDate,
+      verificationCode: entity.verificationCode,
       coachId: entity.coachId,
       institutionId: entity.institutionId,
       registeredAt: entity.registeredAt,
@@ -140,6 +148,8 @@ class EnterpriseModel {
       consentStatus: consentStatus,
       consentDate: consentDate,
       status: _mapStringToStatus(status),
+      graduationDate: graduationDate,
+      verificationCode: verificationCode,
       coachId: coachId,
       institutionId: institutionId,
       registeredAt: registeredAt,
@@ -170,6 +180,8 @@ class EnterpriseModel {
       'consent_status': consentStatus,
       'consent_date': consentDate?.toIso8601String(),
       'status': status,
+      'graduation_date': graduationDate?.toIso8601String(),
+      'verification_code': verificationCode,
       'coach_id': coachId,
       'institution_id': institutionId,
       'registered_at': registeredAt.toIso8601String(),

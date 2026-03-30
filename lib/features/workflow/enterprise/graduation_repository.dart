@@ -4,6 +4,7 @@ import '../../../../core/errors/failure.dart';
 
 abstract class GraduationRepository {
   Future<Either<Failure, Map<String, dynamic>>> requestGraduation(String enterpriseId);
+  Future<Either<Failure, List<Map<String, dynamic>>>> getGraduationReady();
 }
 
 class GraduationRepositoryImpl implements GraduationRepository {
@@ -17,6 +18,16 @@ class GraduationRepositoryImpl implements GraduationRepository {
       return Right(response.data);
     } on DioException catch (e) {
       return Left(ServerFailure(message: e.response?.data['message'] ?? 'Graduation request failed'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> getGraduationReady() async {
+    try {
+      final response = await _dio.get('/api/v1/graduation/ready');
+      return Right(List<Map<String, dynamic>>.from(response.data['data']));
+    } on DioException catch (e) {
+      return Left(ServerFailure(message: e.response?.data['message'] ?? 'Failed to fetch graduation ready list'));
     }
   }
 }

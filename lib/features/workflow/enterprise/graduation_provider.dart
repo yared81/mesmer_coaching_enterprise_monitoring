@@ -23,3 +23,12 @@ class GraduationNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>?>
     );
   }
 }
+
+final graduationReadyListProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+  final repository = ref.watch(graduationRepositoryProvider);
+  final result = await repository.getGraduationReady();
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (data) => data,
+  );
+});

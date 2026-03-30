@@ -14,5 +14,12 @@ class GraduationController {
       res.status(200).json({ success: true, data: result });
     } catch (error) { next(error); }
   };
+
+  verifyCertificate = async (req, res, next) => {
+    try {
+      const result = await enterpriseService.verifyCertificate(req.params.code);
+      res.status(200).json({ success: true, data: result });
+    } catch (error) { next(error); }
+  };
 }
 module.exports = new GraduationController();

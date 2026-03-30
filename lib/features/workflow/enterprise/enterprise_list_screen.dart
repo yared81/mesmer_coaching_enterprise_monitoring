@@ -14,6 +14,7 @@ import 'package:file_picker/file_picker.dart';
 import 'csv_import_service.dart';
 import 'dart:io';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
+import 'enterprise_model.dart';
 
 class EnterpriseListScreen extends ConsumerStatefulWidget {
   const EnterpriseListScreen({super.key});
@@ -73,7 +74,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
         return;
       }
 
-      final data = enterprises.map((e) => EnterpriseModel.fromEntity(e).toJson()).toList();
+      final List<Map<String, dynamic>> data = enterprises.map((e) => EnterpriseModel.fromEntity(e).toJson()).toList();
       
       final repo = ref.read(enterpriseRepositoryProvider);
       final response = await repo.bulkRegister(data);

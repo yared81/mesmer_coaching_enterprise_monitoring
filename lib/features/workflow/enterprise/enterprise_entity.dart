@@ -31,6 +31,8 @@ class EnterpriseEntity {
     this.consentStatus = false,
     this.consentDate,
     this.status = EnterpriseStatus.active,
+    this.graduationDate,
+    this.verificationCode,
   });
 
   final String id;
@@ -55,6 +57,8 @@ class EnterpriseEntity {
   final bool consentStatus;
   final DateTime? consentDate;
   final EnterpriseStatus status;
+  final DateTime? graduationDate;
+  final String? verificationCode;
   final String coachId;
   final String institutionId;
   final DateTime registeredAt;
@@ -85,6 +89,8 @@ class EnterpriseEntity {
     String? coachId,
     String? institutionId,
     DateTime? registeredAt,
+    DateTime? graduationDate,
+    String? verificationCode,
   }) {
     return EnterpriseEntity(
       id: id ?? this.id,
@@ -112,6 +118,8 @@ class EnterpriseEntity {
       coachId: coachId ?? this.coachId,
       institutionId: institutionId ?? this.institutionId,
       registeredAt: registeredAt ?? this.registeredAt,
+      graduationDate: graduationDate ?? this.graduationDate,
+      verificationCode: verificationCode ?? this.verificationCode,
     );
   }
 }

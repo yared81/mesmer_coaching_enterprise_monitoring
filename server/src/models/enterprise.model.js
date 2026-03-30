@@ -102,6 +102,15 @@ const Enterprise = sequelize.define('Enterprise', {
     type: DataTypes.ENUM('active', 'pilot', 'stalled', 'graduated', 'dropped'),
     defaultValue: 'active'
   },
+  graduation_date: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  verification_code: {
+    type: DataTypes.STRING(32),
+    allowNull: true,
+    unique: true
+  },
   last_activity_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
