@@ -38,17 +38,93 @@ class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   ConsumerState<EnterpriseDetailScreen> createState() => _EnterpriseDetailScreenState();
 }
 
+class _TabConfig {
+  final Widget tab;
+  final Widget body;
+  const _TabConfig({required this.tab, required this.body});
+}
+
 class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  // Reduced mock tasks for new entities - in a real app these come from a dedicated provider
-  final List<_Task> _tasks = [];
+  late List<_TabConfig> _permittedTabs;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    final user = ref.read(authProvider).user;
+    _permittedTabs = _getTabConfigs(user?.role);
+    _tabController = TabController(length: _permittedTabs.length, vsync: this);
+  }
+
+  List<_TabConfig> _getTabConfigs(UserRole? role) {
+    // Note: Overview is added in build() because it needs the enterprise entity
+    final configs = <_TabConfig>[];
+
+    // 2. SESSIONS (Coach, Admin, SuperAdmin, RC, ME, Enterprise, DataVerifier)
+    if ([
+      UserRole.superAdmin,
+      UserRole.programManager,
+      UserRole.coach,
+      UserRole.regionalCoordinator,
+      UserRole.meOfficer,
+      UserRole.enterprise,
+      UserRole.dataVerifier,
+    ].contains(role)) {
+      configs.add(_TabConfig(
+        tab: const Tab(icon: Icon(Icons.history_outlined), text: 'SESSIONS'),
+        body: _buildTimelineTab(),
+      ));
+    }
+
+    // 3. ACTION PLAN (Coach, Admin, SuperAdmin, RC, ME, Enterprise)
+    if ([
+      UserRole.superAdmin,
+      UserRole.programManager,
+      UserRole.coach,
+      UserRole.regionalCoordinator,
+      UserRole.meOfficer,
+      UserRole.enterprise,
+    ].contains(role)) {
+      configs.add(_TabConfig(
+        tab: const Tab(icon: Icon(Icons.assignment_turned_in_outlined), text: 'ACTION PLAN'),
+        body: IapTrackerTab(enterpriseId: widget.enterpriseId),
+      ));
+    }
+
+    // 4. DOCUMENTS (Coach, Admin, SuperAdmin, RC, ME, Enterprise, DataVerifier)
+    if ([
+      UserRole.superAdmin,
+      UserRole.programManager,
+      UserRole.coach,
+      UserRole.regionalCoordinator,
+      UserRole.meOfficer,
+      UserRole.enterprise,
+      UserRole.dataVerifier,
+    ].contains(role)) {
+      configs.add(_TabConfig(
+        tab: const Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
+        body: _buildDocumentsTab(ref),
+      ));
+    }
+
+    // 5. EQUIPMENT (Coach, Admin, SuperAdmin, RC, ME, Enterprise, Trainer)
+    if ([
+      UserRole.superAdmin,
+      UserRole.programManager,
+      UserRole.coach,
+      UserRole.regionalCoordinator,
+      UserRole.meOfficer,
+      UserRole.enterprise,
+      UserRole.trainer,
+    ].contains(role)) {
+      configs.add(_TabConfig(
+        tab: const Tab(icon: Icon(Icons.inventory_2_outlined), text: 'EQUIPMENT'),
+        body: _buildEquipmentTab(widget.enterpriseId),
+      ));
+    }
+    
+    return configs;
   }
 
   @override
@@ -87,6 +163,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     // We read performance here so the header can reflect the latest diagnosis health
     final performanceAsync = ref.watch(enterprisePerformanceProvider(enterprise.id));
     final currentUser = ref.watch(authProvider).user;
+
+    // Build final lists for TabBar & TabBarView
+    final tabs = [
+      const Tab(icon: Icon(Icons.explore_outlined), text: 'OVERVIEW'),
+      ..._permittedTabs.map((t) => t.tab),
+    ];
+    final views = [
+      _buildOverviewTab(enterprise, ref),
+      ..._permittedTabs.map((t) => t.body),
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       body: NestedScrollView(
@@ -99,7 +186,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             backgroundColor: const Color(0xFF3D5AFE),
             foregroundColor: Colors.white,
             actions: [
-              SyncIndicator(),
+              const SyncIndicator(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: Colors.white),
                 onSelected: (value) async {
@@ -290,7 +377,6 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
               ),
             ),
-            // Tab bar
             bottom: TabBar(
               controller: _tabController,
               indicatorColor: Colors.white,
@@ -299,25 +385,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               unselectedLabelColor: Colors.white60,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-              tabs: const [
-                Tab(icon: Icon(Icons.explore_outlined), text: 'OVERVIEW'),
-                Tab(icon: Icon(Icons.history_outlined), text: 'SESSIONS'),
-                Tab(icon: Icon(Icons.assignment_turned_in_outlined), text: 'ACTION PLAN'),
-                Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
-                Tab(icon: Icon(Icons.inventory_2_outlined), text: 'EQUIPMENT'),
-              ],
+              tabs: tabs,
             ),
           ),
         ],
         body: TabBarView(
           controller: _tabController,
-          children: [
-            _buildOverviewTab(enterprise, ref),
-            _buildTimelineTab(),
-            IapTrackerTab(enterpriseId: enterprise.id),
-            _buildDocumentsTab(ref),
-            _buildEquipmentTab(enterprise.id),
-          ],
+          children: views,
+        ),
+      ),
+    );
+  }
         ),
       ),
     );

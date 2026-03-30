@@ -11,6 +11,20 @@ class SurveyManagementHubScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final templatesAsync = ref.watch(allTemplatesProvider);
+    final user = ref.watch(authProvider).user;
+    final role = user?.role ?? UserRole.stakeholder;
+
+    // Determine permitted survey types dynamically
+    final List<Map<String, String>> surveyTypes = [
+      {'code': 'baseline', 'label': 'Baseline'},
+      {'code': 'midline', 'label': 'Midline'},
+      {'code': 'endline', 'label': 'Endline'},
+      {'code': 'training', 'label': 'Training'},
+    ];
+
+    // Optional: Add filtering logic here if some roles should only see specific types
+    // For now, all roles allowed in SurveyHub (superAdmin, programManager, meOfficer) can see all.
+    final filteredTypes = surveyTypes;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FE),
@@ -19,39 +33,30 @@ class SurveyManagementHubScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF311B92),
         foregroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            onPressed: () => context.push(AppRoutes.templateBuilder),
-          ),
+          if (role == UserRole.superAdmin || role == UserRole.programManager || role == UserRole.meOfficer)
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: () => context.push(AppRoutes.templateBuilder),
+            ),
         ],
       ),
       body: templatesAsync.when(
         data: (templates) => DefaultTabController(
-          length: 4,
+          length: filteredTypes.length,
           child: Column(
             children: [
               Container(
                 color: Colors.white,
-                child: const TabBar(
-                  labelColor: Color(0xFF311B92),
-                  indicatorColor: Color(0xFF311B92),
+                child: TabBar(
+                  labelColor: const Color(0xFF311B92),
+                  indicatorColor: const Color(0xFF311B92),
                   isScrollable: true,
-                  tabs: [
-                    Tab(text: 'Baseline'),
-                    Tab(text: 'Midline'),
-                    Tab(text: 'Endline'),
-                    Tab(text: 'Training'),
-                  ],
+                  tabs: filteredTypes.map((t) => Tab(text: t['label'])).toList(),
                 ),
               ),
               Expanded(
                 child: TabBarView(
-                  children: [
-                    _buildTemplateList(context, templates, 'baseline'),
-                    _buildTemplateList(context, templates, 'midline'),
-                    _buildTemplateList(context, templates, 'endline'),
-                    _buildTemplateList(context, templates, 'training'),
-                  ],
+                  children: filteredTypes.map((t) => _buildTemplateList(context, templates, t['code']!)).toList(),
                 ),
               ),
             ],
