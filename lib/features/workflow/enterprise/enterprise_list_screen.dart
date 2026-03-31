@@ -96,7 +96,6 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     final enterpriseList = ref.watch(enterpriseListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
@@ -158,7 +157,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),

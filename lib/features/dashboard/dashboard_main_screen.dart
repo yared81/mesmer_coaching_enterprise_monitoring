@@ -325,7 +325,7 @@ class DashboardMainScreen extends ConsumerWidget {
               switch (index) {
                 case 0: targetPath = AppRoutes.intakeQueue; break;
                 case 1: targetPath = AppRoutes.intakeRegister; break;
-                case 2: targetPath = AppRoutes.intakeSubmissions; break;
+                case 2: targetPath = AppRoutes.intakeBaseline; break; // Corrected: Index 2 is Baseline
                 case 3: targetPath = AppRoutes.enumeratorSubmissions; break;
                 case 4: targetPath = '/settings'; break;
               }

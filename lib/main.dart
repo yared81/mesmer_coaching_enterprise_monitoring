@@ -105,7 +105,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final systemSettings = ref.watch(systemSettingsProvider);
 
     return MaterialApp.router(
-      title: 'GrowthTrack Coaching',
+      title: 'MESMER Digital Coaching',
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       theme: systemSettings.highContrast ? AppTheme.highContrastLight : AppTheme.lightTheme,

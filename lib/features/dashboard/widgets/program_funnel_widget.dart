@@ -24,7 +24,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildFunnelChart(stats),
+          _buildFunnelChart(context, stats),
         ],
       ),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -32,7 +32,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildFunnelChart(MeStatsEntity stats) {
+  Widget _buildFunnelChart(BuildContext context, MeStatsEntity stats) {
     final funnel = stats.graduationFunnel;
     final stages = [
       {'key': 'outreach', 'label': 'Outreach', 'color': const Color(0xFF6366F1)},
@@ -46,7 +46,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -71,7 +71,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
           return Column(
             children: [
               if (!isFirst)
-                _buildConversionArrow(conversion),
+                _buildConversionArrow(context, conversion),
               _buildFunnelStep(
                 label: stage['label'] as String,
                 count: count,
@@ -140,7 +140,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildConversionArrow(int percentage) {
+  Widget _buildConversionArrow(BuildContext context, int percentage) {
     return Container(
       height: 30,
       child: Stack(
@@ -153,7 +153,7 @@ class ProgramFunnelWidget extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: Theme.of(context).dividerColor.withOpacity(0.05),
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: Colors.grey.withOpacity(0.1)),
             ),

@@ -75,12 +75,14 @@ import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterpri
 import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final notifier = ref.watch(routerNotifierProvider);
 
   return GoRouter(
     initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
+    refreshListenable: notifier,
     redirect: (context, state) {
+      final authState = ref.read(authProvider);
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
       final isSplashing = state.matchedLocation == AppRoutes.splash;
       
@@ -101,9 +103,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         
         // Skip check for basic shared paths
         final sharedPaths = [
-          AppRoutes.splash, // Allow splash to play its animation
+          AppRoutes.splash,
           AppRoutes.login,
-          AppRoutes.dashboard, // Home is handled by _DashboardHome
+          AppRoutes.dashboard,
           AppRoutes.profile,
           AppRoutes.changePassword,
           AppRoutes.notifications,
@@ -116,7 +118,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (!sharedPaths.contains(path)) {
           if (!RolePermissions.canAccess(user.role, path)) {
             debugPrint('🛡️ RBAC: Blocking ${user.role} from accessing $path');
-            return AppRoutes.dashboard; // Send back to home
+            return AppRoutes.dashboard;
           }
         }
       }
@@ -436,3 +438,15 @@ class _DashboardHome extends ConsumerWidget {
     );
   }
 }
+
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen(authProvider, (_, __) => notifyListeners());
+  }
+}
+
+final routerNotifierProvider = Provider<RouterNotifier>((ref) {
+  return RouterNotifier(ref);
+});

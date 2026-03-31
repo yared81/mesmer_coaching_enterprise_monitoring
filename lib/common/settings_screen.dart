@@ -27,9 +27,7 @@ class SettingsScreen extends ConsumerWidget {
           'Settings',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF3D5AFE),
         elevation: 0,
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -220,8 +218,8 @@ class SettingsScreen extends ConsumerWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[50],
-                        foregroundColor: Colors.red[700],
+                        backgroundColor: Theme.of(context).colorScheme.errorContainer.withOpacity(0.5),
+                        foregroundColor: Theme.of(context).colorScheme.error,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),

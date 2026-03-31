@@ -18,22 +18,20 @@ class RegionalPerformanceWidget extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Regional Performance',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
-              ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(height: 16),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -74,7 +72,7 @@ class RegionalPerformanceWidget extends ConsumerWidget {
                           const SizedBox(height: 4),
                           LinearProgressIndicator(
                             value: mockCompletion / 100,
-                            backgroundColor: Colors.grey.shade200,
+                            backgroundColor: Theme.of(context).dividerColor.withOpacity(0.1),
                             color: Colors.green,
                             borderRadius: BorderRadius.circular(2),
                           ),

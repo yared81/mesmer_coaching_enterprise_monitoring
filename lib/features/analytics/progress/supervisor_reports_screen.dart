@@ -139,7 +139,7 @@ class SupervisorReportsScreen extends ConsumerWidget {
                     return _EnterpriseReviewCard(
                       enterprise: e,
                       onExportPdf: () => _handlePdfExport(context, ref, e.id),
-                      onViewSessions: () => context.go('/sessions?enterpriseId=${e.id}'),
+                      onViewDetail: () => context.push('/enterprises/detail/${e.id}'),
                     );
                   },
                 ),
@@ -176,12 +176,12 @@ class SupervisorReportsScreen extends ConsumerWidget {
 class _EnterpriseReviewCard extends StatelessWidget {
   final EnterpriseEntity enterprise;
   final VoidCallback onExportPdf;
-  final VoidCallback onViewSessions;
+  final VoidCallback onViewDetail;
 
   const _EnterpriseReviewCard({
     required this.enterprise,
     required this.onExportPdf,
-    required this.onViewSessions,
+    required this.onViewDetail,
   });
 
   @override
@@ -198,7 +198,7 @@ class _EnterpriseReviewCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: onViewSessions,
+        onTap: onViewDetail,
         child: Padding(
           padding: const EdgeInsets.all(14),
           child: Column(
@@ -282,9 +282,9 @@ class _EnterpriseReviewCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: onViewSessions,
-                      icon: const Icon(Icons.list_alt_rounded, size: 15),
-                      label: const Text('Sessions', style: TextStyle(fontSize: 12)),
+                      onPressed: onViewDetail,
+                      icon: const Icon(Icons.analytics_outlined, size: 15),
+                      label: const Text('Detail', style: TextStyle(fontSize: 12)),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         side: BorderSide(color: AppColors.primary.withOpacity(0.4)),

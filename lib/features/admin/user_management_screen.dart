@@ -134,30 +134,28 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           ),
           const SizedBox(height: 10),
           // Filter dropdowns
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildRoleTab('All Roles', null, filters.role),
-                      _buildRoleTab('Coaches', UserRole.coach.snakeCase, filters.role),
-                      _buildRoleTab('Trainers', UserRole.trainer.snakeCase, filters.role),
-                      _buildRoleTab('Verifiers', UserRole.dataVerifier.snakeCase, filters.role),
-                      _buildRoleTab('Coordinators', UserRole.regionalCoordinator.snakeCase, filters.role),
-                      _buildRoleTab('M&E Officers', UserRole.meOfficer.snakeCase, filters.role),
-                      _buildRoleTab('Program Managers', UserRole.programManager.snakeCase, filters.role),
-                    ],
-                  ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildRoleTab('All Roles', null, filters.role),
+                    _buildRoleTab('Coaches', UserRole.coach.snakeCase, filters.role),
+                    _buildRoleTab('Trainers', UserRole.trainer.snakeCase, filters.role),
+                    _buildRoleTab('Verifiers', UserRole.dataVerifier.snakeCase, filters.role),
+                    _buildRoleTab('Coordinators', UserRole.regionalCoordinator.snakeCase, filters.role),
+                    _buildRoleTab('M&E Officers', UserRole.meOfficer.snakeCase, filters.role),
+                    _buildRoleTab('Program Managers', UserRole.programManager.snakeCase, filters.role),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: institutionsAsync.when(
-                  data: (institutions) => DropdownButtonFormField<String>(
-                    value: filters.institution,
-                    isExpanded: true,
+              const SizedBox(height: 12),
+              institutionsAsync.when(
+                data: (institutions) => DropdownButtonFormField<String>(
+                  value: filters.institution,
+                  isExpanded: true,
                     decoration: InputDecoration(
                       labelText: 'Institution',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -184,8 +182,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     decoration: InputDecoration(hintText: 'Could not load institutions', isDense: true),
                   ),
                 ),
-              ),
-            ],
+              ],
           ),
         ],
       ),

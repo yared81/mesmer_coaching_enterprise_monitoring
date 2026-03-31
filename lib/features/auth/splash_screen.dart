@@ -88,7 +88,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 const SizedBox(height: 8),
                 
                 Text(
-                  'GrowthTrack Coaching'.toUpperCase(),
+                  'Digital Coaching Platform'.toUpperCase(),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                     fontSize: 12,
@@ -132,19 +132,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               )
               .animate()
               .fadeIn(delay: 1500.ms),
-            ),
-            
-            // Version Info
-            Positioned(
-              bottom: 20,
-              child: Text(
-                'v1.0.0-PRO',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.3),
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
             ),
           ],
         ),

@@ -10,7 +10,7 @@ class SecurityService {
       if (!isAvailable) return false;
 
       return await _auth.authenticate(
-        localizedReason: 'Please authenticate to access GrowthTrack Coaching',
+        localizedReason: 'Please authenticate to access MESMER Digital Coaching',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false, // Allows PIN fallback

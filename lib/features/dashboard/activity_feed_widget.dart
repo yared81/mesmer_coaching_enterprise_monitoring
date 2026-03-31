@@ -14,13 +14,14 @@ class ActivityFeedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     if (activities.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.grey[100]!),
+          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.05)),
         ),
         child: const Center(
           child: Text(
@@ -33,12 +34,12 @@ class ActivityFeedWidget extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey[100]!),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withOpacity(isDark ? 0.3 : 0.02),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -47,16 +48,14 @@ class ActivityFeedWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(20),
             child: Text(
               'Recent Updates',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
-                letterSpacing: -0.5,
-              ),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
+                  ),
             ),
           ),
           ListView.separated(
@@ -81,7 +80,7 @@ class ActivityFeedWidget extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _getBgColor(activity.type),
+                            color: _getBgColor(activity.type, isDark),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -97,11 +96,10 @@ class ActivityFeedWidget extends StatelessWidget {
                             children: [
                               Text(
                                 activity.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: Color(0xFF1A1A1A),
-                                ),
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                               ),
                               const SizedBox(height: 2),
                               Text(
@@ -155,7 +153,10 @@ class ActivityFeedWidget extends StatelessWidget {
     }
   }
 
-  Color _getBgColor(String? type) {
+  Color _getBgColor(String? type, bool isDark) {
+    if (isDark) {
+      return _getIconColor(type).withOpacity(0.15);
+    }
     switch (type) {
       case 'enterprise': return Colors.blue[50]!;
       case 'session': return const Color(0xFF3D5AFE).withOpacity(0.1);

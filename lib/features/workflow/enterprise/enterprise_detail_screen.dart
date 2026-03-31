@@ -104,7 +104,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     ].contains(role)) {
       configs.add(_TabConfig(
         tab: const Tab(icon: Icon(Icons.folder_open_outlined), text: 'DOCUMENTS'),
-        body: _buildDocumentsTab(ref),
+        body: _buildDocumentsTab(),
       ));
     }
 
@@ -182,7 +182,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (ctx, _) => [
           // ── Hero Header ─────────────────────────────────────────────────
@@ -921,10 +921,12 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   // ─── TAB 2: Sessions Timeline ──────────────────────────────────────────────
 
   Widget _buildTimelineTab() {
-    final sessionsAsync = ref.watch(enterpriseSessionsProvider(widget.enterpriseId));
-    final phoneLogsAsync = ref.watch(enterprisePhoneFollowupsProvider(widget.enterpriseId));
-    
-    return sessionsAsync.when(
+    return Consumer(
+      builder: (context, ref, _) {
+        final sessionsAsync = ref.watch(enterpriseSessionsProvider(widget.enterpriseId));
+        final phoneLogsAsync = ref.watch(enterprisePhoneFollowupsProvider(widget.enterpriseId));
+        
+        return sessionsAsync.when(
       data: (sessions) => phoneLogsAsync.when(
         data: (phoneLogs) {
           // Combine and sort (sessions use scheduledDate, logs use date)
@@ -1047,13 +1049,15 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               ),
             ],
           );
-        },
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, _) => Center(child: Text('Error: $err')),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
-      ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text('Error: $err')),
-    );
+      );
+    },
+   );
   }
 
   Widget _buildTimelinePin(bool isLast, Color color) {
@@ -1086,7 +1090,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: accentColor.withOpacity(0.15)),
           boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
@@ -1162,7 +1166,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: accentColor.withOpacity(0.15)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
@@ -1347,8 +1351,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   // ─── TAB 4: Documents & Evidence ──────────────────────────────────────────
 
-  Widget _buildDocumentsTab(WidgetRef ref) {
-    final docsAsync = ref.watch(enterpriseDocumentsProvider(widget.enterpriseId));
+  Widget _buildDocumentsTab() {
+    return Consumer(
+      builder: (context, ref, _) {
+        final docsAsync = ref.watch(enterpriseDocumentsProvider(widget.enterpriseId));
     
     return docsAsync.when(
       data: (docs) {
@@ -1427,7 +1433,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         ),
       ),
     );
-  }
+  },
+ );
+}
 
   Widget _buildEquipmentTab(String enterpriseId) {
     return Consumer(
@@ -2288,7 +2296,7 @@ class _AssetCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
       ),

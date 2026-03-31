@@ -70,10 +70,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // ─── LOGO & VISION ───────────────────────────────────────
-                  const _LogoWidget(),
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 120,
+                    height: 120,
+                  ),
                   const SizedBox(height: 16),
                   const Text(
-                    'GrowthTrack',
+                    'MESMER',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.w900,
@@ -129,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     data: (role) {
                                       final welcomeText = role != null 
                                           ? 'Welcome back, ${role[0].toUpperCase()}${role.substring(1)}'
-                                          : 'Welcome to GrowthTrack';
+                                          : 'Welcome to MESMER';
                                       return Text(
                                         welcomeText,
                                         textAlign: TextAlign.center,
@@ -142,7 +146,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     },
                                     loading: () => const SizedBox(height: 24),
                                     error: (_, __) => const Text(
-                                      'Welcome to GrowthTrack',
+                                      'Welcome to MESMER',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 20,
@@ -313,36 +317,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 }
 
-class _LogoWidget extends StatelessWidget {
-  const _LogoWidget();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(Icons.hub_rounded, size: 40, color: const Color(0xFF1E3A8A)),
-          Positioned(
-            right: 15,
-            top: 20,
-            child: Container(
-              width: 10,
-              height: 10,
-              decoration: const BoxDecoration(color: Colors.blueAccent, shape: BoxShape.circle),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 
 class _GridPainter extends CustomPainter {
