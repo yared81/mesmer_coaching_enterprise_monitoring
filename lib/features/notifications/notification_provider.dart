@@ -26,10 +26,26 @@ class NotificationNotifier extends StateNotifier<AsyncValue<void>> {
   NotificationNotifier(this._repository, this._ref) : super(const AsyncValue.data(null));
 
   Future<void> markAsRead(String id) async {
-    state = const AsyncValue.loading();
     try {
       await _repository.markAsRead(id);
-      state = const AsyncValue.data(null);
+      _ref.invalidate(notificationsProvider);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    try {
+      await _repository.markAllAsRead();
+      _ref.invalidate(notificationsProvider);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> deleteNotification(String id) async {
+    try {
+      await _repository.deleteNotification(id);
       _ref.invalidate(notificationsProvider);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

@@ -131,13 +131,16 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Register Enterprise', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
       body: Form(
         key: _formKey,
@@ -163,14 +166,15 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   }
 
   Widget _buildProgressIndicator() {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
       child: Row(
         children: [
           _buildStepCircle(0, 'Business Info'),
-          Expanded(child: Container(height: 2, color: _currentStep > 0 ? AppColors.primary : Colors.grey[300])),
+          Expanded(child: Container(height: 2, color: _currentStep > 0 ? theme.colorScheme.primary : theme.dividerColor)),
           _buildStepCircle(1, 'Owner & Layout'),
-          Expanded(child: Container(height: 2, color: _currentStep > 1 ? AppColors.primary : Colors.grey[300])),
+          Expanded(child: Container(height: 2, color: _currentStep > 1 ? theme.colorScheme.primary : theme.dividerColor)),
           _buildStepCircle(2, 'Baseline & Consent'),
         ],
       ),
@@ -178,6 +182,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
   }
 
   Widget _buildStepCircle(int step, String label) {
+    final theme = Theme.of(context);
     final isActive = _currentStep >= step;
     return Column(
       children: [
@@ -185,19 +190,19 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           width: 32,
           height: 32,
           decoration: BoxDecoration(
-            color: isActive ? AppColors.primary : Colors.white,
+            color: isActive ? theme.colorScheme.primary : theme.cardColor,
             shape: BoxShape.circle,
-            border: Border.all(color: isActive ? AppColors.primary : Colors.grey[300]!),
-            boxShadow: isActive ? [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
+            border: Border.all(color: isActive ? theme.colorScheme.primary : theme.dividerColor),
+            boxShadow: isActive ? [BoxShadow(color: theme.colorScheme.primary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))] : null,
           ),
           child: Center(
             child: isActive 
-              ? (_currentStep > step ? const Icon(Icons.check, size: 16, color: Colors.white) : Text('${step + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))
-              : Text('${step + 1}', style: TextStyle(color: Colors.grey[400])),
+              ? (_currentStep > step ? Icon(Icons.check, size: 16, color: theme.colorScheme.onPrimary) : Text('${step + 1}', style: TextStyle(color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold)))
+              : Text('${step + 1}', style: TextStyle(color: theme.hintColor)),
           ),
         ),
         const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 10, color: isActive ? AppColors.textPrimary : Colors.grey[400], fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+        Text(label, style: TextStyle(fontSize: 10, color: isActive ? theme.colorScheme.primary : theme.hintColor, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
       ],
     );
   }
@@ -208,7 +213,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Tell us about the business', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary)),
+          Text('Tell us about the business', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
             controller: _nameController,
@@ -244,9 +249,9 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Sector>(
@@ -266,9 +271,9 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<PremiseType>(
@@ -295,7 +300,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Primary Contact Person', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary)),
+          Text('Primary Contact Person', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
             controller: _ownerController,
@@ -356,7 +361,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Baseline & Consent', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary)),
+          Text('Baseline & Consent', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
           const SizedBox(height: AppSpacing.lg),
           AppTextField(
             controller: _revenueController,
@@ -377,9 +382,9 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[200]!),
+              border: Border.all(color: Theme.of(context).dividerColor),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<RecordKeepingSystem>(
@@ -404,9 +409,9 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+              border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)),
             ),
             child: CheckboxListTile(
               title: const Text('Digital Consent Captured', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -415,7 +420,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
               onChanged: (val) => setState(() => _hasConsented = val ?? false),
               controlAffinity: ListTileControlAffinity.leading,
               contentPadding: EdgeInsets.zero,
-              activeColor: AppColors.primary,
+              activeColor: Theme.of(context).colorScheme.primary,
             ),
           ),
         ],
@@ -427,8 +432,8 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4))],
+        color: Theme.of(context).cardColor,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -440,7 +445,7 @@ class _EnterpriseFormScreenState extends ConsumerState<EnterpriseFormScreen> {
                 onPressed: _isLoading ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: AppColors.primary),
+                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   minimumSize: const Size(0, 56), // Ensure consistent height
                 ),

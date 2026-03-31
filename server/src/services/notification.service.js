@@ -15,7 +15,7 @@ class NotificationService {
     return await Notification.findAll({
       where: { user_id: userId },
       order: [['created_at', 'DESC']],
-      limit: 20
+      limit: 50
     });
   }
 
@@ -26,6 +26,17 @@ class NotificationService {
       await notification.save();
     }
     return notification;
+  }
+
+  async markAllAsRead(userId) {
+    await Notification.update(
+      { is_read: true },
+      { where: { user_id: userId, is_read: false } }
+    );
+  }
+
+  async deleteNotification(notificationId) {
+    await Notification.destroy({ where: { id: notificationId } });
   }
 }
 

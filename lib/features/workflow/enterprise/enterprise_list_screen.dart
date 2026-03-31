@@ -124,10 +124,10 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
                       child: Container(
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                           ],
                         ),
                         child: TextField(
@@ -160,10 +160,10 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
                           color: Theme.of(context).cardColor,
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
                           ],
                         ),
-                        child: const Icon(Icons.filter_list_rounded, color: Color(0xFF3D5AFE)),
+                        child: Icon(Icons.filter_list_rounded, color: Theme.of(context).colorScheme.primary),
                       ),
                     ),
                   ],
@@ -184,7 +184,7 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
         if (role == UserRole.coach) return const SizedBox.shrink();
         return FloatingActionButton.extended(
           onPressed: () => context.push(AppRoutes.enterpriseForm),
-          backgroundColor: const Color(0xFF3D5AFE),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           elevation: 4,
           icon: const Icon(Icons.add, color: Colors.white),
           label: const Text('New Enterprise', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -199,9 +199,9 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.business_center_outlined, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+            Icon(Icons.business_center_outlined, size: 64, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
             const SizedBox(height: 16),
-            const Text('No enterprises found', style: TextStyle(color: AppColors.textSecondary)),
+            Text('No enterprises found', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
           ],
         ),
       );
