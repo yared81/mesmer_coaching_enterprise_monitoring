@@ -798,7 +798,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-      decoration: _cardDecor(),
+      decoration: _cardDecor(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1243,7 +1243,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: _cardDecor(),
+            decoration: _cardDecor(context),
             child: Row(
               children: [
                 SizedBox(
@@ -1381,7 +1381,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           itemBuilder: (context, i) {
             final doc = docs[i];
             return Container(
-              decoration: _cardDecor(),
+              decoration: _cardDecor(context),
               child: ListTile(
                 onTap: () {
                   Navigator.of(context).push(
@@ -1774,7 +1774,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
         return Container(
           padding: const EdgeInsets.all(20),
-          decoration: _cardDecor(),
+          decoration: _cardDecor(context),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

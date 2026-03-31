@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
@@ -159,13 +160,13 @@ class _AddSessionFromEnterpriseSheetState
                 decoration: InputDecoration(
                   labelText: 'Session Title',
                   hintText: 'e.g. Initial Assessment, Follow-up Review...',
-                  prefixIcon: const Icon(Icons.edit_note_rounded, color: AppColors.primary),
+                  prefixIcon: Icon(Icons.edit_note_rounded, color: AppColors.primary),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
                   fillColor: Theme.of(context).cardColor,
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                    borderSide: BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
               ),
@@ -182,9 +183,8 @@ class _AddSessionFromEnterpriseSheetState
                   value: _selectedTemplateId,
                   isExpanded: true,
                   decoration: InputDecoration(
-                   decoration: InputDecoration(
                     hintText: 'Select Assessment Tool',
-                    prefixIcon: const Icon(Icons.assessment_outlined, color: AppColors.primary),
+                    prefixIcon: Icon(Icons.assessment_outlined, color: AppColors.primary),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
                     fillColor: Theme.of(context).cardColor,
@@ -259,7 +259,7 @@ class _AddSessionFromEnterpriseSheetState
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 20),
+                      const Icon(Icons.calendar_month_rounded, color: Colors.blue, size: 20),
                       const SizedBox(width: 12),
                       Text(
                         DateFormat('EEEE, MMM dd, yyyy').format(_selectedDate),

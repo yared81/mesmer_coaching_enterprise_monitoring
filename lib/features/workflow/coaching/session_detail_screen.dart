@@ -11,6 +11,7 @@ import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaste
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_document_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/iap/iap_entity.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/theme/app_colors.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -139,7 +140,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     children: [
                       Text(
                         widget.session.title,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -177,17 +178,17 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.1),
+                  color: Colors.amber.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.amber),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.lock_clock, color: Colors.amber, size: 16),
-                    SizedBox(width: 8),
+                    const Icon(Icons.lock_clock, color: Colors.amber, size: 16),
+                    const SizedBox(width: 8),
                     Text(
                       'Locked (48-hour rule). Contact verifier for edits.',
-                      style: TextStyle(color: Colors.amber[700], fontSize: 13, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Colors.amber.shade700, fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -315,7 +316,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                       child: Text(
                         hasDiagnosis ? 'Diagnosis assessment completed ✓' : 'Diagnosis assessment not yet completed',
                         style: TextStyle(
-                          color: hasDiagnosis ? Colors.green[700] : Colors.orange[700],
+                          color: hasDiagnosis ? Colors.green.shade700 : Colors.orange.shade700,
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -417,7 +418,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.primary)),
+        Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.primary)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -428,7 +429,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             fillColor: Theme.of(context).cardColor,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.primary)),
           ),
         ),
       ],
@@ -475,7 +476,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           keyboardType: TextInputType.number,
           enabled: !readOnly,
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.trending_up, color: AppColors.primary, size: 20),
+            prefixIcon: Icon(Icons.trending_up, color: AppColors.primary, size: 20),
             filled: true,
             fillColor: Theme.of(context).cardColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

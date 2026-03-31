@@ -7,6 +7,7 @@ import 'coaching_session_entity.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
 import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mesmer_coaching_enterprise_monitoring/core/theme/app_colors.dart';
 
 class AddSessionScreen extends ConsumerStatefulWidget {
   const AddSessionScreen({super.key});
@@ -298,13 +299,13 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                       )
                     : Row(
                         children: [
-                          const Icon(Icons.playlist_add_check_rounded, color: AppColors.primary),
+                          Icon(Icons.playlist_add_check_rounded, color: AppColors.primary),
                           const SizedBox(width: 12),
                           Text(
                             _selectedEnterpriseId == null
                                 ? 'Select an enterprise first'
                                 : 'Session #$_nextSessionNumber of 8',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                               color: AppColors.primary,

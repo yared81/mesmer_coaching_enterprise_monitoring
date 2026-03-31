@@ -19,7 +19,6 @@ class AuditLogsScreen extends ConsumerWidget {
     final logsAsync = ref.watch(auditLogsProvider);
 
     return Scaffold(
-    return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('System Audit Logs', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -73,7 +72,7 @@ class AuditLogsScreen extends ConsumerWidget {
             icon: const Icon(Icons.filter_list),
             onPressed: () {},
             style: IconButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+              backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
@@ -181,7 +180,6 @@ class AuditLogsScreen extends ConsumerWidget {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-        decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -196,11 +194,11 @@ class AuditLogsScreen extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 children: [
-                  _buildDetailRow('User', log['User']?['name'] ?? 'System'),
-                  _buildDetailRow('Action', log['action']),
-                  _buildDetailRow('Target Table', log['table_name']),
-                  _buildDetailRow('Record ID', log['record_id']),
-                  _buildDetailRow('Timestamp', log['timestamp']),
+                  _buildDetailRow(context, 'User', log['User']?['name'] ?? 'System'),
+                  _buildDetailRow(context, 'Action', log['action']),
+                  _buildDetailRow(context, 'Target Table', log['table_name']),
+                  _buildDetailRow(context, 'Record ID', log['record_id']),
+                  _buildDetailRow(context, 'Timestamp', log['timestamp']),
                   const SizedBox(height: 24),
                   const Text('DATA CHANGE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
                   const SizedBox(height: 12),
@@ -228,7 +226,7 @@ class AuditLogsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(

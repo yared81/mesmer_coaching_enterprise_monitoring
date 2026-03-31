@@ -26,7 +26,7 @@ class ProgramPerformanceChart extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -38,7 +38,7 @@ class ProgramPerformanceChart extends StatelessWidget {
                       letterSpacing: -0.5,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Active Enterprises over time',
                     style: TextStyle(
@@ -56,12 +56,12 @@ class ProgramPerformanceChart extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.trending_up_rounded, color: Colors.green[700], size: 16),
+                    Icon(Icons.trending_up_rounded, color: Colors.green.shade700, size: 16),
                     const SizedBox(width: 4),
                     Text(
                       '+12%',
                       style: TextStyle(
-                        color: Colors.green[700],
+                        color: Colors.green.shade700,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -136,8 +136,8 @@ class ProgramPerformanceChart extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          Colors.blue.withOpacity(0.2),
-                          Colors.blue.withOpacity(0),
+                          Colors.blue.withValues(alpha: 0.2),
+                          Colors.blue.withValues(alpha: 0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
