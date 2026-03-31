@@ -131,13 +131,16 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Attach Evidence', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Column(
         children: [
           if (_isUploading)
             LinearProgressIndicator(
               value: _uploadProgress,
-              backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+              backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
               color: AppColors.primary,
             ),
           Expanded(
@@ -239,7 +242,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -279,6 +282,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
+                disabledBackgroundColor: Theme.of(context).disabledColor,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
@@ -301,8 +305,9 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).dividerColor),
+            border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             borderRadius: BorderRadius.circular(12),
+            color: Theme.of(context).cardColor,
           ),
           child: Column(
             children: [

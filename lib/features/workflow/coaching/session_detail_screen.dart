@@ -110,10 +110,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     final hasDiagnosis = diagnosisReportAsync.valueOrNull != null;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Session Details', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -139,7 +139,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     children: [
                       Text(
                         widget.session.title,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE)),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -158,7 +158,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (isReadOnly ? Colors.green : Colors.orange).withOpacity(0.1),
+                    color: (isReadOnly ? Colors.green : Colors.orange).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: isReadOnly ? Colors.green : Colors.orange),
                   ),
@@ -187,7 +187,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     SizedBox(width: 8),
                     Text(
                       'Locked (48-hour rule). Contact verifier for edits.',
-                      style: TextStyle(color: Colors.amber, fontSize: 13, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: Colors.amber[700], fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -203,9 +203,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF2F2),
+                  color: Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFFCA5A5), width: 1.5),
+                  border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.3), width: 1.5),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +220,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     const SizedBox(height: 12),
                     Text(
                       widget.session.qcFeedback ?? 'Session flagged by supervisor. Please review and update.',
-                      style: const TextStyle(fontSize: 14, color: Color(0xFF991B1B)),
+                      style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onErrorContainer),
                     ),
                   ],
                 ),
@@ -246,9 +246,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
                 ),
                 child: Column(
                   children: [
@@ -299,9 +299,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: hasDiagnosis ? const Color(0xFFF0FDF4) : const Color(0xFFFFF7ED),
+                  color: hasDiagnosis ? Colors.green.withValues(alpha: 0.05) : Colors.orange.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: hasDiagnosis ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3)),
+                  border: Border.all(color: hasDiagnosis ? Colors.green.withValues(alpha: 0.3) : Colors.orange.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -315,7 +315,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                       child: Text(
                         hasDiagnosis ? 'Diagnosis assessment completed ✓' : 'Diagnosis assessment not yet completed',
                         style: TextStyle(
-                          color: hasDiagnosis ? Colors.green[800] : Colors.orange[800],
+                          color: hasDiagnosis ? Colors.green[700] : Colors.orange[700],
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -339,8 +339,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF3D5AFE),
-                    side: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary, width: 2),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
@@ -384,6 +384,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E3A8A),
+                    disabledBackgroundColor: Theme.of(context).disabledColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _isSaving 
@@ -416,7 +417,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Color(0xFF3D5AFE))),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppColors.primary)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -424,10 +425,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           enabled: !readOnly,
           decoration: InputDecoration(
             filled: true,
-            fillColor: readOnly ? Colors.grey[50] : Colors.grey[50],
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3B82F6))),
+            fillColor: Theme.of(context).cardColor,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary)),
           ),
         ),
       ],
@@ -467,18 +468,18 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.blueGrey)),
+        Text(label, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Theme.of(context).hintColor)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: TextInputType.number,
           enabled: !readOnly,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: const Color(0xFF3D5AFE), size: 20),
+            prefixIcon: const Icon(Icons.trending_up, color: AppColors.primary, size: 20),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Theme.of(context).cardColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
           ),
         ),
       ],
@@ -498,9 +499,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           children: tasks.map((task) => Card(
             elevation: 0,
             margin: const EdgeInsets.only(bottom: 8),
+            color: Theme.of(context).cardColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10), 
-              side: BorderSide(color: Colors.grey[200]!),
+              side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             child: ListTile(
               dense: true,

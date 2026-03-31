@@ -129,24 +129,24 @@ class _AddSessionFromEnterpriseSheetState
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey[300],
+                    color: Theme.of(context).dividerColor,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'New Coaching Session',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E3A8A),
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'Recording a new session for this enterprise.',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 13, color: Theme.of(context).hintColor),
               ),
               const SizedBox(height: 24),
 
@@ -159,13 +159,13 @@ class _AddSessionFromEnterpriseSheetState
                 decoration: InputDecoration(
                   labelText: 'Session Title',
                   hintText: 'e.g. Initial Assessment, Follow-up Review...',
-                  prefixIcon: const Icon(Icons.edit_note_rounded, color: Color(0xFF3D5AFE)),
+                  prefixIcon: const Icon(Icons.edit_note_rounded, color: AppColors.primary),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).cardColor,
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF3D5AFE), width: 2),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
                   ),
                 ),
               ),
@@ -174,7 +174,7 @@ class _AddSessionFromEnterpriseSheetState
               // Assessment Profile Dropdown
               const Text(
                 'Assessment Profile',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               ref.watch(allTemplatesProvider).when(
@@ -182,11 +182,12 @@ class _AddSessionFromEnterpriseSheetState
                   value: _selectedTemplateId,
                   isExpanded: true,
                   decoration: InputDecoration(
+                   decoration: InputDecoration(
                     hintText: 'Select Assessment Tool',
-                    prefixIcon: const Icon(Icons.assessment_outlined, color: Color(0xFF3D5AFE)),
+                    prefixIcon: const Icon(Icons.assessment_outlined, color: AppColors.primary),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Theme.of(context).cardColor,
                   ),
                   items: list.map((t) => DropdownMenuItem(
                     value: t.id,
@@ -235,7 +236,7 @@ class _AddSessionFromEnterpriseSheetState
                 decoration: InputDecoration(
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).cardColor,
                 ),
                 items: List.generate(8, (i) => i + 1).map((n) => DropdownMenuItem(
                   value: n,
@@ -252,20 +253,20 @@ class _AddSessionFromEnterpriseSheetState
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[400]!),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[50],
+                    color: Theme.of(context).cardColor,
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_month_rounded, color: Color(0xFF3D5AFE), size: 20),
+                      const Icon(Icons.calendar_month_rounded, color: AppColors.primary, size: 20),
                       const SizedBox(width: 12),
                       Text(
                         DateFormat('EEEE, MMM dd, yyyy').format(_selectedDate),
                         style: const TextStyle(fontSize: 15),
                       ),
                       const Spacer(),
-                      const Icon(Icons.arrow_drop_down_rounded, color: Colors.grey),
+                      Icon(Icons.arrow_drop_down_rounded, color: Theme.of(context).hintColor),
                     ],
                   ),
                 ),
@@ -279,8 +280,8 @@ class _AddSessionFromEnterpriseSheetState
                 child: ElevatedButton(
                   onPressed: _isSubmitting ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3D5AFE),
-                    disabledBackgroundColor: Colors.grey[300],
+                    backgroundColor: AppColors.primary,
+                    disabledBackgroundColor: Theme.of(context).disabledColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
@@ -313,18 +314,18 @@ class _AddSessionFromEnterpriseSheetState
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.white,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!, width: 2),
+          border: Border.all(color: isSelected ? AppColors.primary : Theme.of(context).dividerColor, width: 2),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey, size: 20),
+            Icon(icon, color: isSelected ? AppColors.primary : Theme.of(context).hintColor, size: 20),
             const SizedBox(height: 4),
             Text(label, style: TextStyle(
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
+              color: isSelected ? AppColors.primary : Theme.of(context).hintColor,
             )),
           ],
         ),

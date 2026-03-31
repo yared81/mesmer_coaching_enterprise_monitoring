@@ -21,11 +21,11 @@ class _CoachEnterpriseListScreenState extends ConsumerState<CoachEnterpriseListS
     final selectedSector = ref.watch(coachEnterpriseSectorFilterProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('My Enterprises', 
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: AppColors.primary,
         elevation: 0,
         foregroundColor: Colors.white,
         actions: [
@@ -82,10 +82,11 @@ class _CoachEnterpriseListScreenState extends ConsumerState<CoachEnterpriseListS
         onSelected: (selected) {
           ref.read(coachEnterpriseSectorFilterProvider.notifier).state = selected ? sector : null;
         },
-        backgroundColor: Colors.white.withOpacity(0.85),
-        selectedColor: Colors.white,
+        backgroundColor: Theme.of(context).cardColor,
+        selectedColor: Theme.of(context).cardColor,
+        side: BorderSide(color: isSelected ? AppColors.primary : Theme.of(context).dividerColor),
         labelStyle: TextStyle(
-          color: isSelected ? const Color(0xFF3D5AFE) : Colors.black,
+          color: isSelected ? AppColors.primary : Theme.of(context).hintColor,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),
@@ -98,20 +99,20 @@ class _CoachEnterpriseListScreenState extends ConsumerState<CoachEnterpriseListS
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.store_outlined, size: 80, color: Colors.grey[300]),
+          Icon(Icons.store_outlined, size: 80, color: Theme.of(context).dividerColor),
           const SizedBox(height: 16),
           Text(
             'No enterprises found',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[600],
+              color: Theme.of(context).hintColor,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Try adjusting your filters',
-            style: TextStyle(color: Colors.grey[400]),
+            style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.6)),
           ),
         ],
       ),
@@ -128,9 +129,10 @@ class _EnterpriseCard extends StatelessWidget {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 16),
+      color: Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
       ),
       child: InkWell(
         onTap: () => context.push('/enterprises/detail/${enterprise.id}'),
@@ -163,7 +165,7 @@ class _EnterpriseCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       enterprise.sector.name,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                      style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13),
                     ),
                   ],
                 ),
@@ -174,20 +176,20 @@ class _EnterpriseCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.green[50],
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'v85%', // Placeholder for now
-                      style: TextStyle(
-                        color: Colors.green[700],
+                      style: const TextStyle(
+                        color: Color(0xFF2E7D32),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+                  Icon(Icons.chevron_right_rounded, color: Theme.of(context).hintColor),
                 ],
               ),
             ],

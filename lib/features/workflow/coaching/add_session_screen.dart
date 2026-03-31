@@ -174,11 +174,11 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
     final enterprisesAsync = ref.watch(filteredEnterprisesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: const Color(0xFF3D5AFE),
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -197,7 +197,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                   hintText: 'e.g. Initial Assessment, Follow-up Review...',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   filled: true,
-                  fillColor: Colors.grey[50],
+                  fillColor: Theme.of(context).cardColor,
                 ),
               ),
               const SizedBox(height: 24),
@@ -210,7 +210,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Theme.of(context).cardColor,
                   ),
                   hint: const Text('Select Enterprise'),
                   items: list
@@ -235,7 +235,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                   decoration: InputDecoration(
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     filled: true,
-                    fillColor: Colors.grey[50],
+                    fillColor: Theme.of(context).cardColor,
                   ),
                   hint: const Text('Select Assessment Tool'),
                   items: list
@@ -284,8 +284,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3D5AFE).withOpacity(0.05),
-                  border: Border.all(color: const Color(0xFF3D5AFE).withOpacity(0.4)),
+                  color: AppColors.primary.withValues(alpha: 0.05),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: _isLoadingSessionNumber
@@ -298,7 +298,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                       )
                     : Row(
                         children: [
-                          const Icon(Icons.playlist_add_check_rounded, color: Color(0xFF3D5AFE)),
+                          const Icon(Icons.playlist_add_check_rounded, color: AppColors.primary),
                           const SizedBox(width: 12),
                           Text(
                             _selectedEnterpriseId == null
@@ -307,7 +307,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: Color(0xFF3D5AFE),
+                              color: AppColors.primary,
                             ),
                           ),
                         ],
@@ -331,9 +331,9 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[400]!),
+                    border: Border.all(color: Theme.of(context).dividerColor),
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[50],
+                    color: Theme.of(context).cardColor,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -342,7 +342,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                         DateFormat('MMM dd, yyyy').format(_selectedDate),
                         style: const TextStyle(fontSize: 16),
                       ),
-                      const Icon(Icons.calendar_month, color: Colors.grey),
+                      Icon(Icons.calendar_month, color: Theme.of(context).hintColor),
                     ],
                   ),
                 ),
@@ -356,8 +356,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 child: ElevatedButton(
                   onPressed: (_isSubmitting || _nextSessionNumber > 8) ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3D5AFE),
-                    disabledBackgroundColor: Colors.grey[300],
+                    backgroundColor: AppColors.primary,
+                    disabledBackgroundColor: Theme.of(context).disabledColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _isSubmitting
@@ -385,22 +385,22 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3D5AFE).withOpacity(0.05) : Colors.white,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[300]!,
+            color: isSelected ? AppColors.primary : Theme.of(context).dividerColor,
             width: 2,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey),
+            Icon(icon, color: isSelected ? AppColors.primary : Theme.of(context).hintColor),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? const Color(0xFF3D5AFE) : Colors.grey[700],
+                color: isSelected ? AppColors.primary : Theme.of(context).hintColor,
               ),
             ),
           ],

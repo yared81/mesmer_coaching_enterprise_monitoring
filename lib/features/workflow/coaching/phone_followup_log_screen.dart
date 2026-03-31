@@ -67,10 +67,11 @@ class _PhoneFollowupLogScreenState extends ConsumerState<PhoneFollowupLogScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Log Phone Call'),
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.primary,
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -159,14 +160,14 @@ class _PhoneFollowupLogScreenState extends ConsumerState<PhoneFollowupLogScreen>
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: Theme.of(context).cardColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!),
+              borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             ),
           ),
         ),

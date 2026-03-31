@@ -497,23 +497,24 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 }
 
   Widget _buildEmptyPerformanceState({String? message}) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(32),
       width: double.infinity,
-      decoration: _cardDecor(),
+      decoration: _cardDecor(context),
       child: Column(
         children: [
-          Icon(Icons.analytics_outlined, size: 48, color: Colors.grey[300]),
+          Icon(Icons.analytics_outlined, size: 48, color: theme.dividerColor),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No Assessment Data',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.grey),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: theme.hintColor),
           ),
           const SizedBox(height: 8),
           Text(
             message ?? 'Complete an assessment in the Sessions tab to see performance charts.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey[400], fontSize: 13),
+            style: TextStyle(color: theme.hintColor.withValues(alpha: 0.7), fontSize: 13),
           ),
         ],
       ),
@@ -550,22 +551,22 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     if (catNames.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(32),
-        decoration: _cardDecor(),
-        child: const Center(
-          child: Text('No category data available', style: TextStyle(color: Colors.grey)),
+        decoration: _cardDecor(context),
+        child: Center(
+          child: Text('No category data available', style: TextStyle(color: Theme.of(context).hintColor)),
         ),
       );
     }
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-      decoration: _cardDecor(),
+      decoration: _cardDecor(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Assessment Performance — Score per Category (Max 5.0)',
-            style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -595,7 +596,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           angle: -0.6, // More rotation for clarity
                           child: Text(
                             label.toUpperCase(),
-                            style: const TextStyle(color: Color(0xFF616161), fontSize: 9, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 9, fontWeight: FontWeight.bold),
                           ),
                         );
                       },
@@ -612,7 +613,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           meta: meta,
                           child: Text(
                             value.toInt().toString(),
-                            style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                            style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11),
                           ),
                         );
                       },
@@ -625,7 +626,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: 1,
-                  getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey[100]!, strokeWidth: 1),
+                  getDrawingHorizontalLine: (value) => FlLine(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), strokeWidth: 1),
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: List.generate(catNames.length, (i) {
@@ -646,9 +647,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           ),
           // ── Legend: full category name + score ──────────────
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Category Breakdown',
-            style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 10),
           Column(
@@ -675,7 +676,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         Expanded(
                           child: Text(
                             cleanName,
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF374151)),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -691,7 +692,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       child: LinearProgressIndicator(
                         value: pct,
                         minHeight: 6,
-                        backgroundColor: Colors.grey[100],
+                        backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                         color: barColor,
                       ),
                     ),
@@ -722,9 +723,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
+        color: Colors.green.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.withOpacity(0.3)),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -748,9 +749,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               Expanded(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: const LinearProgressIndicator(
+                  child: LinearProgressIndicator(
                     value: 0.25, // Mock 25% complete
-                    backgroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     color: Colors.green,
                     minHeight: 8,
                   ),
@@ -804,9 +805,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Health Score Trend',
-                style: TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13, fontWeight: FontWeight.w600),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -828,7 +829,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           const SizedBox(height: 4),
           Text(
             'Each dot = one completed session diagnosis (Max score: 5.0)',
-            style: TextStyle(color: Colors.grey[400], fontSize: 11),
+            style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 11),
           ),
           SizedBox(
             height: 160,
@@ -940,7 +941,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             children: [
               // ── New Session button bar (always visible at top) ──
               Container(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 child: Row(
                   children: [
@@ -950,7 +951,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           await showModalBottomSheet(
                             context: context,
                             isScrollControlled: true,
-                            backgroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).cardColor,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                             ),
@@ -995,17 +996,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.calendar_today_outlined, size: 64, color: Colors.grey[300]),
+                          Icon(Icons.calendar_today_outlined, size: 64, color: Theme.of(context).dividerColor),
                           const SizedBox(height: 16),
-                          const Text(
+                          Text(
                             'No sessions yet',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Tap "New Session" above to record the first coaching session.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                            style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 13),
                           ),
                         ],
                       ),
@@ -1018,8 +1019,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         if (item is CoachingSessionEntity) {
                           final isCompleted = item.status == SessionStatus.completed;
                           final isPendingSync = item.id.startsWith('offline_');
-                          final dotColor = isPendingSync ? Colors.grey : (isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A));
-                          final accentColor = isPendingSync ? Colors.grey : (isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A));
+                          final dotColor = isPendingSync ? Theme.of(context).hintColor : (isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A));
+                          final accentColor = isPendingSync ? Theme.of(context).hintColor : (isCompleted ? const Color(0xFF3D5AFE) : const Color(0xFF16A34A));
                           
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1032,8 +1033,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         } else {
                           final log = item as PhoneFollowupEntity;
                           final isPendingSync = log.id.startsWith('offline_');
-                          final accentColor = isPendingSync ? Colors.grey : Colors.orange;
-                          final dotColor = isPendingSync ? Colors.grey : Colors.orange;
+                          final accentColor = isPendingSync ? Theme.of(context).hintColor : Colors.orange;
+                          final dotColor = isPendingSync ? Theme.of(context).hintColor : Colors.orange;
                           
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1069,8 +1070,8 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 6)],
+            border: Border.all(color: Theme.of(context).cardColor, width: 2),
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 6)],
           ),
         ),
         if (!isLast)
@@ -1108,7 +1109,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
                 const SizedBox(width: 8),
                 Text(DateFormat('MMM dd, yyyy').format(s.scheduledDate),
-                  style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                  style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11)),
               ],
             ),
             const SizedBox(height: 8),
@@ -1117,7 +1118,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 s.notes!,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11),
               ),
             const SizedBox(height: 8),
             Row(
@@ -1135,7 +1136,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   ),
                 ),
                 if (s.id.startsWith('offline_'))
-                  const Icon(Icons.sync_rounded, color: Colors.grey, size: 14)
+                   Icon(Icons.sync_rounded, color: Theme.of(context).hintColor, size: 14)
                 else
                   Icon(isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded,
                       size: 14, color: accentColor),
@@ -1183,17 +1184,17 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   overflow: TextOverflow.ellipsis),
               ),
               const SizedBox(width: 6),
-              Text(DateFormat('MMM dd').format(log.date), style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              Text(DateFormat('MMM dd').format(log.date), style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11)),
             ],
           ),
           const SizedBox(height: 6),
           if (log.issueAddressed?.isNotEmpty == true)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
-              child: Text(log.issueAddressed!, style: const TextStyle(color: Color(0xFF424242), fontSize: 13)),
+              child: Text(log.issueAddressed!, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
             ),
           if (log.adviceGiven?.isNotEmpty == true)
-            Text('Advice: ${log.adviceGiven}', style: TextStyle(color: Colors.grey[600], fontSize: 12, fontStyle: FontStyle.italic)),
+            Text('Advice: ${log.adviceGiven}', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12, fontStyle: FontStyle.italic)),
           if (log.nextAction?.isNotEmpty == true)
             Padding(
               padding: const EdgeInsets.only(top: 8),
@@ -1221,7 +1222,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 ),
               ),
               if (log.id.startsWith('offline_'))
-                const Icon(Icons.sync_rounded, color: Colors.grey, size: 14)
+                Icon(Icons.sync_rounded, color: Theme.of(context).hintColor, size: 14)
               else
                 Icon(Icons.check_circle_rounded, size: 14, color: accentColor),
             ],
@@ -1254,7 +1255,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       CircularProgressIndicator(
                         value: _tasks.isEmpty ? 0.0 : completed / _tasks.length,
                         strokeWidth: 6,
-                        backgroundColor: Colors.grey[200],
+                        backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                         valueColor: const AlwaysStoppedAnimation(Color(0xFF3D5AFE)),
                       ),
                       Center(
@@ -1274,7 +1275,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     const SizedBox(height: 4),
                     Text('${_tasks.length - completed} tasks remaining',
-                        style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                        style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
                   ],
                 ),
               ],
@@ -1287,7 +1288,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
              Center(
                child: Padding(
                  padding: const EdgeInsets.all(32.0),
-                 child: Text('No recommendations generated yet.', style: TextStyle(color: Colors.grey[400])),
+                 child: Text('No recommendations generated yet.', style: TextStyle(color: Theme.of(context).hintColor)),
                ),
              )
           else
@@ -1295,9 +1296,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
               return Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 12, offset: const Offset(0, 4))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 12, offset: const Offset(0, 4))],
                 ),
                 child: ListTile(
                   leading: GestureDetector(
@@ -1320,7 +1321,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     _tasks[i].label,
                     style: TextStyle(
                       decoration: _tasks[i].done ? TextDecoration.lineThrough : null,
-                      color: _tasks[i].done ? Colors.grey : const Color(0xFF1A1A1A),
+                      color: _tasks[i].done ? Theme.of(context).hintColor : Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                       fontSize: 14,
                     ),
@@ -1363,11 +1364,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
+                Icon(Icons.folder_open_rounded, size: 64, color: Theme.of(context).dividerColor),
                 const SizedBox(height: 16),
-                const Text('No documents uploaded', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+                Text('No documents uploaded', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor)),
                 const SizedBox(height: 8),
-                Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+                Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 13)),
               ],
             ),
           );
@@ -1409,11 +1410,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       Text(doc.sessionTitle!, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                     Text(
                       DateFormat('MMM dd, yyyy').format(doc.uploadedAt),
-                      style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                      style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11),
                     ),
                   ],
                 ),
-                trailing: const Icon(Icons.open_in_new_rounded, size: 20, color: Colors.grey),
+                trailing: Icon(Icons.open_in_new_rounded, size: 20, color: Theme.of(context).hintColor),
               ),
             );
           },
@@ -1424,11 +1425,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.folder_open_rounded, size: 64, color: Colors.grey[300]),
+            Icon(Icons.folder_open_rounded, size: 64, color: Theme.of(context).dividerColor),
             const SizedBox(height: 16),
-            const Text('No documents uploaded yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+            Text('No documents uploaded yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor)),
             const SizedBox(height: 8),
-            Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+            Text('Attach files during a Coaching Session\nto see them grouped here.', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 13)),
           ],
         ),
       ),
@@ -1447,9 +1448,9 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey[300]),
+                Icon(Icons.inventory_2_outlined, size: 48, color: Theme.of(context).dividerColor),
                 const SizedBox(height: 16),
-                const Text('Could not load equipment', style: TextStyle(color: Colors.grey)),
+                Text('Could not load equipment', style: TextStyle(color: Theme.of(context).hintColor)),
               ],
             ),
           ),
@@ -1459,11 +1460,11 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[300]),
+                    Icon(Icons.inventory_2_outlined, size: 64, color: Theme.of(context).dividerColor),
                     const SizedBox(height: 16),
-                    const Text('No equipment recorded', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
+                    Text('No equipment recorded', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor)),
                     const SizedBox(height: 8),
-                    Text('Program-provided tools or assets will appear here.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+                    Text('Program-provided tools or assets will appear here.', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 13)),
                   ],
                 ),
               );
@@ -1608,7 +1609,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1630,7 +1631,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   child: Container(
                     width: 40,
                     height: 4,
-                    decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                    decoration: BoxDecoration(color: Theme.of(context).dividerColor, borderRadius: BorderRadius.circular(2)),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1808,7 +1809,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                           reservedSize: 40,
                           getTitlesWidget: (v, m) => Text(
                             v >= 1000 ? '${(v / 1000).toStringAsFixed(0)}k' : v.toStringAsFixed(0),
-                            style: TextStyle(color: Colors.grey[400], fontSize: 10),
+                            style: TextStyle(color: Theme.of(context).hintColor, fontSize: 10),
                           ),
                         ),
                       ),
@@ -1822,7 +1823,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Text(
                                 trends[i]['period'],
-                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey),
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor),
                               ),
                             );
                           },
@@ -1921,7 +1922,7 @@ class _EmployeesChip extends StatelessWidget {
 void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEntity enterprise) {
   showModalBottomSheet(
     context: context,
-    backgroundColor: Colors.white,
+    backgroundColor: Theme.of(context).cardColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
@@ -1936,14 +1937,14 @@ void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEnti
               Container(
                 width: 40,
                 height: 4,
-                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: Theme.of(context).dividerColor, borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(height: 12),
               const Text('Reassign Enterprise', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               Text(
                 enterprise.businessName,
-                style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600),
+                style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12, fontWeight: FontWeight.w600),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -1959,9 +1960,9 @@ void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEnti
                 ),
                 data: (coaches) {
                   if (coaches.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
-                      child: Text('No coaches available', style: TextStyle(color: Colors.grey)),
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      child: Text('No coaches available', style: TextStyle(color: Theme.of(context).hintColor)),
                     );
                   }
                   return Flexible(
@@ -1986,10 +1987,10 @@ void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEnti
                               ? Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[100],
+                                    color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Text('Current', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                  child: Text('Current', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor)),
                                 )
                               : const Icon(Icons.chevron_right_rounded),
                           onTap: isCurrent
@@ -2020,10 +2021,10 @@ void _showReassignCoachSheet(BuildContext context, WidgetRef ref, EnterpriseEnti
   );
 }
 
-BoxDecoration _cardDecor() => BoxDecoration(
-  color: Colors.white,
+BoxDecoration _cardDecor(BuildContext context) => BoxDecoration(
+  color: Theme.of(context).cardColor,
   borderRadius: BorderRadius.circular(20),
-  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, offset: const Offset(0, 8))],
+  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 20, offset: const Offset(0, 8))],
 );
 
 class _HealthBadge extends StatelessWidget {
@@ -2105,7 +2106,7 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)));
+    return Text(text, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface));
   }
 }
 
@@ -2119,14 +2120,14 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _cardDecor(),
+      decoration: _cardDecor(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Icon(icon, size: 16, color: const Color(0xFF3D5AFE)),
+            Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface)),
           ]),
           const SizedBox(height: 12),
           ...children,
@@ -2144,14 +2145,15 @@ class _InfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hintColor = Theme.of(context).hintColor;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.grey[400]),
+          Icon(icon, size: 16, color: hintColor.withValues(alpha: 0.6)),
           const SizedBox(width: 8),
-          Text('$label: ', style: TextStyle(fontSize: 13, color: Colors.grey[500])),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151)))),
+          Text('$label: ', style: TextStyle(fontSize: 13, color: hintColor)),
+          Expanded(child: Text(value, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface))),
         ],
       ),
     );
@@ -2189,8 +2191,8 @@ class _LegendBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border.all(color: Colors.grey[200]!),
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -2198,13 +2200,13 @@ class _LegendBadge extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(color: const Color(0xFF3D5AFE).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+            decoration: BoxDecoration(color: const Color(0xFF3D5AFE).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(4)),
             child: Text(short, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF3D5AFE))),
           ),
           const SizedBox(width: 6),
-          Text(full, style: const TextStyle(fontSize: 11, color: Colors.black87, fontWeight: FontWeight.w500)),
+          Text(full, style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500)),
           const SizedBox(width: 4),
-          Text(score.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+          Text(score.toStringAsFixed(1), style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -2317,11 +2319,11 @@ class _AssetCard extends StatelessWidget {
               children: [
                 Text(asset.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 4),
-                Text('S/N: ${asset.serialNumber ?? 'N/A'}', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                Text('S/N: ${asset.serialNumber ?? 'N/A'}', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
                 if (asset.notes != null && asset.notes!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
-                    child: Text(asset.notes!, style: TextStyle(color: Colors.grey[400], fontSize: 12, fontStyle: FontStyle.italic)),
+                    child: Text(asset.notes!, style: TextStyle(color: Theme.of(context).hintColor.withValues(alpha: 0.7), fontSize: 12, fontStyle: FontStyle.italic)),
                   ),
               ],
             ),
@@ -2331,7 +2333,7 @@ class _AssetCard extends StatelessWidget {
             children: [
               Text(
                 DateFormat('MMM dd, yyyy').format(asset.receivedDate),
-                style: TextStyle(color: Colors.grey[400], fontSize: 11),
+                style: TextStyle(color: Theme.of(context).hintColor, fontSize: 11),
               ),
               const SizedBox(height: 4),
               Container(
