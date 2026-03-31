@@ -20,7 +20,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
   void _showProfileMenu(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -37,7 +37,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -58,7 +58,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Text(
                 user?.name ?? 'Supervisor',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.titleLarge?.color),
               ),
               Text(
                 user?.email ?? 'supervisor@mesmer.com',
@@ -88,7 +88,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
   void _showNotificationsSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -101,7 +101,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
             children: [
               Container(
                 width: 40, height: 4,
-                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                decoration: BoxDecoration(color: Theme.of(context).dividerColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(2)),
               ),
               const SizedBox(height: 20),
               Row(
@@ -186,7 +186,7 @@ class SupervisorDashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(supervisorStatsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: statsAsync.when(
         data: (stats) => RefreshIndicator(
           onRefresh: () => ref.refresh(supervisorStatsProvider.future),
@@ -379,9 +379,9 @@ class SupervisorDashboardScreen extends ConsumerWidget {
               children: [
                 const Icon(Icons.cloud_off_rounded, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
-                Text('Unable to load data', style: TextStyle(color: Colors.grey[700], fontSize: 16, fontWeight: FontWeight.bold)),
+                Text('Unable to load data', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text(err.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                Text(err.toString(), textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () => ref.refresh(supervisorStatsProvider),
@@ -422,16 +422,16 @@ class _SectionHeader extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                color: Color(0xFF1A1A1A),
+                color: Theme.of(context).textTheme.titleLarge?.color,
                 letterSpacing: -0.5,
               ),
             ),
             if (subtitle != null) ...[
               const SizedBox(height: 2),
-              Text(subtitle!, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+              Text(subtitle!, style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor)),
             ],
           ],
         ),
@@ -474,9 +474,9 @@ class _AlertCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 6),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: badgeColor.withOpacity(0.25)),
+        border: Border.all(color: badgeColor.withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
             color: badgeColor.withOpacity(0.08),
@@ -495,7 +495,7 @@ class _AlertCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).textTheme.titleMedium?.color),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -509,7 +509,7 @@ class _AlertCard extends StatelessWidget {
               ),
             ],
           ),
-          Text(coach, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+          Text(coach, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -593,7 +593,7 @@ class _ProfileMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? const Color(0xFF1A1A1A);
+    final c = color ?? Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF1A1A1A);
     return ListTile(
       onTap: onTap,
       leading: Container(

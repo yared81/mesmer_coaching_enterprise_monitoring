@@ -19,7 +19,8 @@ class AuditLogsScreen extends ConsumerWidget {
     final logsAsync = ref.watch(auditLogsProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('System Audit Logs', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -118,7 +119,7 @@ class AuditLogsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: actionColor.withOpacity(0.1),
+                color: actionColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(actionIcon, color: actionColor, size: 20),
@@ -160,7 +161,7 @@ class AuditLogsScreen extends ConsumerWidget {
                   ),
                   Text(
                     'ID: ...${recordId.toString().substring(recordId.toString().length - 8)}',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[500], fontFamily: 'monospace'),
+                    style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor, fontFamily: 'monospace'),
                   ),
                 ],
               ),
@@ -180,16 +181,17 @@ class AuditLogsScreen extends ConsumerWidget {
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
             const Text('Event Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Divider(),
+            Divider(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -206,7 +208,7 @@ class AuditLogsScreen extends ConsumerWidget {
                     const Text('PREVIOUS STATE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(8)),
+                      decoration: BoxDecoration(color: Theme.of(context).dividerColor.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
                       child: Text(log['old_data'].toString(), style: const TextStyle(fontSize: 10, fontFamily: 'monospace')),
                     ),
                     const SizedBox(height: 16),
@@ -214,7 +216,7 @@ class AuditLogsScreen extends ConsumerWidget {
                   const Text('NEW STATE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                   Container(
                     padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(8)),
+                    decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                     child: Text(log['new_data'].toString(), style: const TextStyle(fontSize: 10, fontFamily: 'monospace')),
                   ),
                 ],
@@ -232,7 +234,7 @@ class AuditLogsScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+          Text(label, style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         ],
       ),

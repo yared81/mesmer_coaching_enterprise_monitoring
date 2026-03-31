@@ -28,9 +28,9 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
@@ -60,7 +60,7 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
                   const SizedBox(height: 4),
                   Text(
                     'Sessions completed this month',
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).hintColor, fontSize: 12),
                   ),
                 ],
               ),
@@ -137,7 +137,7 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
                           meta: meta,
                           child: Text(
                             value.toInt().toString(),
-                            style: const TextStyle(fontSize: 10, color: Color(0xFF9E9E9E)),
+                            style: TextStyle(fontSize: 10, color: Theme.of(context).hintColor),
                           ),
                         );
                       },
@@ -151,7 +151,7 @@ class _CoachActivityChartState extends State<CoachActivityChart> {
                   drawVerticalLine: false,
                   horizontalInterval: 5,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: Colors.grey.shade100,
+                    color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
                     strokeWidth: 1,
                   ),
                 ),

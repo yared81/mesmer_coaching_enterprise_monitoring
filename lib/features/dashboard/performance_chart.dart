@@ -9,9 +9,9 @@ class ProgramPerformanceChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey[100]!),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -34,7 +34,7 @@ class ProgramPerformanceChart extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A1A),
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -42,7 +42,7 @@ class ProgramPerformanceChart extends StatelessWidget {
                   Text(
                     'Active Enterprises over time',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: Theme.of(context).hintColor,
                       fontSize: 12,
                     ),
                   ),
@@ -51,7 +51,7 @@ class ProgramPerformanceChart extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green[50],
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -84,8 +84,8 @@ class ProgramPerformanceChart extends StatelessWidget {
                       reservedSize: 30,
                       interval: 1,
                       getTitlesWidget: (value, meta) {
-                        const style = TextStyle(
-                          color: Colors.grey,
+                        final style = TextStyle(
+                          color: Theme.of(context).hintColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 10,
                         );

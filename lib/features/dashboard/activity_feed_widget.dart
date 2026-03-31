@@ -63,7 +63,7 @@ class ActivityFeedWidget extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: activities.length,
             separatorBuilder: (context, index) => Divider(
-              color: Colors.grey[50],
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
               height: 1,
               indent: 70,
             ),
@@ -105,7 +105,7 @@ class ActivityFeedWidget extends StatelessWidget {
                               Text(
                                 activity.description,
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: Theme.of(context).hintColor,
                                   fontSize: 13,
                                 ),
                               ),
@@ -154,12 +154,13 @@ class ActivityFeedWidget extends StatelessWidget {
   }
 
   Color _getBgColor(String? type, bool isDark) {
+    final baseColor = _getIconColor(type);
     if (isDark) {
-      return _getIconColor(type).withOpacity(0.15);
+      return baseColor.withValues(alpha: 0.12);
     }
     switch (type) {
       case 'enterprise': return Colors.blue[50]!;
-      case 'session': return const Color(0xFF3D5AFE).withOpacity(0.1);
+      case 'session': return const Color(0xFF3D5AFE).withValues(alpha: 0.08);
       case 'phone_call': return Colors.green[50]!;
       case 'assessment': return Colors.orange[50]!;
       default: return Colors.grey[50]!;

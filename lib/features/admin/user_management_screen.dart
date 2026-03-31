@@ -99,7 +99,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         color: Theme.of(context).colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -203,15 +203,15 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             _updateFilter(role: null);
           }
         },
-        selectedColor: AppColors.primary.withOpacity(0.1),
+        selectedColor: AppColors.primary.withValues(alpha: 0.1),
         labelStyle: TextStyle(
-          color: isSelected ? AppColors.primary : Colors.grey[700],
+          color: isSelected ? AppColors.primary : Theme.of(context).hintColor,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
-            color: isSelected ? AppColors.primary : Colors.grey[300]!,
+            color: isSelected ? AppColors.primary : Theme.of(context).dividerColor,
           ),
         ),
       ),
@@ -226,7 +226,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           children: [
             const Icon(Icons.people_outline, size: 56, color: Colors.grey),
             const SizedBox(height: 12),
-            const Text('No users found matching your filters.', style: TextStyle(color: Colors.grey)),
+            Text('No users found matching your filters.', style: TextStyle(color: Theme.of(context).hintColor)),
             const SizedBox(height: 16),
             TextButton(
               onPressed: _clearFilters,
@@ -262,7 +262,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
               children: [
                 // Avatar - Slightly smaller to save vertical space
                 CircleAvatar(
-                  backgroundColor: roleColor.withOpacity(0.12),
+                  backgroundColor: roleColor.withValues(alpha: 0.12),
                   radius: 20,
                   child: Text(
                     user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
@@ -298,9 +298,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: roleColor.withOpacity(0.1),
+                              color: roleColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: roleColor.withOpacity(0.3)),
+                              border: Border.all(color: roleColor.withValues(alpha: 0.3)),
                             ),
                             child: Text(
                               roleLabel.toUpperCase(),
@@ -310,7 +310,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: user.isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              color: (user.isActive ? Colors.green : Colors.red).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -326,9 +326,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: Colors.indigo.withOpacity(0.08),
+                                color: Colors.indigo.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.indigo.withOpacity(0.2)),
+                                border: Border.all(color: Colors.indigo.withValues(alpha: 0.2)),
                               ),
                               child: Text(
                                 user.institutionName!.toUpperCase(),

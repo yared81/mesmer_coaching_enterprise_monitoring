@@ -18,6 +18,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(adminStatsProvider);
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: statsAsync.when(
         data: (stats) => RefreshIndicator(
           onRefresh: () => ref.refresh(adminStatsProvider.future),
