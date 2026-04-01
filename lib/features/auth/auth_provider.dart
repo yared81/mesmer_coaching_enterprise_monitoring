@@ -39,7 +39,7 @@ final lastUserRoleProvider = FutureProvider<String?>((ref) async {
 
 // --- Auth Presentation State ---
 
-enum AuthStatus { authenticated, unauthenticated, initial }
+enum AuthStatus { authenticated, unauthenticated, loading, initial }
 
 class AuthState {
   const AuthState({
@@ -63,7 +63,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final Ref _ref;
 
   Future<void> login(String email, String password) async {
-    state = const AuthState(status: AuthStatus.initial); // or loading
+    state = const AuthState(status: AuthStatus.loading);
     final result = await _ref.read(loginUseCaseProvider)(email, password);
     state = await result.fold(
       (failure) async => AuthState.unauthenticated(error: failure.message),

@@ -17,6 +17,6 @@ router.put('/templates/:id', authorize('super_admin', 'supervisor', 'admin', 'me
 router.delete('/templates/:id', authorize('super_admin', 'supervisor', 'admin', 'me_officer', 'program_manager'), diagnosisController.deleteTemplate);
 router.post('/reports', diagnosisController.submitReport);
 router.get('/reports/session/:sessionId', diagnosisController.getReportBySession);
-router.get('/enterprise/:enterpriseId/performance', authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user', 'me_officer', 'program_manager', 'regional_coordinator'), restrictToOwnEnterprise, diagnosisController.getEnterprisePerformance);
+router.get('/enterprise/:enterpriseId/performance', authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise', 'me_officer', 'program_manager', 'regional_coordinator'), restrictToOwnEnterprise, diagnosisController.getEnterprisePerformance);
 
 module.exports = router;

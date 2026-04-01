@@ -69,11 +69,13 @@ const CoachingSession = sequelize.define('CoachingSession', {
   },
   latitude: {
     type: DataTypes.DECIMAL(10, 8),
-    allowNull: false
+    allowNull: true,
+    defaultValue: 0.0
   },
   longitude: {
     type: DataTypes.DECIMAL(11, 8),
-    allowNull: false
+    allowNull: true,
+    defaultValue: 0.0
   },
   problems_identified: {
     type: DataTypes.TEXT

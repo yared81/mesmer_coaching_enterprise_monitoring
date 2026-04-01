@@ -26,21 +26,21 @@ router.get(
 
 router.get(
   '/:id', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise_user'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise'),
   restrictToOwnEnterprise,
   enterpriseController.getById
 );
 
 router.put(
   '/:id',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise_user', 'program_manager', 'regional_coordinator'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'enterprise', 'program_manager', 'regional_coordinator'),
   restrictToOwnEnterprise,
   enterpriseController.update
 );
 
 router.get(
   '/:id/trends',
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise_user'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise'),
   restrictToOwnEnterprise,
   enterpriseController.getTrends
 );

@@ -9,8 +9,8 @@ router.route('/')
   .get(authorize('super_admin', 'admin', 'trainer', 'me_officer'), equipmentController.getAllAssets)
   .post(authorize('super_admin', 'admin', 'supervisor', 'trainer'), equipmentController.addEquipment);
 
-router.get('/enterprise/:enterpriseId', authorize('super_admin', 'admin', 'trainer', 'coach', 'me_officer', 'enterprise_user'), restrictToOwnEnterprise, equipmentController.getEnterpriseAssets);
+router.get('/enterprise/:enterpriseId', authorize('super_admin', 'admin', 'trainer', 'coach', 'me_officer', 'enterprise'), restrictToOwnEnterprise, equipmentController.getEnterpriseAssets);
 
-router.put('/:id/status', authorize('super_admin', 'admin', 'trainer'), equipmentController.updateStatus);
+router.put('/:id/status', authorize('super_admin', 'admin', 'trainer', 'enterprise'), equipmentController.updateStatus);
 
 module.exports = router;

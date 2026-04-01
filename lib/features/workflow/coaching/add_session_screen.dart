@@ -128,8 +128,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       notes: '',
       problemsIdentified: '',
       recommendations: '',
-      latitude: lat,
-      longitude: lng,
+      latitude: lat ?? 0.0,
+      longitude: lng ?? 0.0,
     );
 
     try {
