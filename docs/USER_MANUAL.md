@@ -248,10 +248,10 @@
 
 #### **Daily Workflow**
 1. **Daily Planning**: Review scheduled coaching visits
-2. **Enterprise Visits**: Conduct coaching sessions
-3. **Session Documentation**: Record visit details and outcomes
-4. **Action Plan Updates**: Update enterprise IAPs
-5. **Evidence Upload**: Capture photos and documents
+2. **Enterprise Visits**: Conduct coaching sessions, identify business problems
+3. **Session Documentation & Sign-off**: Capture both Coach and Enterprise Owner signatures (mandatory for physical visits)
+4. **Action Plan Specialist**: Use the IAP Builder to create or update multi-task growth strategies
+5. **Evidence Upload**: Capture photos and documents for compliance verification
 
 #### **Important Screens**
 - **My Enterprises**: Assigned enterprises list

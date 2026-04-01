@@ -30,8 +30,9 @@ The MESMER Digital Coaching app transforms traditional business coaching into a 
 ### **🏢 Enterprise Management**
 - **Digital Intake** - CSV import + manual registration
 - **Baseline Assessments** - Photo evidence, GPS stamping
-- **Individual Action Plans** - Coach-enterprise collaboration
+- **Individual Action Plans** - Multi-task builder for coaches
 - **Progress Tracking** - Real-time KPI monitoring
+- **Digital Signatures** - Compliance-ready sign-off for visits
 
 ### **🎓 Coaching & Training**
 - **Session Management** - Scheduling, attendance, feedback
@@ -49,7 +50,7 @@ The MESMER Digital Coaching app transforms traditional business coaching into a 
 - **MERL Dashboards** - Funnel analytics, per-coach stats
 - **Regional Analytics** - Geographic performance tracking
 - **Export Capabilities** - PDF, Excel, CSV reports
-- **Real-Time KPIs** - Live program metrics
+- **System-Wide KPIs** - Aggregate M&E impact monitoring
 
 ---
 

@@ -219,7 +219,125 @@ class IapTrackerTab extends ConsumerWidget {
                   }
                 }
               },
-              child: const Text('Add Task'),
+                  child: const Text('Add Task'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── IAP Builder Dialog (Multi-task) ────────────────────────────────────────
+  void _showIapBuilderDialog(BuildContext context, WidgetRef ref) {
+    final List<Map<String, dynamic>> builderTasks = [];
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setBuilderState) => AlertDialog(
+          title: const Text('IAP Builder', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Define initial tasks for this enterprise growth plan.', 
+                  style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const Divider(),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: builderTasks.length,
+                    itemBuilder: (context, index) => ListTile(
+                      title: Text(builderTasks[index]['description'], style: const TextStyle(fontSize: 13)),
+                      subtitle: Text('Due: ${DateFormat('MMM dd').format(DateTime.parse(builderTasks[index]['deadline']))}',
+                        style: const TextStyle(fontSize: 11)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
+                        onPressed: () => setBuilderState(() => builderTasks.removeAt(index)),
+                      ),
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final descCtrl = TextEditingController();
+                    DateTime deadline = DateTime.now().add(const Duration(days: 14));
+                    
+                    await showDialog(
+                      context: ctx,
+                      builder: (childCtx) => StatefulBuilder(
+                        builder: (childCtx, setChildState) => AlertDialog(
+                          title: const Text('Add Task to Plan', style: TextStyle(fontSize: 16)),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Task Description')),
+                              const SizedBox(height: 12),
+                              ListTile(
+                                leading: const Icon(Icons.calendar_today, size: 16),
+                                title: Text('Deadline: ${DateFormat('MMM dd, yyyy').format(deadline)}'),
+                                onTap: () async {
+                                  final picked = await showDatePicker(
+                                    context: childCtx,
+                                    initialDate: deadline,
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                                  );
+                                  if (picked != null) setChildState(() => deadline = picked);
+                                },
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(onPressed: () => Navigator.pop(childCtx), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () {
+                                if (descCtrl.text.isEmpty) return;
+                                setBuilderState(() {
+                                  builderTasks.add({
+                                    'description': descCtrl.text,
+                                    'deadline': deadline.toIso8601String(),
+                                    'status': 'pending'
+                                  });
+                                });
+                                Navigator.pop(childCtx);
+                              },
+                              child: const Text('Add'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_task),
+                  label: const Text('Add Initial Task'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: builderTasks.isEmpty ? null : () async {
+                try {
+                  final ds = ref.read(iapDataSourceProvider);
+                  await ds.createIap({
+                    'enterprise_id': enterpriseId,
+                    'tasks': builderTasks,
+                  });
+                  if (context.mounted) {
+                    Navigator.pop(ctx);
+                    ref.invalidate(enterpriseIapsProvider(enterpriseId));
+                    CustomToaster.show(context: context, message: 'IAP created successfully! 🚀');
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    CustomToaster.show(context: context, message: 'Failed: $e', isError: true);
+                  }
+                }
+              },
+              child: const Text('Save & Activate Plan'),
             ),
           ],
         ),
@@ -455,121 +573,36 @@ class _TaskCard extends ConsumerWidget {
     await _doUpload(context, ref, result.files.single.path!);
   }
 
-  // ─── IAP Builder Dialog (Multi-task) ────────────────────────────────────────
-  void _showIapBuilderDialog(BuildContext context, WidgetRef ref) {
-    final List<Map<String, dynamic>> builderTasks = [];
-    
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setBuilderState) => AlertDialog(
-          title: const Text('IAP Builder', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Define initial tasks for this enterprise growth plan.', 
-                  style: TextStyle(fontSize: 12, color: Colors.grey)),
-                const Divider(),
-                Flexible(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: builderTasks.length,
-                    itemBuilder: (context, index) => ListTile(
-                      title: Text(builderTasks[index]['description'], style: const TextStyle(fontSize: 13)),
-                      subtitle: Text('Due: ${DateFormat('MMM dd').format(DateTime.parse(builderTasks[index]['deadline']))}',
-                        style: const TextStyle(fontSize: 11)),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-                        onPressed: () => setBuilderState(() => builderTasks.removeAt(index)),
-                      ),
-                    ),
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () async {
-                    final descCtrl = TextEditingController();
-                    DateTime deadline = DateTime.now().add(const Duration(days: 14));
-                    
-                    await showDialog(
-                      context: ctx,
-                      builder: (childCtx) => StatefulBuilder(
-                        builder: (childCtx, setChildState) => AlertDialog(
-                          title: const Text('Add Task to Plan', style: TextStyle(fontSize: 16)),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Task Description')),
-                              const SizedBox(height: 12),
-                              ListTile(
-                                leading: const Icon(Icons.calendar_today, size: 16),
-                                title: Text('Deadline: ${DateFormat('MMM dd, yyyy').format(deadline)}'),
-                                onTap: () async {
-                                  final picked = await showDatePicker(
-                                    context: childCtx,
-                                    initialDate: deadline,
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                                  );
-                                  if (picked != null) setChildState(() => deadline = picked);
-                                },
-                              ),
-                            ],
-                          ),
-                          actions: [
-                            TextButton(onPressed: () => Navigator.pop(childCtx), child: const Text('Cancel')),
-                            TextButton(
-                              onPressed: () {
-                                if (descCtrl.text.isEmpty) return;
-                                setBuilderState(() {
-                                  builderTasks.add({
-                                    'description': descCtrl.text,
-                                    'deadline': deadline.toIso8601String(),
-                                    'status': 'pending'
-                                  });
-                                });
-                                Navigator.pop(childCtx);
-                              },
-                              child: const Text('Add'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.add_task),
-                  label: const Text('Add Initial Task'),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: builderTasks.isEmpty ? null : () async {
-                try {
-                  final ds = ref.read(iapDataSourceProvider);
-                  await ds.createIap({
-                    'enterprise_id': enterpriseId,
-                    'tasks': builderTasks,
-                  });
-                  if (context.mounted) {
-                    Navigator.pop(ctx);
-                    ref.invalidate(enterpriseIapsProvider(enterpriseId));
-                    CustomToaster.show(context: context, message: 'IAP created successfully! 🚀');
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    CustomToaster.show(context: context, message: 'Failed: $e', isError: true);
-                  }
-                }
-              },
-              child: const Text('Save & Activate Plan'),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _doUpload(BuildContext context, WidgetRef ref, String filePath) async {
+    try {
+      ref.read(_uploadProgressProvider(task.id).notifier).state = 0.0;
+      
+      final svc = ref.read(iapEvidenceServiceProvider);
+      // Wait for upload
+      await svc.uploadEvidence(
+        taskId: task.id,
+        filePath: filePath,
+        onProgress: (sent, total) {
+          ref.read(_uploadProgressProvider(task.id).notifier).state = sent / total;
+        },
+      );
+
+      // Auto-update status to 'pending_verification' if enterprise user uploads
+      if (isEnterpriseUser) {
+        await svc.updateTaskStatus(task.id, 'pending_verification');
+      }
+
+      ref.invalidate(enterpriseIapsProvider(enterpriseId));
+      ref.read(_uploadProgressProvider(task.id).notifier).state = null;
+
+      if (context.mounted) {
+        CustomToaster.show(context: context, message: 'Evidence uploaded successfully! ✅');
+      }
+    } catch (e) {
+      ref.read(_uploadProgressProvider(task.id).notifier).state = null;
+      if (context.mounted) {
+        CustomToaster.show(context: context, message: 'Upload failed: $e', isError: true);
+      }
+    }
   }
 }

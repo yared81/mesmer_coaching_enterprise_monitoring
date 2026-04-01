@@ -396,8 +396,6 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                       );
                       return;
                     }
-                      }
-                    }
                     // Check signatures for physical sessions
                     if (widget.session.followupType == FollowupType.physical) {
                       if (_coachSignatureBase64 == null && widget.session.coachSignature == null) {
