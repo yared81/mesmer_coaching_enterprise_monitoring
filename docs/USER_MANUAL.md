@@ -1,4 +1,4 @@
-# 📖 MESMER Digital Coaching Platform - User Manual
+# 📖 MESMER Digital Coaching - User Manual
 
 **Complete Guide for All User Roles**
 

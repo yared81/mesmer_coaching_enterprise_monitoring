@@ -1,6 +1,6 @@
-# 📡 MESMER Digital Coaching Platform - API Documentation
+# 📡 MESMER Digital Coaching - API Documentation
 
-**Complete REST API Reference for the MESMER Digital Coaching Platform**
+**Complete REST API Reference for the MESMER Digital Coaching App**
 
 ---
 

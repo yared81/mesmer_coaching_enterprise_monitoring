@@ -1,12 +1,12 @@
-# 📚 MESMER Platform Documentation
+# 📚 MESMER Digital Coaching Documentation
 
-**Comprehensive documentation for the MESMER Digital Coaching Platform**
+**Comprehensive documentation for the MESMER Digital Coaching app**
 
 ---
 
 ## 📋 **Documentation Overview**
 
-This directory contains complete documentation for the MESMER Digital Coaching Platform, covering everything from user guides to technical architecture.
+This directory contains complete documentation for the MESMER Digital Coaching app, covering everything from user guides to technical architecture.
 
 ---
 

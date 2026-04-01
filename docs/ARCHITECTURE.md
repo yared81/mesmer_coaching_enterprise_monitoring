@@ -1,4 +1,4 @@
-# 🏗️ MESMER Digital Coaching Platform - Architecture Guide
+# 🏗️ MESMER Digital Coaching - Architecture Guide
 
 **System Design, Patterns, and Technical Architecture**
 
@@ -6,7 +6,7 @@
 
 ## 🎯 **Architecture Overview**
 
-The MESMER Digital Coaching Platform follows **Clean Architecture** principles with **Flutter** for the mobile frontend and **Node.js** for the backend API. The system is designed for scalability, maintainability, and security.
+The MESMER Digital Coaching app follows **Clean Architecture** principles with **Flutter** for the mobile frontend and **Node.js** for the backend API. The system is designed for scalability, maintainability, and security.
 
 ### **Architecture Principles**
 - **Separation of Concerns**: Clear boundaries between layers

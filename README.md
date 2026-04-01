@@ -1,14 +1,14 @@
-# 🏆 MESMER Digital Coaching Platform
+# 🏆 MESMER Digital Coaching
 
 **Enterprise Transformation through Digital Coaching & Quality Assurance**
 
-A comprehensive Flutter + Node.js platform that digitizes the MESMER Program's end-to-end workflow from enterprise intake to graduation, featuring role-based access control, offline capabilities, and professional certificate generation.
+A comprehensive Flutter + Node.js app that digitizes the MESMER Program's end-to-end workflow from enterprise intake to graduation, featuring role-based access control, offline capabilities, and professional certificate generation.
 
 ---
 
 ## 🎯 **Project Overview**
 
-The MESMER Digital Coaching Platform transforms traditional business coaching into a scalable, data-driven system supporting **500+ Ethiopian MSEs** through:
+The MESMER Digital Coaching app transforms traditional business coaching into a scalable, data-driven system supporting **500+ Ethiopian MSEs** through:
 
 - **📊 Complete Program Management** - From intake to graduation
 - **👥 11-Role RBAC System** - Super Admin to Enterprise Users
@@ -82,7 +82,7 @@ The MESMER Digital Coaching Platform transforms traditional business coaching in
 ```bash
 # 1. Clone Repository
 git clone <repository-url>
-cd mesmer_coaching_enterprise_monitoring
+cd mesmer_digital_coaching
 
 # 2. Database Setup
 sudo -i -u postgres psql
@@ -244,7 +244,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Project Category**: Enterprise Digital Transformation  
 **Target Users**: 500+ Ethiopian MSEs, 11 user roles  
-**Impact**: Scalable coaching platform with measurable outcomes  
+**Impact**: Scalable coaching app with measurable outcomes  
 
 ### **Demo Highlights**
 - Live certificate generation with QR verification

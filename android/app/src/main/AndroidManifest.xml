@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="mesmer_coaching_enterprise_monitoring"
+        android:label="MESMER Digital Coaching"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
