@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
 import 'coaching_provider.dart';
 import 'coaching_session_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/diagnosis_provider.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/theme/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/theme/app_colors.dart';
 
 class AddSessionScreen extends ConsumerStatefulWidget {
   const AddSessionScreen({super.key});

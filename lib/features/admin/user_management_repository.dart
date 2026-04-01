@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_model.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_model.dart';
+import 'package:mesmer_digital_coaching/features/admin/institution_model.dart';
 
 abstract class UserManagementRepository {
   Future<Either<String, List<UserModel>>> getUsers({String? role, String? institutionId, String? search});

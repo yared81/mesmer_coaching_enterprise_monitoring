@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_model.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_entity.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_model.dart';
 
 abstract class NotificationRepository {
   Future<List<NotificationEntity>> getNotifications();

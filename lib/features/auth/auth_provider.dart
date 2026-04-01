@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_remote_datasource.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_repository_impl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_repository.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/get_current_user_usecase.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/login_usecase.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/logout_usecase.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_remote_datasource.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_repository_impl.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_repository.dart';
+import 'package:mesmer_digital_coaching/features/auth/get_current_user_usecase.dart';
+import 'package:mesmer_digital_coaching/features/auth/login_usecase.dart';
+import 'package:mesmer_digital_coaching/features/auth/logout_usecase.dart';
 
 // --- Auth Data & Domain Providers ---
 

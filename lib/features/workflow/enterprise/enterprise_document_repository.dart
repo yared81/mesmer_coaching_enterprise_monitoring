@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'enterprise_document_entity.dart';
 
 abstract class EnterpriseDocumentRepository {

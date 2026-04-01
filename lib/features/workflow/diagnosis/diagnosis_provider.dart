@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
 import 'diagnosis_remote_datasource.dart';
 import 'diagnosis_repository_impl.dart';
 import 'diagnosis_template_entity.dart';

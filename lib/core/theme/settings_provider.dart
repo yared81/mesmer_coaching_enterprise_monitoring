@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
 
 class SystemSettings {
   final String textSize; // 'small', 'medium', 'large', 'xlarge'

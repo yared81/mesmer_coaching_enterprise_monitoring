@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/theme/settings_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/theme/theme_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/theme/settings_provider.dart';
+import 'package:mesmer_digital_coaching/core/theme/theme_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

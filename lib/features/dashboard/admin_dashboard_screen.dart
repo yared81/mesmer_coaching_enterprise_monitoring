@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/stat_card.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/app_search_bar.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/program_funnel_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/regional_performance_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/stat_card.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/activity_feed_widget.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/app_search_bar.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/widgets/program_funnel_widget.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/widgets/regional_performance_widget.dart';
+import 'package:mesmer_digital_coaching/core/widgets/notification_bell.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});

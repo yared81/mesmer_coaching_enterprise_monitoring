@@ -1,5 +1,5 @@
-import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/core/utils/num_utils.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
 
 class ActivityModel extends ActivityEntity {
   ActivityModel({

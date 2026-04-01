@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
 
 class ProgramFunnelWidget extends ConsumerWidget {
   const ProgramFunnelWidget({super.key});

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_entity.dart';
 
 class CertificateService {
   static Future<Uint8List> generateGraduationCertificate({

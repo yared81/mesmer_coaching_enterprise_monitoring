@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'calendar_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_session_entity.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});

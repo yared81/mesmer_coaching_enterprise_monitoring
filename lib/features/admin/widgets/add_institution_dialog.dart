@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/user_management_provider.dart';
+import 'package:mesmer_digital_coaching/features/admin/institution_model.dart';
+import 'package:mesmer_digital_coaching/features/admin/user_management_provider.dart';
 
 class AddInstitutionDialog extends ConsumerStatefulWidget {
   final InstitutionModel? institution;

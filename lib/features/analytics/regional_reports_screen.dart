@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/program_funnel_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/analytics/progress/supervisor_reports_screen.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/widgets/program_funnel_widget.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
 
 class RegionalReportsScreen extends ConsumerWidget {
   const RegionalReportsScreen({super.key});

@@ -4,16 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'enterprise_provider.dart';
 import 'enterprise_card.dart';
 import 'enterprise_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 import 'enterprise_filter_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import 'csv_import_service.dart';
 import 'dart:io';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'enterprise_model.dart';
 
 class EnterpriseListScreen extends ConsumerStatefulWidget {

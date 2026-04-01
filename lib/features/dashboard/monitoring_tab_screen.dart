@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/qc/qc_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/analytics/progress/supervisor_reports_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/assessment_profile_list_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/features/workflow/qc/qc_dashboard_screen.dart';
+import 'package:mesmer_digital_coaching/features/analytics/progress/supervisor_reports_screen.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/assessment_profile_list_screen.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 
 /// Monitoring hub: QC Queue + MERL Reports + Screening dynamically loaded based on strict Role Based Access Control.
 /// NOTE: No Scaffold here — the outer DashboardMainScreen already provides one.

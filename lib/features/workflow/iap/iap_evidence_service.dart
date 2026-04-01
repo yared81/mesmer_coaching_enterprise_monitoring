@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
 
 class IapEvidenceService {
   final Dio _client;

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/storage/secure_storage.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
 
 class ApiInterceptor extends Interceptor {
   ApiInterceptor(this._secureStorage);

@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/app_exception.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/errors/app_exception.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'coach_entity.dart';
 import 'coach_repository.dart';
 import 'coach_remote_datasource.dart';

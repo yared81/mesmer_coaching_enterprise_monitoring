@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import 'package:mesmer_digital_coaching/features/workflow/training/training_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/training/training_entity.dart';
+import 'package:mesmer_digital_coaching/core/widgets/sync_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 
 class TrainerDashboardScreen extends ConsumerWidget {
   const TrainerDashboardScreen({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_entity.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_entity.dart';
 
 class CoachListScreen extends ConsumerStatefulWidget {
   const CoachListScreen({super.key});

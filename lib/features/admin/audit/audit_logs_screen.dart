@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
 import 'package:intl/intl.dart';
 
 final auditLogsProvider = FutureProvider<List<dynamic>>((ref) async {

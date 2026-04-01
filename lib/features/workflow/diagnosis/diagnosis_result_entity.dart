@@ -1,4 +1,4 @@
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/assessment_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/assessment_entity.dart';
 
 // TODO: DiagnosisResultEntity — summarises the assessment outcome
 class DiagnosisResultEntity {

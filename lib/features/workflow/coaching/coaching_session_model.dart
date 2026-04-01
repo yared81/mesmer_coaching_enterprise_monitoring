@@ -1,4 +1,4 @@
-import 'package:mesmer_coaching_enterprise_monitoring/core/utils/num_utils.dart';
+import 'package:mesmer_digital_coaching/core/utils/num_utils.dart';
 import 'coaching_session_entity.dart';
 
 class CoachingSessionModel extends CoachingSessionEntity {

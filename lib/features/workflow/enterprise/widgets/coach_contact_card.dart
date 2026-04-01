@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 
 class CoachContactCard extends StatelessWidget {
   final UserCoachEntity coach;

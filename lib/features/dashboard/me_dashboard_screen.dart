@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/widgets/program_funnel_widget.dart';
+import 'package:mesmer_digital_coaching/core/widgets/notification_bell.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/widgets/program_funnel_widget.dart';
 
 class MeDashboardScreen extends ConsumerWidget {
   const MeDashboardScreen({super.key});

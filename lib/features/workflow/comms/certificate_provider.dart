@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'certificate_template.dart';
 import 'certificate_verification.dart';
 import 'graduation_validator.dart';

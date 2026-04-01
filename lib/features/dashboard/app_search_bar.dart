@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_entity.dart';
 
 class AppSearchBar extends ConsumerStatefulWidget {
   const AppSearchBar({super.key});

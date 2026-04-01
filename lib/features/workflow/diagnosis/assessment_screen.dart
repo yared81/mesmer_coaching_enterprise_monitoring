@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_report_model.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_session_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/diagnosis_report_model.dart';
 import 'diagnosis_provider.dart';
 import 'diagnosis_template_entity.dart';
 import 'question_card.dart';
 import 'diagnosis_summary_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 
 class AssessmentScreen extends ConsumerStatefulWidget {
   final String sessionId;

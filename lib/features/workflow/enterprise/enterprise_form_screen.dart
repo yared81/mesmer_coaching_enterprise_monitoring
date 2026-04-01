@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'enterprise_provider.dart';
 import 'enterprise_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/primary_button.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/shared/widgets/app_text_field.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/shared/widgets/primary_button.dart';
+import 'package:mesmer_digital_coaching/shared/widgets/app_text_field.dart';
 
 class EnterpriseFormScreen extends ConsumerStatefulWidget {
   const EnterpriseFormScreen({super.key});

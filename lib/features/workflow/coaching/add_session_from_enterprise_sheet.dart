@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_provider.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_session_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/diagnosis_provider.dart';
 import 'package:geolocator/geolocator.dart';
 
 /// A lighter session creation sheet that pre-selects the enterprise.

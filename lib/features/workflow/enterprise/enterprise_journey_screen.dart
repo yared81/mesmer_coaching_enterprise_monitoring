@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coaching_session_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/training/training_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_session_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/training/training_provider.dart';
 
 class EnterpriseJourneyScreen extends ConsumerWidget {
   const EnterpriseJourneyScreen({super.key});

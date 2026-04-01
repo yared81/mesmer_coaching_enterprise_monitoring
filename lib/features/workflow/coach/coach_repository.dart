@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_entity.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_entity.dart';
 
 abstract class CoachRepository {
   Future<Either<Failure, List<CoachEntity>>> getCoaches();

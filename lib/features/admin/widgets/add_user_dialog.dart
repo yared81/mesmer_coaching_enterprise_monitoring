@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/user_management_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/admin/user_management_provider.dart';
 
 class AddUserDialog extends ConsumerStatefulWidget {
   final dynamic user;

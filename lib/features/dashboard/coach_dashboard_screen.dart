@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
 import 'stat_card.dart';
 
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/metric_swiper.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/performance_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/sync/sync_service.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_navigation_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/add_session_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/notification_bell.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/metric_swiper.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/performance_chart.dart';
+import 'package:mesmer_digital_coaching/core/sync/sync_service.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/activity_feed_widget.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/activity_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_navigation_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/add_session_screen.dart';
+import 'package:mesmer_digital_coaching/core/widgets/notification_bell.dart';
 
 class _LiveActivityFeed extends ConsumerWidget {
   const _LiveActivityFeed();

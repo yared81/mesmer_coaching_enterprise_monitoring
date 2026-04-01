@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_repository.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_entity.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_repository.dart';
 
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   return NotificationRepositoryImpl(ref.watch(dioProvider));

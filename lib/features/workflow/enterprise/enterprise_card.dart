@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'enterprise_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
 
 class EnterpriseCard extends StatelessWidget {
   const EnterpriseCard({

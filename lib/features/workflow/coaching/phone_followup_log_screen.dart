@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'coaching_provider.dart';
 import 'phone_followup_entity.dart';
 

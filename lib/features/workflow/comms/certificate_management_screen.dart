@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/graduation_provider.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/graduation_provider.dart';
 import 'package:printing/printing.dart';
 import 'certificate_service.dart';
 

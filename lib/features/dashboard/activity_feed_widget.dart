@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
 
 class ActivityFeedWidget extends StatelessWidget {
   final List<ActivityEntity> activities;

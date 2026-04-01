@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/consent/consent_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/consent/consent_provider.dart';
 import 'consent_capture_screen.dart';
 
 class ConsentGate extends ConsumerWidget {

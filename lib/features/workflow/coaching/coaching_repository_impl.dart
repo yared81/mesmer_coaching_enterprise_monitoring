@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/api_constants.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_database.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/db/local_database.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'coaching_session_entity.dart';
 import 'coaching_repository.dart';
 import 'coaching_remote_datasource.dart';

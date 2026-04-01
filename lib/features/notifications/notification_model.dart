@@ -1,4 +1,4 @@
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_entity.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_entity.dart';
 
 class NotificationModel {
   static NotificationEntity fromJson(Map<String, dynamic> json) {

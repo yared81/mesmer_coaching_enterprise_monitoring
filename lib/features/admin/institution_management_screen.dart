@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/admin/institution_model.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/features/admin/institution_model.dart';
 
 final institutionsProvider = FutureProvider<List<InstitutionModel>>((ref) async {
   final dio = ref.watch(dioProvider);

@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_remote_datasource.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_repository.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_remote_datasource.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_model.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_repository.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
   final DashboardRemoteDataSource remoteDataSource;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/notifications/notification_entity.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_provider.dart';
+import 'package:mesmer_digital_coaching/features/notifications/notification_entity.dart';
 import 'package:intl/intl.dart';
 
 class NotificationScreen extends ConsumerWidget {

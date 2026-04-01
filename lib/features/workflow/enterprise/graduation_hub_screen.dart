@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'graduation_provider.dart';
 import 'enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 
 class GraduationHubScreen extends ConsumerWidget {
   const GraduationHubScreen({super.key});

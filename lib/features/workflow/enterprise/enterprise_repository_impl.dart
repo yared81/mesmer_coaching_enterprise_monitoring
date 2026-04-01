@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/hive_storage.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'enterprise_entity.dart';
 import 'enterprise_repository.dart';
 import 'enterprise_remote_datasource.dart';

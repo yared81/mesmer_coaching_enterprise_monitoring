@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/db/local_database.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/db/local_database.dart';
 import 'coaching_remote_datasource.dart';
 import 'coaching_repository_impl.dart';
 import 'coaching_repository.dart';

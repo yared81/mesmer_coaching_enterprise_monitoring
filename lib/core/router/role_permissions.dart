@@ -1,5 +1,5 @@
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 
 class RolePermissions {
   static const Map<UserRole, List<String>> _allowedPrefixes = {

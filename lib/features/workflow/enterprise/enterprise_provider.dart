@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
 import 'enterprise_remote_datasource.dart';
 import 'enterprise_repository_impl.dart';
 import 'enterprise_repository.dart';
@@ -8,7 +8,7 @@ import 'register_enterprise_usecase.dart';
 import 'update_enterprise_usecase.dart';
 import 'enterprise_entity.dart';
 import 'enterprise_dashboard_stats.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
 
 // 1. Datasource Provider
 final enterpriseRemoteDataSourceProvider = Provider<EnterpriseRemoteDatasource>((ref) {

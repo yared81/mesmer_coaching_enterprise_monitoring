@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
 import 'enterprise_document_entity.dart';
 import 'enterprise_document_repository.dart';
 import 'enterprise_document_remote_datasource.dart';

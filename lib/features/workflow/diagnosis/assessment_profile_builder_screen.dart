@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'diagnosis_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/custom_toaster.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/diagnosis/diagnosis_template_entity.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
+import 'package:mesmer_digital_coaching/features/workflow/diagnosis/diagnosis_template_entity.dart';
 
 class _CategoryDraft {
   final String? id; // Track original ID for delta updates

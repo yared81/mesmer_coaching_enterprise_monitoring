@@ -317,7 +317,7 @@ class EnterpriseService {
     const ready = [];
     for (const ent of enterprises) {
       const count = parseInt(ent.getDataValue('completedCount') || 0);
-      if (count >= 1) { // Leniency for hackathon demo: 1+ session instead of 8
+      if (count >= 8) { // Requires 8 completed coaching sessions for graduation
         const pendingQC = await QcAudit.count({ where: { target_id: ent.id, status: 'pending' } });
         if (pendingQC === 0) ready.push(ent);
       }

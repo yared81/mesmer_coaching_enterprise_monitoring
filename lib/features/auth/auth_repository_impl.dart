@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/failure.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/storage/secure_storage.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_repository.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_token_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_model.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_remote_datasource.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/storage/secure_storage.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_repository.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_token_model.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_model.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_remote_datasource.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({

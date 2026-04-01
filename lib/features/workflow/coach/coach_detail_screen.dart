@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/enterprise/enterprise_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_stats_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_spacing.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_entity.dart';
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_stats_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 
 class CoachDetailScreen extends ConsumerWidget {
   final String coachId;

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_navigation_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/metric_swiper.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/performance_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_activity_chart.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/activity_feed_widget.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/app_search_bar.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/widgets/sync_indicator.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_navigation_provider.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/metric_swiper.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/performance_chart.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/coach_activity_chart.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/activity_feed_widget.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/app_search_bar.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/core/widgets/sync_indicator.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class SupervisorDashboardScreen extends ConsumerWidget {

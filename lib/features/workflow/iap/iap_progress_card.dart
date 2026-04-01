@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'iap_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 
 /// Displays a progress ring and key stats for an IAP.
 /// Pass the [iapId] and it fetches live stats from the backend.

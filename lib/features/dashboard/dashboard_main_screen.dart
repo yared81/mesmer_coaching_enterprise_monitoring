@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/auth_provider.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/auth/user_entity.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/admin_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/supervisor_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/coach_dashboard_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/common/settings_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_list_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/regional_coordinator_dashboard_screen.dart';
+import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/admin_dashboard_screen.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/supervisor_dashboard_screen.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/coach_dashboard_screen.dart';
+import 'package:mesmer_digital_coaching/common/settings_screen.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_list_screen.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/regional_coordinator_dashboard_screen.dart';
 
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_enterprise_list_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coaching/coach_session_list_screen.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/dashboard/dashboard_navigation_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_enterprise_list_screen.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coach_session_list_screen.dart';
+import 'package:mesmer_digital_coaching/features/dashboard/dashboard_navigation_provider.dart';
 
 class DashboardMainScreen extends ConsumerWidget {
   final Widget child;

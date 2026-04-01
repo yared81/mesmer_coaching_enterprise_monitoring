@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/core/errors/app_exception.dart';
-import 'package:mesmer_coaching_enterprise_monitoring/features/workflow/coach/coach_model.dart';
+import 'package:mesmer_digital_coaching/core/errors/app_exception.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coach/coach_model.dart';
 
 abstract class CoachRemoteDataSource {
   Future<List<CoachModel>> getCoaches();
