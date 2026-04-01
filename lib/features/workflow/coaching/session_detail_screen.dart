@@ -12,6 +12,7 @@ import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_
 import 'package:mesmer_digital_coaching/features/workflow/iap/iap_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/iap/iap_entity.dart';
 import 'package:mesmer_digital_coaching/core/theme/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/widgets/signature_pad_widget.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
   final CoachingSessionEntity session;
@@ -29,6 +30,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
   late TextEditingController _revenueController;
   late TextEditingController _employeesController;
   bool _isSaving = false;
+  String? _coachSignatureBase64;
+  String? _enterpriseSignatureBase64;
 
   @override
   void initState() {
@@ -70,6 +73,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       recommendations: _recommendationsController.text,
       notes: _notesController.text,
       templateId: widget.session.templateId,
+      coachSignature: _coachSignatureBase64 ?? widget.session.coachSignature,
+      enterpriseSignature: _enterpriseSignatureBase64 ?? widget.session.enterpriseSignature,
     );
 
     try {
@@ -294,6 +299,24 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
 
             const SizedBox(height: 32),
 
+            // ─── SIGNATURES SECTION ───
+            if (!isReadOnly && widget.session.followupType == FollowupType.physical) ...[
+              const Text('Digital Sign-off', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 16),
+              SignaturePadWidget(
+                title: 'Coach Signature',
+                onSave: (base64) => setState(() => _coachSignatureBase64 = base64),
+              ),
+              const SizedBox(height: 16),
+              SignaturePadWidget(
+                title: 'Enterprise Owner Signature',
+                onSave: (base64) => setState(() => _enterpriseSignatureBase64 = base64),
+              ),
+              const SizedBox(height: 32),
+            ],
+
+            const SizedBox(height: 32),
+
             // ─── ACTION BUTTONS ───
             if (!isReadOnly) ...[
               const Divider(),
@@ -373,12 +396,22 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                       );
                       return;
                     }
-                    // Check growth metrics for physical sessions
+                      }
+                    }
+                    // Check signatures for physical sessions
                     if (widget.session.followupType == FollowupType.physical) {
-                      if (_revenueController.text.isEmpty || _employeesController.text.isEmpty) {
+                      if (_coachSignatureBase64 == null && widget.session.coachSignature == null) {
                         CustomToaster.show(
                           context: context,
-                          message: 'Please provide revenue and employee metrics before finalizing.',
+                          message: 'Coach signature is required for physical visits.',
+                          isError: true,
+                        );
+                        return;
+                      }
+                      if (_enterpriseSignatureBase64 == null && widget.session.enterpriseSignature == null) {
+                        CustomToaster.show(
+                          context: context,
+                          message: 'Enterprise owner signature is required for physical visits.',
                           isError: true,
                         );
                         return;

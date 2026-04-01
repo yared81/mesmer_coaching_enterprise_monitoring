@@ -27,6 +27,8 @@ class CoachingSessionEntity {
     this.problemsIdentified,
     this.recommendations,
     this.notes,
+    this.coachSignature,
+    this.enterpriseSignature,
   });
 
   final String id;
@@ -49,6 +51,8 @@ class CoachingSessionEntity {
   final String? problemsIdentified;
   final String? recommendations;
   final String? notes;
+  final String? coachSignature;
+  final String? enterpriseSignature;
 
   factory CoachingSessionEntity.fromJson(Map<String, dynamic> json) {
     return CoachingSessionEntity(
@@ -83,6 +87,8 @@ class CoachingSessionEntity {
       problemsIdentified: json['problems_identified'],
       recommendations: json['recommendations'],
       notes: json['notes'],
+      coachSignature: json['coach_signature'],
+      enterpriseSignature: json['enterprise_signature'],
     );
   }
 }

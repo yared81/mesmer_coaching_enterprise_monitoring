@@ -26,3 +26,15 @@ exports.getRegionalStats = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getSystemWideStats = async (req, res, next) => {
+  try {
+    const data = await AnalyticsService.getSystemWideStats();
+    res.status(200).json({
+      success: true,
+      data
+    });
+  } catch (err) {
+    next(err);
+  }
+};

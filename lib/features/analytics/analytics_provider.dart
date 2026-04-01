@@ -37,7 +37,36 @@ class RegionalAnalytics {
   }
 }
 
+class SystemWideStats {
+  final int totalEnterprises;
+  final int totalSessions;
+  final double avgRevenueGrowth;
+  final int activeSectors;
+
+  SystemWideStats({
+    required this.totalEnterprises,
+    required this.totalSessions,
+    required this.avgRevenueGrowth,
+    required this.activeSectors,
+  });
+
+  factory SystemWideStats.fromJson(Map<String, dynamic> json) {
+    return SystemWideStats(
+      totalEnterprises: json['totalEnterprises'] ?? 0,
+      totalSessions: json['totalSessions'] ?? 0,
+      avgRevenueGrowth: (json['avgRevenueGrowth'] ?? 0).toDouble(),
+      activeSectors: json['activeSectors'] ?? 0,
+    );
+  }
+}
+
 // ─── Providers ───────────────────────────────────────────────────────────────
+
+final systemWideStatsProvider = FutureProvider<SystemWideStats>((ref) async {
+  final dio = ref.read(dioProvider);
+  final response = await dio.get('${ApiConstants.baseUrl}/analytics/system');
+  return SystemWideStats.fromJson(response.data['data']);
+});
 
 final sectorAnalyticsProvider = FutureProvider<List<SectorAnalytics>>((ref) async {
   final dio = ref.watch(dioProvider);

@@ -86,15 +86,23 @@ const CoachingSession = sequelize.define('CoachingSession', {
   notes: {
     type: DataTypes.TEXT
   },
-  template_id: {
-    type: DataTypes.UUID,
-    allowNull: true,
-    references: {
-      model: 'diagnosis_templates',
-      key: 'id'
+    template_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: 'diagnosis_templates',
+        key: 'id'
+      }
+    },
+    coach_signature: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    enterprise_signature: {
+      type: DataTypes.TEXT,
+      allowNull: true
     }
-  }
-}, {
+  }, {
   tableName: 'coaching_sessions',
   timestamps: true,
   createdAt: 'created_at',

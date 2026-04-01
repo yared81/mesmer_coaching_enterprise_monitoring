@@ -24,6 +24,14 @@ const IndividualActionPlan = sequelize.define('IndividualActionPlan', {
   signoff_date: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  coach_signature: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  owner_signature: {
+    type: DataTypes.TEXT,
+    allowNull: true
   }
 }, {
   tableName: 'individual_action_plans',

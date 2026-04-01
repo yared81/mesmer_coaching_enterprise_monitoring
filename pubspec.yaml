@@ -58,6 +58,7 @@ dependencies:
   qr_flutter: ^4.1.0
   table_calendar: ^3.1.2
   url_launcher: ^6.3.1
+  signature: ^5.5.0
  
   # Data Persistence & Generation
   freezed_annotation: ^2.4.4

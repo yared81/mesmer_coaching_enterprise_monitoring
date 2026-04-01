@@ -11,6 +11,7 @@ class CrossSectorAnalyticsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sectorsAsync = ref.watch(sectorAnalyticsProvider);
     final regionsAsync = ref.watch(regionalAnalyticsProvider);
+    final systemStats = ref.watch(systemWideStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,6 +22,14 @@ class CrossSectorAnalyticsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ─── System-Wide KPIs (M&E Focus) ──────────────────────────────────
+            systemStats.when(
+              data: (stats) => _buildSystemKpiGrid(stats),
+              loading: () => const Center(child: LinearProgressIndicator()),
+              error: (e, _) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 24),
+
             const Text(
               'Sector Distribution',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -172,6 +181,56 @@ class CrossSectorAnalyticsScreen extends ConsumerWidget {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => Text('Error: $err'),
+    );
+  }
+
+  Widget _buildSystemKpiGrid(SystemWideStats stats) {
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      childAspectRatio: 2.2,
+      children: [
+        _buildKpiCard('Total Enterprises', stats.totalEnterprises.toString(), Icons.business, Colors.blue),
+        _buildKpiCard('Completed Sessions', stats.totalSessions.toString(), Icons.check_circle_outline, Colors.green),
+        _buildKpiCard('Avg. Rev Growth', '${stats.avgRevenueGrowth}%', Icons.trending_up, Colors.orange),
+        _buildKpiCard('Active Sectors', stats.activeSectors.toString(), Icons.category_outlined, Colors.purple),
+      ],
+    );
+  }
+
+  Widget _buildKpiCard(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey), overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

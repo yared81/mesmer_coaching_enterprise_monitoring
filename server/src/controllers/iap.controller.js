@@ -6,16 +6,33 @@ class IapController {
    */
   createIap = async (req, res, next) => {
     try {
-      const { enterprise_id, status } = req.body;
+      const { enterprise_id, status, tasks } = req.body;
       const coach_id = req.user.userId;
 
-      const iap = await IndividualActionPlan.create({
-        enterprise_id,
-        coach_id,
-        status: status || 'active'
+      // Use a transaction for bulk creation
+      const { sequelize } = require('../models');
+      const result = await sequelize.transaction(async (t) => {
+        const iap = await IndividualActionPlan.create({
+          enterprise_id,
+          coach_id,
+          status: status || 'active'
+        }, { transaction: t });
+
+        if (tasks && tasks.length > 0) {
+          const tasksWithIapId = tasks.map(task => ({
+            ...task,
+            iap_id: iap.id
+          }));
+          await IapTask.bulkCreate(tasksWithIapId, { transaction: t });
+        }
+
+        return await IndividualActionPlan.findByPk(iap.id, {
+          include: [{ model: IapTask, as: 'tasks' }],
+          transaction: t
+        });
       });
 
-      res.status(201).json({ success: true, data: iap });
+      res.status(201).json({ success: true, data: result });
     } catch (error) {
       next(error);
     }

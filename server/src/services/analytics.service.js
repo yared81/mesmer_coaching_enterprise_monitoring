@@ -70,6 +70,25 @@ class AnalyticsService {
       avgBaseline: parseFloat(parseFloat(r.avgBaseline || 0).toFixed(1))
     }));
   }
+
+  /**
+   * Get global KPIs for M&E Dashboard
+   */
+  async getSystemWideStats() {
+    const [totalEnterprises, totalSessions, avgGrowth, sectorCount] = await Promise.all([
+      Enterprise.count(),
+      CoachingSession.count({ where: { status: 'completed' } }),
+      CoachingSession.aggregate('revenue_growth_percent', 'AVG', { where: { status: 'completed' } }),
+      Enterprise.count({ distinct: true, col: 'sector' })
+    ]);
+
+    return {
+      totalEnterprises,
+      totalSessions,
+      avgRevenueGrowth: parseFloat(parseFloat(avgGrowth || 0).toFixed(1)),
+      activeSectors: sectorCount
+    };
+  }
 }
 
 module.exports = new AnalyticsService();
