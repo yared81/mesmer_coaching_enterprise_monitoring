@@ -8,20 +8,19 @@ class SuccessStoryEditorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Success Stories', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFFDB2777),
-        foregroundColor: Colors.white,
       ),
       body: DefaultTabController(
         length: 2,
         child: Column(
           children: [
             Container(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               child: const TabBar(
                 labelColor: Color(0xFFDB2777),
+                unselectedLabelColor: Colors.grey,
                 indicatorColor: Color(0xFFDB2777),
                 tabs: [
                   Tab(text: 'DRAFTS (3)'),
@@ -54,11 +53,13 @@ class SuccessStoryEditorScreen extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         _buildStoryCard(
+          context,
           title: 'ABC Hardware - From Kiosk to Thriving Store',
           date: 'Created: Mar 23, 2025',
           isDraft: true,
         ),
         _buildStoryCard(
+          context,
           title: 'Tesfa Bakery - Baking Success Through Better Records',
           date: 'Created: Mar 22, 2025',
           isDraft: true,
@@ -72,6 +73,7 @@ class SuccessStoryEditorScreen extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
         _buildStoryCard(
+          context,
           title: 'Kebede Traders - How Proper Bookkeeping Doubled Sales',
           date: 'Published: Mar 15, 2025',
           isDraft: false,
@@ -81,11 +83,11 @@ class SuccessStoryEditorScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStoryCard({required String title, required String date, bool isDraft = false, String? views}) {
+  Widget _buildStoryCard(BuildContext context, {required String title, required String date, bool isDraft = false, String? views}) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey[200]!)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1))),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -167,7 +169,7 @@ class SuccessStoryEditorScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFDB2777),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),

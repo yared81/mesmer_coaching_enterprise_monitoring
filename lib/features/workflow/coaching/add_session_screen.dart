@@ -178,9 +178,6 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('New Session', style: TextStyle(fontWeight: FontWeight.bold)),
-        elevation: 0,
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -285,8 +282,8 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.05),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.4)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: _isLoadingSessionNumber
@@ -299,7 +296,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                       )
                     : Row(
                         children: [
-                          Icon(Icons.playlist_add_check_rounded, color: AppColors.primary),
+                          Icon(Icons.playlist_add_check_rounded, color: Theme.of(context).colorScheme.primary),
                           const SizedBox(width: 12),
                           Text(
                             _selectedEnterpriseId == null
@@ -308,7 +305,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         ],
@@ -357,7 +354,7 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
                 child: ElevatedButton(
                   onPressed: (_isSubmitting || _nextSessionNumber > 8) ? null : _submit,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     disabledBackgroundColor: Theme.of(context).disabledColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
@@ -386,22 +383,22 @@ class _AddSessionScreenState extends ConsumerState<AddSessionScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Theme.of(context).cardColor,
+          color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.05) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? AppColors.primary : Theme.of(context).dividerColor,
+            color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor,
             width: 2,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? AppColors.primary : Theme.of(context).hintColor),
+            Icon(icon, color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).hintColor),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? AppColors.primary : Theme.of(context).hintColor,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).hintColor,
               ),
             ),
           ],

@@ -67,7 +67,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                            session.status == SessionStatus.cancelled;
 
         return Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
             title: const Text('Digital Diagnosis'),
             backgroundColor: AppColors.primary,
@@ -101,7 +101,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                                 SliverToBoxAdapter(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                    color: AppColors.background,
+                                    color: Theme.of(context).scaffoldBackgroundColor,
                                     child: Text(
                                       category.name.toUpperCase(),
                                       style: const TextStyle(
@@ -139,7 +139,7 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
                                       ? () => _submit(template) 
                                       : null,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
+                                    backgroundColor: Theme.of(context).colorScheme.primary,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(vertical: 16),
                                     shape: RoundedRectangleBorder(
@@ -253,9 +253,9 @@ class _AssessmentScreenState extends ConsumerState<AssessmentScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+            border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

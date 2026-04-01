@@ -8,7 +8,7 @@ class CommsReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Program Reports', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
@@ -18,18 +18,21 @@ class CommsReportsScreen extends StatelessWidget {
           const Text('GENERATE NEW REPORT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
           const SizedBox(height: AppSpacing.md),
           _buildReportTypeCard(
+            context,
             title: 'Quarterly Impact Report',
             description: 'Success stories, KPIs, and regional breakdown.',
             icon: Icons.analytics,
             color: Colors.blue,
           ),
           _buildReportTypeCard(
+            context,
             title: 'Graduation Summary',
             description: 'List of certified enterprises and metrics.',
             icon: Icons.school,
             color: Colors.green,
           ),
           _buildReportTypeCard(
+            context,
             title: 'Donor/Partner Report',
             description: 'Formatted for stakeholder presentation.',
             icon: Icons.description,
@@ -38,14 +41,15 @@ class CommsReportsScreen extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           const Text('RECENT REPORTS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.grey)),
           const SizedBox(height: AppSpacing.md),
-          _buildRecentReportItem(title: 'Q1 2025 Impact Report', date: 'Mar 20, 2025', size: '2.4 MB'),
-          _buildRecentReportItem(title: 'Feb 2025 Graduation Summary', date: 'Mar 1, 2025', size: '1.2 MB'),
+          _buildRecentReportItem(context, title: 'Q1 2025 Impact Report', date: 'Mar 20, 2025', size: '2.4 MB'),
+          _buildRecentReportItem(context, title: 'Feb 2025 Graduation Summary', date: 'Mar 1, 2025', size: '1.2 MB'),
         ],
       ),
     );
   }
 
-  Widget _buildReportTypeCard({
+  Widget _buildReportTypeCard(
+    BuildContext context, {
     required String title,
     required String description,
     required IconData icon,
@@ -54,7 +58,7 @@ class CommsReportsScreen extends StatelessWidget {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1))),
       child: ListTile(
         leading: CircleAvatar(backgroundColor: color.withOpacity(0.1), child: Icon(icon, color: color)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -65,11 +69,11 @@ class CommsReportsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentReportItem({required String title, required String date, required String size}) {
+  Widget _buildRecentReportItem(BuildContext context, {required String title, required String date, required String size}) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[100]!)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.05))),
       child: ListTile(
         leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
         title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal)),

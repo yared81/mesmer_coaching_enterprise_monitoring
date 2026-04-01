@@ -56,7 +56,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         onPressed: () => Navigator.pushNamed(context, '/sessions/new'),
         icon: const Icon(Icons.add_task),
         label: const Text('Schedule'),
-        backgroundColor: AppColors.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -83,20 +83,20 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           });
         },
         eventLoader: (day) => _getSessionsForDay(day, sessions),
-        calendarStyle: const CalendarStyle(
+        calendarStyle: CalendarStyle(
           markerDecoration: BoxDecoration(
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
             shape: BoxShape.circle,
           ),
           todayDecoration: BoxDecoration(
-            color: Color(0xFFE3F2FD),
+            color: Theme.of(context).colorScheme.primaryContainer,
             shape: BoxShape.circle,
           ),
-          todayTextStyle: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+          todayTextStyle: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold),
         ),
         headerStyle: const HeaderStyle(
           formatButtonVisible: false,

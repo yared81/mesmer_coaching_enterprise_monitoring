@@ -1,6 +1,6 @@
 const PDFDocument = require('pdfkit');
 const { Parser } = require('json2csv');
-const { Enterprise, CoachingSession, IAP, IAPTask, User, sequelize } = require('../models');
+const { Enterprise, CoachingSession, IndividualActionPlan, IapTask, User, sequelize } = require('../models');
 const { Op } = require('sequelize');
 
 class ReportService {
@@ -12,9 +12,9 @@ class ReportService {
       include: [
         { model: CoachingSession, as: 'sessions' },
         {
-          model: IAP,
+          model: IndividualActionPlan,
           as: 'actionPlans',
-          include: [{ model: IAPTask, as: 'tasks' }]
+          include: [{ model: IapTask, as: 'tasks' }]
         },
         { model: User, as: 'coach', attributes: ['name', 'email'] }
       ],
@@ -131,9 +131,9 @@ class ReportService {
     const enterprises = await Enterprise.findAll({
       include: [
         {
-          model: IAP,
+          model: IndividualActionPlan,
           as: 'actionPlans',
-          include: [{ model: IAPTask, as: 'tasks' }]
+          include: [{ model: IapTask, as: 'tasks' }]
         },
         { model: User, as: 'coach', attributes: ['name'] }
       ]

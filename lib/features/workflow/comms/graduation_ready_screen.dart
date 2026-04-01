@@ -23,7 +23,7 @@ class GraduationReadyScreen extends ConsumerWidget {
     final readyAsync = ref.watch(graduationReadyProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,8 +32,6 @@ class GraduationReadyScreen extends ConsumerWidget {
             Text('Cleared by M&E for Certification', style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal)),
           ],
         ),
-        backgroundColor: const Color(0xFF1E3A8A),
-        foregroundColor: Colors.white,
       ),
       body: readyAsync.when(
         data: (list) {
@@ -77,7 +75,7 @@ class GraduationReadyScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -86,7 +84,7 @@ class GraduationReadyScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.school, color: Color(0xFF1E3A8A)),
+                Icon(Icons.school, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -94,12 +92,12 @@ class GraduationReadyScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green[50],
+                    color: Colors.green.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '$sessionCount Sessions',
-                    style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.bold, fontSize: 12),
+                    style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
               ],
@@ -116,8 +114,8 @@ class GraduationReadyScreen extends ConsumerWidget {
                   icon: const Icon(Icons.edit_note, size: 18),
                   label: const Text('STORY'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF1E3A8A),
-                    side: const BorderSide(color: Color(0xFF1E3A8A)),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -126,7 +124,7 @@ class GraduationReadyScreen extends ConsumerWidget {
                   icon: const Icon(Icons.card_membership, size: 18),
                   label: const Text('GENERATE'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E3A8A),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
                   ),

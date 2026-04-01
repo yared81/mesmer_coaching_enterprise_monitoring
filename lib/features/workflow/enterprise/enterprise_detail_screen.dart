@@ -29,6 +29,7 @@ import 'package:mesmer_digital_coaching/features/workflow/qc/qc_audit_entity.dar
 import 'package:mesmer_digital_coaching/core/widgets/sync_indicator.dart';
 import 'report_provider.dart';
 import 'widgets/certificate_generator.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 
 class EnterpriseDetailScreen extends ConsumerStatefulWidget {
   final String enterpriseId;
@@ -54,7 +55,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     super.initState();
     final user = ref.read(authProvider).user;
     _permittedTabs = _getTabConfigs(user?.role);
-    _tabController = TabController(length: _permittedTabs.length, vsync: this);
+    _tabController = TabController(length: _permittedTabs.length + 1, vsync: this);
   }
 
   List<_TabConfig> _getTabConfigs(UserRole? role) {
@@ -190,19 +191,19 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
             expandedHeight: 280, // Increased height to prevent overlap
             pinned: true,
             elevation: 0,
-            backgroundColor: const Color(0xFF3D5AFE),
-            foregroundColor: Colors.white,
             actions: [
               const SyncIndicator(),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Colors.white),
+                icon: const Icon(Icons.more_vert),
                 onSelected: (value) async {
                   if (value == 'edit') {
                     if (currentUser?.role == UserRole.enterprise) {
                       final hoursSinceReg = DateTime.now().difference(enterprise.registeredAt).inHours;
                       if (hoursSinceReg > 48) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Profile locked (48-hour rule). Contact verifier to edit.')),
+                        CustomToaster.show(
+                          context: context,
+                          message: 'Profile locked (48-hour rule). Contact verifier to edit.',
+                          isError: true,
                         );
                         return;
                       }
@@ -241,7 +242,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                     ),
                     const PopupMenuItem(
                       value: 'export_pdf',
-                      child: Row(children: [Icon(Icons.picture_as_pdf_rounded, color: Color(0xFFDC2626), size: 18), SizedBox(width: 8), Text('Export Progress PDF')]),
+                      child: Row(children: [Icon(Icons.picture_as_pdf_rounded, color: Colors.red, size: 18), SizedBox(width: 8), Text('Export Progress PDF')]),
                     ),
                   ];
                 },
@@ -1491,8 +1492,10 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
     );
 
     if (completedSessions < 8) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ineligible: Only $completedSessions/8 sessions completed.')),
+      CustomToaster.show(
+        context: context,
+        message: 'Ineligible: Only $completedSessions/8 sessions completed.',
+        isError: true,
       );
       return;
     }
@@ -1513,15 +1516,18 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
       try {
         await ref.read(graduationProvider.notifier).request(enterprise.id);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Graduation successful! Enterprise status updated.')),
+          CustomToaster.show(
+            context: context,
+            message: 'Graduation successful! Enterprise status updated.',
           );
           ref.invalidate(enterpriseListProvider); // Refresh to show new status
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Graduation failed: $e'), backgroundColor: Colors.red),
+          CustomToaster.show(
+            context: context,
+            message: 'Graduation failed: $e',
+            isError: true,
           );
         }
       }

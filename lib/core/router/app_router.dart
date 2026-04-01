@@ -86,7 +86,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final isLoggingIn = state.matchedLocation == AppRoutes.login;
       final isSplashing = state.matchedLocation == AppRoutes.splash;
       
-      // 1. If not authenticated and not on login or splash, redirect to login
+      // 1. If we are still in initial/loading state, don't redirect yet
+      if (authState.status == AuthStatus.initial) {
+        return isSplashing ? null : AppRoutes.splash;
+      }
+
+      // 2. If not authenticated and not on login or splash, redirect to login
       if (authState.status == AuthStatus.unauthenticated && !isLoggingIn && !isSplashing) {
         return AppRoutes.login;
       }

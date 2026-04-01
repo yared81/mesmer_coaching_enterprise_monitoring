@@ -63,12 +63,12 @@ class QuestionCard extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: isSelected ? AppColors.primary : AppColors.border,
+                        color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withOpacity(0.1),
                         width: isSelected ? 2 : 1,
                       ),
                       borderRadius: BorderRadius.circular(8),
                       color: isSelected
-                          ? AppColors.primary.withOpacity(0.05)
+                          ? Theme.of(context).colorScheme.primary.withOpacity(0.05)
                           : Colors.transparent,
                     ),
                     child: Row(
@@ -79,10 +79,10 @@ class QuestionCard extends ConsumerWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? AppColors.primary : AppColors.textPlaceholder,
+                              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).hintColor,
                               width: 2,
                             ),
-                            color: isSelected ? AppColors.primary : Colors.transparent,
+                            color: isSelected ? Theme.of(context).colorScheme.primary : Colors.transparent,
                           ),
                           child: isSelected
                               ? const Icon(Icons.check, size: 14, color: Colors.white)
@@ -93,7 +93,7 @@ class QuestionCard extends ConsumerWidget {
                           child: Text(
                             choice.text,
                             style: TextStyle(
-                              color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                              color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyLarge?.color,
                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                             ),
                           ),

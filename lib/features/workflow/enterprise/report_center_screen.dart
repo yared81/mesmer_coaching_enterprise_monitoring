@@ -6,6 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
 import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'report_provider.dart';
 
 class ReportCenterScreen extends ConsumerWidget {
@@ -22,18 +23,15 @@ class ReportCenterScreen extends ConsumerWidget {
         role == UserRole.meOfficer;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
         title: const Text(
           'Report Center',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(color: Colors.white.withOpacity(0.15), height: 1),
+          child: Divider(height: 1, color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         ),
       ),
       body: ListView(
@@ -43,12 +41,20 @@ class ReportCenterScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Theme.of(context).brightness == Brightness.dark 
+                ? Theme.of(context).cardColor 
+                : AppColors.primary,
+              gradient: Theme.of(context).brightness == Brightness.dark 
+                ? null 
+                : const LinearGradient(
+                    colors: [Color(0xFF3D5AFE), Color(0xFF1976D2)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
               borderRadius: BorderRadius.circular(16),
+              border: Theme.of(context).brightness == Brightness.dark 
+                ? Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))
+                : null,
             ),
             child: Row(
               children: [
@@ -90,7 +96,7 @@ class ReportCenterScreen extends ConsumerWidget {
           _SectionLabel(
             icon: Icons.person_rounded,
             label: 'My Reports',
-            color: AppColors.primary,
+            color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(height: 12),
 
@@ -199,22 +205,17 @@ class ReportCenterScreen extends ConsumerWidget {
             filename: filename,
           );
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$filename ready!'),
-            backgroundColor: AppColors.success,
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomToaster.show(
+          context: context,
+          message: '$filename ready!',
         );
       },
       loading: () {},
       error: (e, _) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Export failed: $e'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        CustomToaster.show(
+          context: context,
+          message: 'Export failed: $e',
+          isError: true,
         );
       },
     );
@@ -286,12 +287,12 @@ class _ReportCard extends ConsumerWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSuccess
-              ? AppColors.success.withOpacity(0.4)
-              : AppColors.border,
+              ? Colors.green.withOpacity(0.4)
+              : Theme.of(context).dividerColor.withOpacity(0.1),
           width: isSuccess ? 1.5 : 1,
         ),
         boxShadow: [
@@ -328,10 +329,10 @@ class _ReportCard extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF1F2937),
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                       ),
@@ -342,7 +343,7 @@ class _ReportCard extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[500], height: 1.4),
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor, height: 1.4),
                   ),
                   const SizedBox(height: 14),
                   SizedBox(

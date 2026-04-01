@@ -114,14 +114,17 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Session Details', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
         actions: [
           if (!isReadOnly)
             TextButton(
               onPressed: _isSaving ? null : () => _saveNotes(),
-              child: const Text('SAVE DRAFT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text(
+                'SAVE DRAFT',
+                style: TextStyle(
+                  color: Theme.of(context).appBarTheme.foregroundColor ?? Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
         ],
       ),
@@ -140,7 +143,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     children: [
                       Text(
                         widget.session.title,
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary),
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -340,8 +343,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: BorderSide(color: AppColors.primary, width: 2),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
@@ -384,7 +387,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                     _saveNotes(isFinalizing: true);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E3A8A),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
                     disabledBackgroundColor: Theme.of(context).disabledColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
@@ -429,7 +432,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
             fillColor: Theme.of(context).cardColor,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: AppColors.primary)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Theme.of(context).colorScheme.primary)),
           ),
         ),
       ],
@@ -476,7 +479,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           keyboardType: TextInputType.number,
           enabled: !readOnly,
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.trending_up, color: AppColors.primary, size: 20),
+            prefixIcon: Icon(Icons.trending_up, color: Theme.of(context).colorScheme.primary, size: 20),
             filled: true,
             fillColor: Theme.of(context).cardColor,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

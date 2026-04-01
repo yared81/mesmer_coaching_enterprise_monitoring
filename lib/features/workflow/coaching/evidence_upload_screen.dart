@@ -131,9 +131,6 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Attach Evidence', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 0,
       ),
       body: Column(
         children: [
@@ -141,7 +138,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
             LinearProgressIndicator(
               value: _uploadProgress,
               backgroundColor: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-              color: AppColors.primary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           Expanded(
             child: _selectedFiles.isEmpty
@@ -280,7 +277,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
             child: ElevatedButton(
               onPressed: (_selectedFiles.isEmpty || _isUploading) ? null : _uploadAll,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Theme.of(context).disabledColor,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -311,7 +308,7 @@ class _EvidenceUploadScreenState extends ConsumerState<EvidenceUploadScreen> {
           ),
           child: Column(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 4),
               Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
             ],

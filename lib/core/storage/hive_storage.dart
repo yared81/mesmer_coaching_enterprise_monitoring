@@ -8,10 +8,12 @@ class HiveStorage {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    await Hive.openBox(diagnosisDraftsBox);
-    await Hive.openBox(prefsBox);
-    await Hive.openBox(cachedEnterprisesBox);
-    await Hive.openBox(cachedDashboardsBox);
+    await Future.wait([
+      Hive.openBox(diagnosisDraftsBox),
+      Hive.openBox(prefsBox),
+      Hive.openBox(cachedEnterprisesBox),
+      Hive.openBox(cachedDashboardsBox),
+    ]);
   }
 
   static Future<void> saveDraft(String sessionId, Map<String, String> responses) async {

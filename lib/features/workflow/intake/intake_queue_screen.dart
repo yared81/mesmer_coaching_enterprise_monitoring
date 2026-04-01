@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
 import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'package:go_router/go_router.dart';
 
 class IntakeQueueScreen extends ConsumerWidget {
@@ -11,7 +12,7 @@ class IntakeQueueScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,8 +163,9 @@ class IntakeQueueScreen extends ConsumerWidget {
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Starting call to $phone...')),
+                    CustomToaster.show(
+                      context: context,
+                      message: 'Starting call to $phone...',
                     );
                   },
                   icon: const Icon(Icons.call, size: 16),
@@ -172,8 +174,9 @@ class IntakeQueueScreen extends ConsumerWidget {
                 ),
                 TextButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Logging visit attempt for $name...')),
+                    CustomToaster.show(
+                      context: context,
+                      message: 'Logging visit attempt for $name...',
                     );
                   },
                   icon: const Icon(Icons.directions_walk, size: 16),

@@ -10,7 +10,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Diagnosis Summary'),
         backgroundColor: AppColors.primary,
@@ -22,7 +22,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildHealthScoreHeader(),
-            _buildCategoryBreakdown(),
+            _buildCategoryBreakdown(context),
             _buildChallengesSection(),
             _buildFooter(context),
           ],
@@ -100,7 +100,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryBreakdown() {
+  Widget _buildCategoryBreakdown(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -122,7 +122,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -159,7 +159,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: score.percentage / 100,
                       minHeight: 8,
-                      backgroundColor: AppColors.background,
+                      backgroundColor: Theme.of(context).dividerColor.withOpacity(0.05),
                       valueColor: AlwaysStoppedAnimation(_getHealthColor(score.percentage)),
                     ),
                   ),
@@ -260,7 +260,7 @@ class DiagnosisSummaryScreen extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () => Navigator.pop(context),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
+            backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

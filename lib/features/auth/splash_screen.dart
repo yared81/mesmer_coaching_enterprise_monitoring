@@ -25,11 +25,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     
     if (!mounted) return;
 
-    final authStatus = ref.read(authProvider).status;
+    AuthStatus authStatus = ref.read(authProvider).status;
+    
+    // If still initial, wait a bit more or force re-check
+    if (authStatus == AuthStatus.initial) {
+      await ref.read(authProvider.notifier).checkAuthStatus();
+      authStatus = ref.read(authProvider).status;
+    }
+    
     if (authStatus == AuthStatus.authenticated) {
-      context.go(AppRoutes.dashboard);
+      if (mounted) context.go(AppRoutes.dashboard);
     } else {
-      context.go(AppRoutes.login);
+      if (mounted) context.go(AppRoutes.login);
     }
   }
 

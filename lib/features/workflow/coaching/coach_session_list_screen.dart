@@ -15,18 +15,15 @@ class CoachSessionListScreen extends ConsumerWidget {
     final sessionsAsync = ref.watch(coachingSessionsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('My Coaching Sessions', 
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 0,
-        foregroundColor: Colors.white,
       ),
       body: sessionsAsync.when(
         data: (sessions) {
           if (sessions.isEmpty) {
-            return _buildEmptyState();
+            return _buildEmptyState(context);
           }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
@@ -53,7 +50,7 @@ class CoachSessionListScreen extends ConsumerWidget {
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Retry'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3D5AFE),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -70,16 +67,16 @@ class CoachSessionListScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.calendar_today_outlined, size: 80, color: Colors.grey[300]),
+          Icon(Icons.calendar_today_outlined, size: 80, color: Theme.of(context).disabledColor),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'No sessions recorded yet',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).disabledColor),
           ),
         ],
       ),
@@ -103,13 +100,13 @@ class _SessionCard extends StatelessWidget {
     final IconData statusIcon;
 
     if (isPendingSync) {
-      themeColor = Colors.grey[700]!;
-      lightBg = Colors.grey[200]!;
+      themeColor = Theme.of(context).disabledColor;
+      lightBg = Theme.of(context).disabledColor.withValues(alpha: 0.1);
       statusLabel = 'Pending Sync ...';
       statusIcon = Icons.hourglass_empty_rounded;
     } else {
-      themeColor = isCompleted ? const Color(0xFF1E3A8A) : const Color(0xFF16A34A);
-      lightBg = isCompleted ? const Color(0xFFEFF6FF) : const Color(0xFFF0FDF4);
+      themeColor = isCompleted ? Colors.blue : Colors.green;
+      lightBg = (isCompleted ? Colors.blue : Colors.green).withValues(alpha: 0.1);
       statusLabel = isCompleted ? 'Completed' : 'Draft';
       statusIcon = isCompleted ? Icons.check_circle_rounded : Icons.edit_note_rounded;
     }

@@ -17,6 +17,7 @@ import 'package:mesmer_digital_coaching/features/dashboard/activity_provider.dar
 import 'package:mesmer_digital_coaching/features/dashboard/dashboard_navigation_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/coaching/add_session_screen.dart';
 import 'package:mesmer_digital_coaching/core/widgets/notification_bell.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 
 class _LiveActivityFeed extends ConsumerWidget {
   const _LiveActivityFeed();
@@ -47,7 +48,7 @@ class CoachDashboardScreen extends ConsumerWidget {
     final coachStatsAsync = ref.watch(coachStatsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: coachStatsAsync.when(
         data: (stats) => CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -210,11 +211,25 @@ class CoachDashboardScreen extends ConsumerWidget {
           tooltip: 'Sync Offline Data',
           onPressed: () async {
             try {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Syncing offline data...')));
+              CustomToaster.show(
+                context: context,
+                message: 'Syncing offline data...',
+              );
               await ref.read(syncServiceProvider).syncQueue();
-              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sync completed successfully.')));
+              if (context.mounted) {
+                CustomToaster.show(
+                  context: context,
+                  message: 'Sync completed successfully.',
+                );
+              }
             } catch (e) {
-              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Sync failed: $e')));
+              if (context.mounted) {
+                CustomToaster.show(
+                  context: context,
+                  message: 'Sync failed: $e',
+                  isError: true,
+                );
+              }
             }
           },
         ),
