@@ -232,7 +232,7 @@ class QcRecordDetailScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () => _submit(context, ref, audit.id, QcAuditStatus.correction_requested, commentController.text),
+                onPressed: () => _submit(context, ref, audit.id, QcAuditStatus.correctionRequested, commentController.text),
                 icon: const Icon(Icons.assignment_return_outlined, color: Colors.white),
                 label: const Text('CORRECTION', style: TextStyle(color: Colors.white, fontSize: 13)),
                 style: ElevatedButton.styleFrom(
@@ -346,7 +346,7 @@ class QcRecordDetailScreen extends ConsumerWidget {
   }
 
   Future<void> _submit(BuildContext context, WidgetRef ref, String auditId, QcAuditStatus status, String comment) async {
-    if ((status == QcAuditStatus.failed || status == QcAuditStatus.correction_requested) && comment.isEmpty) {
+    if ((status == QcAuditStatus.failed || status == QcAuditStatus.correctionRequested) && comment.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Reason for ${status.name} is required.')));
       return;
     }

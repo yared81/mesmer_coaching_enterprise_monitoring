@@ -69,6 +69,10 @@ dependencies:
   path: ^1.9.1
   geolocator: ^14.0.2
 
+  # Core constraints fixes
+  vector_math: ^2.2.0
+  win32: ^5.15.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,6 +1,6 @@
 // TrainingEntity — domain object for a training session
 
-enum TrainingModule { bookkeeping, marketing, customer_service, business_planning, financial_management, other }
+enum TrainingModule { bookkeeping, marketing, customerService, businessPlanning, financialManagement, other }
 
 enum TrainingStatus { scheduled, completed, cancelled }
 

@@ -1,4 +1,4 @@
-enum QcAuditStatus { pending, passed, failed, correction_requested }
+enum QcAuditStatus { pending, passed, failed, correctionRequested }
 enum QcTargetType { baseline, session, endline }
 
 class QcAuditEntity {

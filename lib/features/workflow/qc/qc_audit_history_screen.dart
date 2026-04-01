@@ -72,7 +72,7 @@ class QcAuditHistoryScreen extends ConsumerWidget {
     switch (status) {
       case QcAuditStatus.passed: return Colors.green;
       case QcAuditStatus.failed: return Colors.red;
-      case QcAuditStatus.correction_requested: return Colors.orange;
+      case QcAuditStatus.correctionRequested: return Colors.orange;
       default: return Colors.grey;
     }
   }
@@ -81,7 +81,7 @@ class QcAuditHistoryScreen extends ConsumerWidget {
     switch (status) {
       case QcAuditStatus.passed: return Icons.check_circle;
       case QcAuditStatus.failed: return Icons.cancel;
-      case QcAuditStatus.correction_requested: return Icons.assignment_return;
+      case QcAuditStatus.correctionRequested: return Icons.assignment_return;
       default: return Icons.help_outline;
     }
   }
