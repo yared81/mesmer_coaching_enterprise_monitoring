@@ -52,30 +52,43 @@ class CoachingSessionModel extends CoachingSessionEntity {
 
   factory CoachingSessionModel.fromJson(Map<String, dynamic> json) {
     return CoachingSessionModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      enterpriseId: json['enterprise_id'] as String,
-      coachId: json['coach_id'] as String,
-      scheduledDate: DateTime.parse(json['scheduled_date'] as String),
-      status: SessionStatus.values.byName(json['status'] as String),
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? 'Coaching Session',
+      enterpriseId: json['enterprise_id']?.toString() ?? '',
+      coachId: json['coach_id']?.toString() ?? '',
+      scheduledDate: json['scheduled_date'] != null
+          ? DateTime.tryParse(json['scheduled_date'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      status: SessionStatus.values.firstWhere(
+        (s) => s.name == (json['status']?.toString() ?? 'scheduled'),
+        orElse: () => SessionStatus.scheduled,
+      ),
       sessionNumber: NumUtils.toInt(json['session_number']),
-      followupType: json['followup_type'] != null 
-          ? FollowupType.values.byName(json['followup_type'] as String)
+      followupType: json['followup_type'] != null
+          ? FollowupType.values.firstWhere(
+              (f) => f.name == json['followup_type'].toString(),
+              orElse: () => FollowupType.physical,
+            )
           : FollowupType.physical,
       revenueGrowthPercent: NumUtils.toDouble(json['revenue_growth_percent']),
       currentEmployees: NumUtils.toInt(json['current_employees']),
       jobsCreated: NumUtils.toInt(json['jobs_created']),
-      qcStatus: json['qc_status'] != null 
-          ? QcStatus.values.byName(json['qc_status'] as String)
+      qcStatus: json['qc_status'] != null
+          ? QcStatus.values.firstWhere(
+              (q) => q.name == json['qc_status'].toString(),
+              orElse: () => QcStatus.pending,
+            )
           : QcStatus.pending,
-      qcFeedback: json['qc_feedback'] as String?,
+      qcFeedback: json['qc_feedback']?.toString(),
       latitude: NumUtils.toDouble(json['latitude']),
       longitude: NumUtils.toDouble(json['longitude']),
-      templateId: json['template_id'] as String?,
-      enterpriseName: json['enterprise'] != null ? json['enterprise']['business_name'] as String? : null,
-      problemsIdentified: json['problems_identified'] as String?,
-      recommendations: json['recommendations'] as String?,
-      notes: json['notes'] as String?,
+      templateId: json['template_id']?.toString(),
+      enterpriseName: json['enterprise'] != null
+          ? json['enterprise']['business_name']?.toString()
+          : null,
+      problemsIdentified: json['problems_identified']?.toString(),
+      recommendations: json['recommendations']?.toString(),
+      notes: json['notes']?.toString(),
     );
   }
 

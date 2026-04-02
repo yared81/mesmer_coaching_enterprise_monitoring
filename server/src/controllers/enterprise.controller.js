@@ -18,7 +18,7 @@ class EnterpriseController {
       }
 
       // req.user is populated by auth middleware
-      const { userId, institutionId } = req.user;
+      const { userId, institution_id: institutionId } = req.user;
       
       const enterprise = await enterpriseService.registerEnterprise(
         req.body, 
@@ -48,7 +48,7 @@ class EnterpriseController {
         });
       }
  
-      const { userId, institutionId } = req.user;
+      const { userId, institution_id: institutionId } = req.user;
       
       const results = await enterpriseService.bulkRegisterEnterprises(
         enterprises, 

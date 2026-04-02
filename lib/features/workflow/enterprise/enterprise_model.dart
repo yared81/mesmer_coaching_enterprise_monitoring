@@ -86,9 +86,11 @@ class EnterpriseModel {
       status: json['status'] as String? ?? 'active',
       graduationDate: json['graduation_date'] != null ? DateTime.parse(json['graduation_date'] as String) : null,
       verificationCode: json['verification_code'] as String?,
-      coachId: json['coach_id'] as String? ?? '',
-      institutionId: json['institution_id'] as String? ?? '',
-      registeredAt: DateTime.parse(json['registered_at'] as String),
+      coachId: json['coach_id']?.toString() ?? '',
+      institutionId: json['institution_id']?.toString() ?? '',
+      registeredAt: json['registered_at'] != null
+          ? DateTime.tryParse(json['registered_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 

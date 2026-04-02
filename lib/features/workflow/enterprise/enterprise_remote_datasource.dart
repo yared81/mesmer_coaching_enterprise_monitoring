@@ -20,8 +20,9 @@ class EnterpriseRemoteDatasource {
         if (coachId != null) 'coach_id': coachId,
       },
     );
-    
-    final List<dynamic> data = response.data['enterprises'];
+    // Backend returns either {enterprises: [...]} or {data: [...]}
+    final raw = response.data;
+    final List<dynamic> data = raw['enterprises'] ?? raw['data'] ?? [];
     return data.map((e) => e as Map<String, dynamic>).toList();
   }
 

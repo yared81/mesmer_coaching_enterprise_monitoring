@@ -38,10 +38,10 @@ class ReportDownloadService {
   }
 
   Future<void> downloadEnterprisePDF(String id) async {
-    await downloadReport('/reports/enterprise/$id/pdf', 'Enterprise_Report_$id.pdf');
+    await downloadReport('reports/enterprise/$id/pdf', 'Enterprise_Report_$id.pdf');
   }
 
   Future<void> downloadSystemCSV() async {
-    await downloadReport('/reports/system/csv', 'System_Health_Report.csv');
+    await downloadReport('reports/system/csv', 'System_Health_Report.csv');
   }
 }

@@ -531,49 +531,68 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   Widget _buildClearCacheTile(BuildContext context, bool isDark) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(Icons.cleaning_services_rounded, color: isDark ? Colors.white : Colors.black87),
-      ),
-      title: const Text('Clear Local Cache', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-      subtitle: Text(
-        'Frees up device storage (approx 12.4 MB)\nCloud data will not be deleted.',
-        style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13, height: 1.3),
-      ),
-      trailing: TextButton(
-        onPressed: () async {
-          // Clear Hive boxes logic
-          await HiveStorage.clearAllCache();
-          
-          // Clear physical temporary files (images, PDFs)
-          try {
-            final tempDir = await getTemporaryDirectory();
-            if (tempDir.existsSync()) {
-              tempDir.deleteSync(recursive: true);
-              tempDir.createSync();
-            }
-          } catch (e) {
-            // Silently ignore locked files
-          }
-
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Local cache cleared successfully!')),
-            );
-          }
-        },
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.red[400],
-        ),
-        child: const Text('CLEAR'),
-      ),
+    return FutureBuilder<String>(
+      future: _getCacheSize(),
+      builder: (context, snapshot) {
+        final sizeLabel = snapshot.data ?? 'Calculating...';
+        return ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[50],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(Icons.cleaning_services_rounded, color: isDark ? Colors.white : Colors.black87),
+          ),
+          title: const Text('Clear Local Cache', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Text(
+            'Frees up device storage ($sizeLabel)\nCloud data will not be deleted.',
+            style: TextStyle(color: isDark ? Colors.grey[400] : Colors.grey[500], fontSize: 13, height: 1.3),
+          ),
+          trailing: TextButton(
+            onPressed: () async {
+              await HiveStorage.clearAllCache();
+              try {
+                final tempDir = await getTemporaryDirectory();
+                if (tempDir.existsSync()) {
+                  tempDir.deleteSync(recursive: true);
+                  tempDir.createSync();
+                }
+              } catch (e) {
+                // Silently ignore locked files
+              }
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Local cache cleared successfully!')),
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red[400]),
+            child: const Text('CLEAR'),
+          ),
+        );
+      },
     );
+  }
+
+  Future<String> _getCacheSize() async {
+    try {
+      int totalBytes = 0;
+      final tempDir = await getTemporaryDirectory();
+      if (tempDir.existsSync()) {
+        tempDir.listSync(recursive: true).forEach((entity) {
+          if (entity is File) {
+            try { totalBytes += entity.lengthSync(); } catch (_) {}
+          }
+        });
+      }
+      if (totalBytes < 1024) return '$totalBytes B';
+      if (totalBytes < 1024 * 1024) return '${(totalBytes / 1024).toStringAsFixed(1)} KB';
+      return '${(totalBytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    } catch (_) {
+      return 'unknown size';
+    }
   }
 
   Widget _buildBiometricTile(BuildContext context, WidgetRef ref, bool biometricEnabled, bool isDark) {

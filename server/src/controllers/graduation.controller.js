@@ -3,7 +3,7 @@ const enterpriseService = require('../services/enterprise.service');
 class GraduationController {
   getReady = async (req, res, next) => {
     try {
-      const list = await enterpriseService.getGraduationReady(req.user.institutionId);
+      const list = await enterpriseService.getGraduationReady(req.user.institution_id);
       res.status(200).json({ success: true, data: list });
     } catch (error) { next(error); }
   };
