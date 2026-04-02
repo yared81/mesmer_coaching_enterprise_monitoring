@@ -4,11 +4,32 @@ require('dotenv').config();
 
 const isSqlite = (process.env.DB_DIALECT || 'postgres') === 'sqlite';
 
-const sequelize = isSqlite 
+// Railway provides DATABASE_URL automatically for Postgres addon
+const databaseUrl = process.env.DATABASE_URL;
+
+const sequelize = isSqlite
   ? new Sequelize({
       dialect: 'sqlite',
       storage: process.env.DB_STORAGE || './data/mesmer.sqlite',
       logging: process.env.NODE_ENV === 'development' ? console.log : false,
+      define: {
+        timestamps: true,
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      }
+    })
+  : databaseUrl
+  ? new Sequelize(databaseUrl, {
+      dialect: 'postgres',
+      protocol: 'postgres',
+      logging: false,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false // Required for Railway/Heroku managed Postgres
+        }
+      },
       define: {
         timestamps: true,
         underscored: true,
@@ -25,12 +46,7 @@ const sequelize = isSqlite
         port: process.env.DB_PORT,
         dialect: 'postgres',
         logging: process.env.NODE_ENV === 'development' ? console.log : false,
-        pool: {
-          max: 5,
-          min: 0,
-          acquire: 30000,
-          idle: 10000
-        },
+        pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
         define: {
           timestamps: true,
           underscored: true,
