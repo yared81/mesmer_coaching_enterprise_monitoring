@@ -51,7 +51,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     Future.microtask(() async {
       await ref.read(authProvider.notifier).checkAuthStatus();
       
-      // Initial Auth Check if biometrics are enabled globally
+      // Only trigger biometric on startup if explicitly enabled in settings
       final isBiometricEnabled = ref.read(systemSettingsProvider).biometricEnabled;
       if (isBiometricEnabled) {
         _isAuthenticating = true;
@@ -59,7 +59,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         _isAuthenticating = false;
         
         if (!authenticated && mounted) {
-          // If they fail setup or cancel, boot them to login
           ref.read(authProvider.notifier).logout();
         }
       }
@@ -84,13 +83,18 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         if (settings.autoLockTimeout > 0) {
           final difference = DateTime.now().difference(_pausedTime!);
           if (difference.inMinutes >= settings.autoLockTimeout) {
-            _isAuthenticating = true;
-            final authenticated = await SecurityService.authenticate();
-            _isAuthenticating = false;
+            // Only trigger biometric lock if biometric is explicitly enabled
+            if (settings.biometricEnabled) {
+              _isAuthenticating = true;
+              final authenticated = await SecurityService.authenticate();
+              _isAuthenticating = false;
 
-            if (!authenticated && mounted) {
-               ref.read(authProvider.notifier).logout();
+              if (!authenticated && mounted) {
+                ref.read(authProvider.notifier).logout();
+              }
             }
+            // If biometric not enabled, timeout just means we keep the session
+            // (user is still logged in — they just need to re-open the app)
           }
         }
       }
