@@ -1,5 +1,7 @@
-// TODO: Reports repository interface
+import 'package:dartz/dartz.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'report_entity.dart';
+
 abstract class ReportsRepository {
-  // TODO: Future<Either<Failure, ReportEntity>> getAggregatedStats()
-  // TODO: Future<Either<Failure, List<ReportEntity>>> getReportsByPeriod(DateTime from, DateTime to)
+  Future<Either<Failure, ReportEntity>> getAggregatedStats();
 }
