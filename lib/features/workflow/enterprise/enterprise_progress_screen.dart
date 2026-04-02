@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
 import 'enterprise_provider.dart';
 import 'enterprise_dashboard_stats.dart';
+import 'enterprise_entity.dart';
 
 class EnterpriseProgressScreen extends ConsumerWidget {
   const EnterpriseProgressScreen({super.key});
@@ -11,7 +12,6 @@ class EnterpriseProgressScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(enterpriseDashboardStatsProvider);
-    final user = ref.watch(authProvider).user;
 
     return Scaffold(
       appBar: AppBar(
@@ -20,25 +20,33 @@ class EnterpriseProgressScreen extends ConsumerWidget {
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
-        data: (stats) => ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildScoreOverview(stats),
-            const SizedBox(height: 24),
-            _buildRadarChart(stats),
-            const SizedBox(height: 24),
-            _buildCategoryBreakdown(stats),
-            const SizedBox(height: 24),
-            _buildLatestRecommendation(stats),
-          ],
-        ),
+        data: (stats) {
+          // Pull baseline score from the enterprise entity if available
+          final user = ref.read(authProvider).user;
+          final enterpriseId = user?.enterpriseId ?? '';
+          final enterpriseAsync = ref.watch(enterpriseDetailProvider(enterpriseId));
+          final baselineScore = enterpriseAsync.maybeWhen(
+            data: (e) => e.baselineScore ?? 0.0,
+            orElse: () => 0.0,
+          );
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildScoreOverview(stats, baselineScore),
+              const SizedBox(height: 24),
+              _buildRadarChart(stats),
+              const SizedBox(height: 24),
+              _buildCategoryBreakdown(stats),
+              const SizedBox(height: 24),
+              _buildLatestRecommendation(stats),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildScoreOverview(EnterpriseDashboardStats stats) {
-    // baseline_score from API (0–100)
-    final baselineScore = 0.0; // TODO: wire from stats when baseline available
+  Widget _buildScoreOverview(EnterpriseDashboardStats stats, double baselineScore) {
     final currentScore = stats.radarScores.isEmpty
         ? 0.0
         : stats.radarScores.map((e) => e.value).reduce((a, b) => a + b) / stats.radarScores.length;

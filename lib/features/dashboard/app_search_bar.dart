@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mesmer_digital_coaching/features/workflow/coach/coach_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/coach/coach_entity.dart';
@@ -102,7 +103,7 @@ class _AppSearchBarState extends ConsumerState<AppSearchBar> {
       subtitle: Text(coach.email),
       onTap: () {
         _controller.closeView(coach.name);
-        // TODO: Navigate to coach details
+        context.push('/coaches/${coach.id}');
       },
     );
   }
@@ -121,7 +122,7 @@ class _AppSearchBarState extends ConsumerState<AppSearchBar> {
       subtitle: Text(enterprise.sector.name),
       onTap: () {
         _controller.closeView(enterprise.businessName);
-        // TODO: Navigate to enterprise details
+        context.push('/enterprises/detail/${enterprise.id}');
       },
     );
   }

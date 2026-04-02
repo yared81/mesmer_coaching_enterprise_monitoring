@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'package:mesmer_digital_coaching/shared/widgets/app_text_field.dart';
 import 'package:mesmer_digital_coaching/shared/widgets/primary_button.dart';
 
@@ -21,6 +24,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -30,16 +34,29 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Implement actual password change logic via API
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password changed successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      context.pop();
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _loading = true);
+    try {
+      final dio = ref.read(dioProvider);
+      await dio.put('/auth/change-password', data: {
+        'currentPassword': _currentPasswordController.text,
+        'newPassword': _newPasswordController.text,
+      });
+      if (mounted) {
+        CustomToaster.show(context: context, message: 'Password changed successfully!');
+        context.pop();
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        CustomToaster.show(
+          context: context,
+          message: e.response?.data?['message'] ?? 'Failed to change password',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -126,8 +143,8 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
               
               const SizedBox(height: 48),
               PrimaryButton(
-                label: 'Update Password',
-                onPressed: _submit,
+                label: _loading ? 'Updating...' : 'Update Password',
+                onPressed: _loading ? null : _submit,
               ),
             ],
           ),
