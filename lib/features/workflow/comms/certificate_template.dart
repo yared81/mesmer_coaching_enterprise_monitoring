@@ -1,22 +1,13 @@
-import 'package:json_annotation/json_annotation.dart';
-
-part 'certificate_template.g.dart';
-
-enum CertificateStatus {
-  @JsonValue('pending') pending,
-  @JsonValue('approved') approved,
-  @JsonValue('issued') issued,
-  @JsonValue('revoked') revoked,
-}
+enum CertificateStatus { pending, approved, issued, revoked }
 
 enum GraduationStatus {
-  @JsonValue('ready_for_certificate') readyForCertificate,
-  @JsonValue('baseline_pending') baselinePending,
-  @JsonValue('insufficient_coaching') insufficientCoaching,
-  @JsonValue('midline_pending') midlinePending,
-  @JsonValue('coach_signoff_pending') coachSignoffPending,
-  @JsonValue('insufficient_evidence') insufficientEvidence,
-  @JsonValue('not_eligible') notEligible,
+  readyForCertificate,
+  baselinePending,
+  insufficientCoaching,
+  midlinePending,
+  coachSignoffPending,
+  insufficientEvidence,
+  notEligible,
 }
 
 class CertificateTemplate {
@@ -52,10 +43,51 @@ class CertificateTemplate {
     this.pdfFileUrl,
   });
 
-  factory CertificateTemplate.fromJson(Map<String, dynamic> json) =>
-      _$CertificateTemplateFromJson(json);
+  factory CertificateTemplate.fromJson(Map<String, dynamic> json) {
+    return CertificateTemplate(
+      id: json['id']?.toString() ?? '',
+      enterpriseId: json['enterprise_id']?.toString() ?? '',
+      enterpriseName: json['enterprise_name']?.toString() ?? '',
+      ownerName: json['owner_name']?.toString() ?? '',
+      programName: json['program_name']?.toString() ?? 'MESMER Digital Coaching Program',
+      issueDate: json['issue_date'] != null
+          ? DateTime.parse(json['issue_date'].toString())
+          : DateTime.now(),
+      completionDate: json['completion_date'] != null
+          ? DateTime.parse(json['completion_date'].toString())
+          : DateTime.now(),
+      verificationCode: json['verification_code']?.toString() ?? '',
+      coachName: json['coach_name']?.toString() ?? '',
+      regionalCoordinator: json['regional_coordinator']?.toString() ?? '',
+      achievements: (json['achievements'] as List?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      status: CertificateStatus.values.firstWhere(
+        (s) => s.name == (json['status']?.toString() ?? 'pending'),
+        orElse: () => CertificateStatus.pending,
+      ),
+      certificateNumber: json['certificate_number']?.toString(),
+      pdfFileUrl: json['pdf_file_url']?.toString(),
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$CertificateTemplateToJson(this);
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'enterprise_id': enterpriseId,
+        'enterprise_name': enterpriseName,
+        'owner_name': ownerName,
+        'program_name': programName,
+        'issue_date': issueDate.toIso8601String(),
+        'completion_date': completionDate.toIso8601String(),
+        'verification_code': verificationCode,
+        'coach_name': coachName,
+        'regional_coordinator': regionalCoordinator,
+        'achievements': achievements,
+        'status': status.name,
+        'certificate_number': certificateNumber,
+        'pdf_file_url': pdfFileUrl,
+      };
 
   CertificateTemplate copyWith({
     String? id,
@@ -117,13 +149,11 @@ class CertificateVerification {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'certificate_id': certificateId,
-      'verification_code': verificationCode,
-      'verified_at': verifiedAt.toIso8601String(),
-      'ip_address': ipAddress,
-      'user_agent': userAgent,
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'certificate_id': certificateId,
+        'verification_code': verificationCode,
+        'verified_at': verifiedAt.toIso8601String(),
+        'ip_address': ipAddress,
+        'user_agent': userAgent,
+      };
 }

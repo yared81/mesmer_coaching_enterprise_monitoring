@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
 import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CoachContactCard extends StatelessWidget {
-  final CoachEntity coach;
+  final UserCoachEntity coach;
 
   const CoachContactCard({super.key, required this.coach});
 
@@ -81,9 +83,7 @@ class CoachContactCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Navigate to Chat Tab (Phase B3)
-                },
+                onPressed: () => context.go(AppRoutes.chat),
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: const Text('Send Message'),
                 style: ElevatedButton.styleFrom(

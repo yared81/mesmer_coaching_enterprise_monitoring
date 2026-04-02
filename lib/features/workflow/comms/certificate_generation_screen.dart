@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:mesmer_digital_coaching/core/theme/app_colors.dart';
 import 'certificate_provider.dart';
-import 'certificate_template.dart';
 import 'graduation_validator.dart';
 
 class CertificateGenerationScreen extends ConsumerStatefulWidget {
@@ -391,7 +390,7 @@ class _CertificateGenerationScreenState extends ConsumerState<CertificateGenerat
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.star),
                     ),
-                    onSubmitted: (_) => _addAchievement(),
+                    onFieldSubmitted: (_) => _addAchievement(),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -427,17 +426,18 @@ class _CertificateGenerationScreenState extends ConsumerState<CertificateGenerat
   }
 
   Widget _buildGenerateButton() {
+    final isLoading = ref.watch(certificateProvider).isLoading;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: certificateState.isLoading ? null : _generateCertificate,
+        onPressed: isLoading ? null : _generateCertificate,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        child: certificateState.isLoading
+        child: isLoading
             ? const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

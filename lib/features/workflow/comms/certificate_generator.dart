@@ -5,7 +5,6 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'certificate_template.dart';
 import 'certificate_verification.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class CertificateGenerator {
   static const double _certificateWidth = 1122.52; // A4 landscape width in points
@@ -61,7 +60,7 @@ class CertificateGenerator {
   }
 
   /// Build certificate border decoration
-  static pw.Decoration _buildCertificateBorder() {
+  static pw.BoxDecoration _buildCertificateBorder() {
     return pw.BoxDecoration(
       border: pw.Border.all(color: PdfColors.amber, width: 3),
       borderRadius: pw.BorderRadius.circular(10),

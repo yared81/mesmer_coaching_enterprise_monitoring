@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_spacing.dart';
+import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/training/training_provider.dart';
 import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_session_entity.dart';
@@ -76,9 +78,7 @@ class UpcomingScheduleCard extends ConsumerWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: () {
-                  // TODO: Navigate to full Calendar view (Phase B3/B4)
-                },
+                onPressed: () => context.go(AppRoutes.calendar),
                 child: const Text('View Full Calendar'),
               ),
             ),
@@ -94,12 +94,12 @@ class UpcomingScheduleCard extends ConsumerWidget {
 
     // Add sessions
     for (final s in sessions) {
-      if (s.date.isAfter(now)) {
+      if (s.scheduledDate.isAfter(now)) {
         events.add(_ScheduledEvent(
-          title: 'Coaching Session',
-          date: s.date,
+          title: s.title.isNotEmpty ? s.title : 'Coaching Session',
+          date: s.scheduledDate,
           type: _EventType.session,
-          location: s.location ?? 'In-person',
+          location: 'In-person',
         ));
       }
     }
@@ -111,7 +111,7 @@ class UpcomingScheduleCard extends ConsumerWidget {
           title: t.title,
           date: t.date,
           type: _EventType.training,
-          location: t.location ?? 'Training Center',
+          location: 'In-person',
         ));
       }
     }
