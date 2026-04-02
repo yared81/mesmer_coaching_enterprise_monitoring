@@ -41,9 +41,9 @@ class AdminStatsModel extends AdminStatsEntity {
   });
 
   factory AdminStatsModel.fromJson(Map<String, dynamic> json) {
-    final stats = json['stats'] as Map<String, dynamic>;
+    final stats = (json['stats'] ?? {}) as Map<String, dynamic>;
     final recent = List<ActivityEntity>.from(
-      (json['recentEnterprises'] as List? ?? [])
+      ((json['recentEnterprises'] ?? json['recentActivity']) as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
     );
     
@@ -67,9 +67,9 @@ class SupervisorStatsModel extends SupervisorStatsEntity {
   });
 
   factory SupervisorStatsModel.fromJson(Map<String, dynamic> json) {
-    final stats = json['stats'] as Map<String, dynamic>;
+    final stats = (json['stats'] ?? {}) as Map<String, dynamic>;
     final recent = List<ActivityEntity>.from(
-      (json['recentActivity'] as List? ?? [])
+      ((json['recentActivity'] ?? json['recentEnterprises']) as List? ?? [])
         .map((e) => ActivityModel.fromJson(e as Map<String, dynamic>))
     );
 

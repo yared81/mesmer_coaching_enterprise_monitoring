@@ -3,11 +3,13 @@ import 'package:mesmer_digital_coaching/features/notifications/notification_enti
 class NotificationModel {
   static NotificationEntity fromJson(Map<String, dynamic> json) {
     return NotificationEntity(
-      id: json['id'].toString(),
-      title: json['title'] as String,
-      message: json['message'] as String,
-      type: json['type'] as String? ?? 'info',
-      createdAt: DateTime.parse(json['created_at'] as String),
+      id: json['id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      message: json['message']?.toString() ?? '',
+      type: json['type']?.toString() ?? 'info',
+      createdAt: json['created_at'] != null
+          ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
       isRead: json['is_read'] as bool? ?? false,
     );
   }

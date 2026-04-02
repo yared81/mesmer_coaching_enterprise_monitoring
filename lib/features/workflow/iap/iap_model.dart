@@ -19,14 +19,17 @@ class IapModel {
 
   factory IapModel.fromJson(Map<String, dynamic> json) {
     return IapModel(
-      id: json['id'] as String,
-      enterpriseId: json['enterprise_id'] as String,
-      coachId: json['coach_id'] as String,
-      status: json['status'] as String? ?? 'active',
-      signoffDate: json['signoff_date'] != null ? DateTime.parse(json['signoff_date'] as String) : null,
+      id: json['id']?.toString() ?? '',
+      enterpriseId: json['enterprise_id']?.toString() ?? '',
+      coachId: json['coach_id']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'active',
+      signoffDate: json['signoff_date'] != null
+          ? DateTime.tryParse(json['signoff_date'].toString())
+          : null,
       tasks: (json['tasks'] as List<dynamic>?)
               ?.map((t) => IapTaskModel.fromJson(t as Map<String, dynamic>))
-              .toList() ?? [],
+              .toList() ??
+          [],
     );
   }
 
@@ -68,12 +71,14 @@ class IapTaskModel {
 
   factory IapTaskModel.fromJson(Map<String, dynamic> json) {
     return IapTaskModel(
-      id: json['id'] as String,
-      iapId: json['iap_id'] as String,
-      description: json['description'] as String,
-      deadline: DateTime.parse(json['deadline'] as String),
-      status: json['status'] as String? ?? 'pending',
-      evidenceUrl: json['evidence_url'] as String?,
+      id: json['id']?.toString() ?? '',
+      iapId: json['iap_id']?.toString() ?? '',
+      description: json['description']?.toString() ?? '',
+      deadline: json['deadline'] != null
+          ? DateTime.tryParse(json['deadline'].toString()) ?? DateTime.now().add(const Duration(days: 14))
+          : DateTime.now().add(const Duration(days: 14)),
+      status: json['status']?.toString() ?? 'pending',
+      evidenceUrl: json['evidence_url']?.toString(),
     );
   }
 

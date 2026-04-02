@@ -18,18 +18,23 @@ class QcAuditModel extends QcAuditEntity {
 
   factory QcAuditModel.fromJson(Map<String, dynamic> json) {
     return QcAuditModel(
-      id: json['id'] as String,
-      targetType: _parseTargetType(json['target_type']),
-      targetId: json['target_id'] as String,
-      verifierId: json['verifier_id'] as String?,
+      id: json['id']?.toString() ?? '',
+      targetType: _parseTargetType(json['target_type']?.toString() ?? ''),
+      targetId: json['target_id']?.toString() ?? '',
+      verifierId: json['verifier_id']?.toString(),
       isRandomSample: json['is_random_sample'] as bool? ?? false,
-      status: QcAuditStatus.values.byName(json['status'] as String),
-      auditorComments: json['auditor_comments'] as String?,
-      flagReason: json['flag_reason'] as String?,
-      targetName: json['enterprise']?['business_name'] ?? json['session']?['title'],
-      createdAt: DateTime.parse(
-        (json['createdAt'] ?? json['created_at'] ?? DateTime.now().toIso8601String()) as String,
+      status: QcAuditStatus.values.firstWhere(
+        (s) => s.name == (json['status']?.toString() ?? 'pending'),
+        orElse: () => QcAuditStatus.pending,
       ),
+      auditorComments: json['auditor_comments']?.toString(),
+      flagReason: json['flag_reason']?.toString(),
+      targetName: json['enterprise']?['business_name']?.toString() ??
+          json['session']?['title']?.toString(),
+      createdAt: DateTime.tryParse(
+            (json['createdAt'] ?? json['created_at'] ?? '').toString(),
+          ) ??
+          DateTime.now(),
     );
   }
 

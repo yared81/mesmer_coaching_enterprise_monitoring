@@ -9,27 +9,27 @@ class QcRemoteDataSource {
   const QcRemoteDataSource(this._dio);
 
   Future<List<QcAuditModel>> getPendingAudits() async {
-    final response = await _dio.get('/qc-audits/pending');
-    final List data = response.data['data'];
-    return data.map((json) => QcAuditModel.fromJson(json)).toList();
+    final response = await _dio.get('qc-audits/pending');
+    final List data = response.data['data'] ?? [];
+    return data.map((json) => QcAuditModel.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   Future<List<QcAuditModel>> getAuditHistory() async {
-    final response = await _dio.get('/qc-audits/history');
-    final List data = response.data['data'];
-    return data.map((json) => QcAuditModel.fromJson(json)).toList();
+    final response = await _dio.get('qc-audits/history');
+    final List data = response.data['data'] ?? [];
+    return data.map((json) => QcAuditModel.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   Future<void> reviewAudit(String id, QcAuditStatus status, String? comments) async {
-    await _dio.put('/qc-audits/$id/review', data: {
+    await _dio.put('qc-audits/$id/review', data: {
       'status': status.name,
       'auditor_comments': comments,
     });
   }
 
   Future<QcAuditModel> getAuditById(String id) async {
-    final response = await _dio.get('/qc-audits/$id');
-    return QcAuditModel.fromJson(response.data['data']);
+    final response = await _dio.get('qc-audits/$id');
+    return QcAuditModel.fromJson(response.data['data'] as Map<String, dynamic>);
   }
 }
 
