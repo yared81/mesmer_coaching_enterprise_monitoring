@@ -264,10 +264,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Phase | Goal | Status |
 |---|---|---|
-| **1. Foundation** | Architecture, Core Infra | ✅ COMPLETE |
-| **2. Auth & Security** | JWT flows, Roles & Guards | ✅ COMPLETE |
-| **3. Enterprise Management** | Registration, Baseline | ✅ COMPLETE |
-| **4. Coaching Workflow** | Sessions, Evidence, QC | ✅ COMPLETE |
-| **5. Certificate System** | PDF Generation, Verification | ✅ COMPLETE |
-| **6. Analytics & Reporting** | MERL Dashboards, Exports | ✅ COMPLETE |
-| **7. Final Polish** | UI/UX, Animations | ✅ COMPLETE |
+| **1. Foundation** | Architecture, Core Infra, 74-File Skeleton | ✅ COMPLETE |
+| **2. Auth & Security** | JWT flows, Biometric, Roles & Protected Guards | ✅ COMPLETE |
+| **3. Onboarding** | Enterprise Registration, CSV Import, Consent Capture | ✅ COMPLETE |
+| **4. Diagnosis** | Assessment Tool, Scoring & Result Summary | ✅ COMPLETE |
+| **5. Coaching** | Session Tracking, IAP, Evidence Upload, Phone Logs | ✅ COMPLETE |
+| **6. Progress** | Baseline vs. Midline KPI Visualization | 🔄 Partial — charts wired, progress dashboard placeholder |
+| **7. Oversight** | Supervisor Reports & Program Analytics | 🔄 Partial — screens exist, some data stubs |
+| **8. Final Polish** | Brand consistency, Animations, Demo Prep | 🔄 In progress |
