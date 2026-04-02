@@ -1,38 +1,34 @@
-# Deploying MESMER to Railway
+# MESMER Backend — Deployment
 
-This guide covers deploying the backend to Railway with a managed PostgreSQL database so the app works live on any phone over the internet.
+## Current Status
 
----
+The backend is **live on Railway**:
 
-## Prerequisites
+```
+https://mesmercoachingenterprisemonitoring-production.up.railway.app
+```
 
-- [Railway account](https://railway.app) (free tier is sufficient)
-- Your repo pushed to GitHub
-- Flutter SDK installed locally for building the APK
+Health check: `GET /health` → `{"status":"UP","message":"MESMER API is reaching you!"}`
 
----
-
-## Step 1 — Create a Railway Project
-
-1. Go to [railway.app](https://railway.app) and sign in
-2. Click **New Project → Deploy from GitHub repo**
-3. Select your repository
-4. When asked for the **Root Directory**, set it to `server`
-5. Railway will detect Node.js automatically
+Database: SQLite (bundled, pre-seeded). To switch to persistent PostgreSQL, see the PostgreSQL section below.
 
 ---
 
-## Step 2 — Add PostgreSQL
+## Deploying a New Instance on Railway
 
-1. In your Railway project dashboard, click **+ New**
-2. Select **Database → Add PostgreSQL**
-3. Railway creates a managed Postgres instance and automatically injects `DATABASE_URL` into your service environment
+### Prerequisites
+- Railway account at [railway.app](https://railway.app)
+- Repo pushed to GitHub
 
----
+### Step 1 — Create project
 
-## Step 3 — Set Environment Variables
+1. Railway dashboard → **New Project → Deploy from GitHub repo**
+2. Select your repository
+3. Set **Root Directory** to `server` — this is critical, Railway must look inside `server/` not the repo root
 
-In your Railway service → **Variables**, add:
+### Step 2 — Set environment variables
+
+In your service → **Variables** tab (not Project Settings → Shared Variables):
 
 | Variable | Value |
 |---|---|
@@ -44,119 +40,101 @@ In your Railway service → **Variables**, add:
 | `JWT_ACCESS_EXPIRE` | `8h` |
 | `JWT_REFRESH_EXPIRE` | `7d` |
 | `BCRYPT_ROUNDS` | `10` |
+| `DB_DIALECT` | `sqlite` |
+| `DB_STORAGE` | `./data/mesmer.sqlite` |
 
-Do **not** set `DB_DIALECT` or `DB_STORAGE` — the server auto-detects `DATABASE_URL` from the Postgres addon and uses PostgreSQL.
+### Step 3 — Deploy
 
----
+Railway deploys automatically. The server starts, connects to SQLite, syncs the schema, and is ready.
 
-## Step 4 — Deploy
+### Step 4 — Seed demo data (if needed)
 
-Railway deploys automatically on every push to your main branch. The first deploy:
-- Runs `npm ci --only=production`
-- Starts `node server.js`
-- Sequelize runs `sync({ alter: true })` and creates all tables automatically
+The `mesmer.sqlite` file is committed to the repo and contains pre-seeded data. If you need to re-seed:
 
----
-
-## Step 5 — Seed Demo Data
-
-After the first successful deploy, open Railway's terminal for your service and run:
-
+Open Railway's service terminal and run:
 ```bash
 node scripts/seed.js
 ```
 
-This creates the institution, all 11 demo user accounts, and sample enterprises.
+**Demo accounts — all passwords: `123456`**
 
-**Demo credentials after seeding:**
-
-| Role | Email | Password |
-|---|---|---|
-| Super Admin | superadmin@mesmer.com | 123456 |
-| Program Manager | programmanager@mesmer.com | 123456 |
-| Regional Coordinator | regionalcoordinator@mesmer.com | 123456 |
-| Coach | coach@mesmer.com | 123456 |
-| Enterprise User | enterprise@mesmer.com | 123456 |
-| M&E Officer | meofficer@mesmer.com | 123456 |
-| Enumerator | enumerator@mesmer.com | 123456 |
-
----
-
-## Step 6 — Get Your Public URL
-
-Railway assigns a URL like:
-```
-https://mesmer-backend-production.up.railway.app
-```
-
-Find it in your service → **Settings → Domains**.
+| Role | Email |
+|---|---|
+| Super Admin | superadmin@mesmer.com |
+| Program Manager | programmanager@mesmer.com |
+| Regional Coordinator | regionalcoordinator@mesmer.com |
+| M&E Officer | meofficer@mesmer.com |
+| Data Verifier | dataverifier@mesmer.com |
+| Trainer | trainer@mesmer.com |
+| Coach | coach@mesmer.com |
+| Enumerator | enumerator@mesmer.com |
+| Comms Officer | commsofficer@mesmer.com |
+| Enterprise User | beneficiary@mesmer.com |
+| Stakeholder | stakeholder@mesmer.com |
 
 ---
 
-## Step 7 — Build the Flutter APK
+## Switching to PostgreSQL (Persistent Data)
 
-Update your `.env` file at the project root:
+SQLite resets on redeploy. For persistent data across redeploys:
+
+1. In Railway project → **+ New → Database → PostgreSQL**
+2. Railway injects `DATABASE_URL` automatically into your service
+3. In your service Variables, remove `DB_DIALECT` and `DB_STORAGE`
+4. The server auto-detects `DATABASE_URL` and uses PostgreSQL
+5. Redeploy — Sequelize creates all tables automatically on startup
+6. Run `node scripts/seed.js` once to populate demo accounts
+
+---
+
+## Building the Flutter APK
+
+After deployment, update `.env` at the project root:
 
 ```env
 API_BASE_URL=https://your-service.up.railway.app/api/v1
 ```
 
-Then build:
-
+Build:
 ```bash
 flutter build apk --release --dart-define-from-file=.env
 ```
 
-The APK is at `build/app/outputs/flutter-apk/app-release.apk`.
+APK: `build/app/outputs/flutter-apk/app-release.apk`
 
-Install it on any Android phone. The app connects to your Railway server over the internet — WiFi or cellular, anywhere.
+The APK connects to your Railway server over HTTPS — works on any phone, any network.
 
 ---
 
-## Architecture on Railway
+## Architecture
 
 ```
-Railway Service (Node.js)
-    ↓ reads DATABASE_URL
-Railway PostgreSQL Addon
-    ↓ persistent data, survives redeploys
+Railway (Node.js + Express)
+    ↓ SQLite (bundled) or PostgreSQL addon
+    ↓ HTTPS public URL
 
 Flutter APK on phone
-    ↓ HTTPS requests to Railway public URL
-    ↓ works on any network (WiFi, cellular)
-    ↓ caches data locally for offline use
-    ↓ syncs queued actions when back online
+    ↓ Calls Railway API when online
+    ↓ Caches to local SQLite (sqflite) on device
+    ↓ Offline → reads cache, queues writes
+    ↓ Back online → syncs queue to server
 ```
-
----
-
-## Offline Behavior
-
-The Flutter app caches enterprises, sessions, and other data locally after the first successful load. When offline:
-- Previously loaded data is visible
-- Forms can be filled and are queued locally
-- When connectivity returns, the sync queue replays to the server automatically
-
-A fresh install with no prior cache requires at least one online session to populate the local cache.
-
----
-
-## Local Demo (No Deployment)
-
-See `DEMO_SETUP.md` for running everything locally with SQLite — no PostgreSQL or internet required.
 
 ---
 
 ## Troubleshooting
 
-**Deploy fails with "Cannot find module"**
-→ Make sure Root Directory is set to `server` in Railway settings.
+**Build fails — "Railpack could not determine how to build"**
+→ Root Directory must be set to `server` in Railway service settings.
 
-**App gets CORS error**
-→ Confirm `ALLOWED_ORIGINS=*` is set in Railway variables.
+**Variables not loading (`injecting env (0)`)**
+→ Variables must be in the service's own Variables tab, not Project Settings → Shared Variables.
 
-**Login fails after deploy**
-→ Run `node scripts/seed.js` from Railway's terminal to create user accounts.
+**CORS error in app**
+→ Set `ALLOWED_ORIGINS=*` in service Variables.
 
-**DATABASE_URL not found**
-→ Make sure the PostgreSQL addon is linked to the same Railway project as your service.
+**Login fails**
+→ Run `node scripts/seed.js` from Railway terminal to create accounts.
+
+**`DATABASE_URL` not found**
+→ PostgreSQL addon must be in the same Railway project as the Node.js service.

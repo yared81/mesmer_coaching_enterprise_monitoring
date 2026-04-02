@@ -1,274 +1,123 @@
-# 🏆 MESMER Digital Coaching
+# MESMER Digital Coaching
 
-**Enterprise Transformation through Digital Coaching & Quality Assurance**
-
-A comprehensive Flutter + Node.js app that digitizes the MESMER Program's end-to-end workflow from enterprise intake to graduation, featuring role-based access control, offline capabilities, and professional certificate generation.
+Enterprise transformation through digital coaching and quality assurance — a Flutter + Node.js platform that digitizes the MESMER Program end-to-end, from enterprise intake to graduation.
 
 ---
 
-## 🎯 **Project Overview**
+## Live Demo
 
-The MESMER Digital Coaching app transforms traditional business coaching into a scalable, data-driven system supporting **500+ Ethiopian MSEs** through:
+The backend is deployed and running. Install the APK and log in immediately — no setup required.
 
-- **📊 Complete Program Management** - From intake to graduation
-- **👥 11-Role RBAC System** - Super Admin to Enterprise Users
-- **📱 Mobile-First Design** - Offline-capable field operations
-- **🔒 Enterprise Security** - Biometric auth, encryption, audit trails
-- **🏅 Professional Certificates** - QR-coded verification system
-- **📈 Real-Time Analytics** - MERL dashboards with KPI tracking
+**Backend:** `https://mesmercoachingenterprisemonitoring-production.up.railway.app`
 
----
+**Demo Accounts — all passwords: `123456`**
 
-## ⚡ **Key Features**
-
-### **🔐 Authentication & Security**
-- **Biometric Authentication** - Fingerprint & face recognition
-- **11-Role RBAC** - Granular permissions per user type
-- **Audit Logging** - Complete activity tracking
-- **Data Encryption** - PII protection at rest and in transit
-
-### **🏢 Enterprise Management**
-- **Digital Intake** - CSV import + manual registration
-- **Baseline Assessments** - Photo evidence, GPS stamping
-- **Individual Action Plans** - Multi-task builder for coaches
-- **Progress Tracking** - Real-time KPI monitoring
-- **Digital Signatures** - Compliance-ready sign-off for visits
-
-### **🎓 Coaching & Training**
-- **Session Management** - Scheduling, attendance, feedback
-- **Evidence Upload** - Photo/document capture with verification
-- **Quality Control** - Random sampling, peer review
-- **Offline Support** - Field operations without connectivity
-
-### **🏅 Certificate System**
-- **Professional PDF Generation** - MESMER-branded certificates
-- **Secure Verification** - 12-digit codes with cryptographic validation
-- **Graduation Validation** - 5-step requirement checking
-- **Public Verification** - QR code scanning interface
-
-### **📊 Monitoring & Reporting**
-- **MERL Dashboards** - Funnel analytics, per-coach stats
-- **Regional Analytics** - Geographic performance tracking
-- **Export Capabilities** - PDF, Excel, CSV reports
-- **System-Wide KPIs** - Aggregate M&E impact monitoring
+| Role | Email |
+|---|---|
+| Super Admin | superadmin@mesmer.com |
+| Program Manager | programmanager@mesmer.com |
+| Regional Coordinator | regionalcoordinator@mesmer.com |
+| M&E Officer | meofficer@mesmer.com |
+| Data Verifier | dataverifier@mesmer.com |
+| Trainer | trainer@mesmer.com |
+| Coach | coach@mesmer.com |
+| Enumerator | enumerator@mesmer.com |
+| Comms Officer | commsofficer@mesmer.com |
+| Enterprise User | beneficiary@mesmer.com |
+| Stakeholder | stakeholder@mesmer.com |
 
 ---
 
-## 🛠️ **Tech Stack**
+## What It Does
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Frontend** | Flutter 3.x | Cross-platform mobile app |
-| **State Management** | Riverpod 2.x | Reactive state management |
-| **Navigation** | GoRouter | Declarative routing |
-| **HTTP Client** | Dio | REST API communication |
-| **Authentication** | JWT + Biometric | Secure user sessions |
-| **Backend** | Node.js + Express | REST API server |
-| **Database** | PostgreSQL | Primary data storage |
-| **File Storage** | Cloudflare R2 | Document & media storage |
-| **Notifications** | Brevo SMS | Transactional messaging |
-
----
-
-## 🚀 **Quick Start**
-
-### **Prerequisites**
-- Flutter SDK 3.11.1+
-- Node.js 18+
-- PostgreSQL 14+
-- Git
-
-### **Installation**
-
-```bash
-# 1. Clone Repository
-git clone <repository-url>
-cd mesmer_digital_coaching
-
-# 2. Database Setup
-sudo -i -u postgres psql
-CREATE DATABASE mesmer_db;
-CREATE USER mesmer_user WITH PASSWORD 'your_pass';
-GRANT ALL PRIVILEGES ON DATABASE mesmer_db TO mesmer_user;
-
-# 3. Initialize Schema
-psql -h localhost -U mesmer_user -d mesmer_db -f docs/setup.sql
-
-# 4. Flutter Dependencies
-flutter pub get
-
-# 5. Environment Configuration
-cp .env.example .env
-# Edit .env with your API_BASE_URL and database credentials
-
-# 6. Run Application
-flutter run --dart-define-from-file=.env
-```
+- 11-role RBAC system — Super Admin down to Enterprise User
+- Enterprise intake, consent capture, baseline assessment with photo evidence
+- Individual Action Plans with task tracking and evidence upload
+- Coaching session logging, phone follow-up logs, calendar scheduling
+- Diagnosis/assessment tool with category scoring and result visualization
+- QC workflow — random sampling, verification queue, audit history
+- Training management — sessions, attendance, feedback
+- Certificate generation — PDF with QR verification code, graduation checklist lock
+- MERL dashboards — funnel analytics, progress charts, regional reports
+- Offline-first — caches data locally, queues writes, syncs when back online
+- Biometric auth + auto-lock timeout
 
 ---
 
-## 👥 **Demo Accounts**
+## Tech Stack
 
-| Role | Email | Password | Access Level |
-|---|---|---|---|
-| **Super Admin** | admin@mesmer.app | admin123 | Full system access |
-| **Program Manager** | pm@mesmer.app | admin123 | Program oversight |
-| **Regional Coordinator** | rc@mesmer.app | admin123 | Regional management |
-| **Coach** | coach@mesmer.app | admin123 | Enterprise coaching |
-| **Enterprise User** | enterprise@mesmer.app | admin123 | Business owner access |
-
----
-
-## 📱 **Screenshots**
-
-### **Professional Authentication**
-- 🌟 **Beautiful Splash Screen** - Animated MESMER branding
-- 🔐 **Biometric Login** - Fingerprint & face recognition
-- 👤 **Role-Based Dashboards** - Customized interfaces per role
-
-### **Enterprise Management**
-- 📋 **Digital Intake Forms** - Photo capture, GPS stamping
-- 📊 **Baseline Assessments** - Comprehensive business analysis
-- 🎯 **Individual Action Plans** - Goal setting & tracking
-
-### **Coaching Workflow**
-- 📅 **Session Scheduling** - Calendar integration
-- 📸 **Evidence Upload** - Photo verification system
-- ✅ **Quality Control** - Peer review & validation
-
-### **Certificate System**
-- 🏅 **Professional Certificates** - MESMER-branded PDFs
-- 🔍 **Verification Interface** - Public certificate verification
-- 📱 **QR Code Support** - Mobile verification scanning
+| Layer | Technology |
+|---|---|
+| Mobile | Flutter 3.x + Riverpod 2.x |
+| Navigation | GoRouter |
+| HTTP | Dio with JWT interceptor |
+| Local Cache | SQLite (sqflite) |
+| Backend | Node.js + Express |
+| Database | PostgreSQL (Railway) |
+| Auth | JWT access + refresh tokens |
 
 ---
 
-## 🏗️ **Architecture Overview**
+## Running the App
+
+See **[DEMO_SETUP.md](./DEMO_SETUP.md)** — covers both the live deployment and local development options.
+
+For deploying your own instance, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+---
+
+## Architecture
 
 ```
 lib/
-├── core/                    # Shared infrastructure
-│   ├── constants/          # App constants & configurations
-│   ├── errors/             # Error handling & exceptions
-│   ├── network/            # HTTP client & API configuration
-│   ├── router/             # Navigation & routing
-│   ├── services/           # Shared services (biometric, storage)
-│   ├── storage/            # Local storage (Hive, SQLite)
-│   └── theme/              # App theming & design system
-├── shared/                  # Reusable components
-│   ├── widgets/            # Common UI components
-│   └── utils/              # Utility functions
-└── features/               # Feature modules
-    ├── auth/               # Authentication & user management
-    ├── dashboard/          # Role-based dashboards
-    ├── enterprise/         # Enterprise management
-    ├── workflow/           # Business workflows
-    │   ├── coaching/       # Coaching sessions & evidence
-    │   ├── training/       # Training management
-    │   ├── diagnosis/      # Assessments & scoring
-    │   ├── qc/            # Quality control & verification
-    │   └── comms/         # Communications & certificates
-    ├── monitoring/         # MERL & analytics
-    └── reports/           # Reporting & exports
+├── core/           # Network, router, storage, theme, utils
+├── shared/         # Reusable widgets
+└── features/
+    ├── auth/           # JWT auth, biometric, splash
+    ├── dashboard/      # Role-based dashboards (8 roles)
+    └── workflow/
+        ├── enterprise/ # Registration, profile, progress, graduation
+        ├── coaching/   # Sessions, IAP, evidence, phone logs
+        ├── diagnosis/  # Assessment tool, scoring, results
+        ├── intake/     # Enumerator queue, baseline, consent
+        ├── training/   # Sessions, attendance, evaluation
+        ├── qc/         # QC dashboard, audit history
+        └── comms/      # Certificates, success stories
 ```
 
----
-
-## 📊 **Project Status**
-
-### **✅ Completed Features (100%)**
-- **Authentication System** - JWT + biometric authentication
-- **Role-Based Access Control** - 11 roles with granular permissions
-- **Enterprise Management** - Complete CRUD + CSV import
-- **Baseline Assessments** - Photo evidence, offline support
-- **Coaching Workflow** - Session tracking, evidence upload
-- **Quality Control** - Random sampling, verification workflow
-- **Training Management** - Attendance, feedback, scheduling
-- **Certificate Generation** - Professional PDFs with verification
-- **MERL Dashboards** - Real-time KPI tracking
-- **Reporting System** - Export capabilities
-
-### **🎯 Hackathon Ready**
-- **Mobile Application** - Fully functional Flutter app
-- **Backend API** - Complete REST API implementation
-- **Database Schema** - Optimized PostgreSQL structure
-- **Security Features** - Enterprise-grade security
-- **Documentation** - Comprehensive project documentation
+Clean Architecture + Feature-First. Presentation → Domain → Data. No cross-feature imports.
 
 ---
 
-## 🏆 **Competitive Advantages**
+## Offline Behavior
 
-### **Technical Excellence**
-- **Clean Architecture** - Maintainable, scalable codebase
-- **Advanced State Management** - Riverpod with proper patterns
-- **Security-First Design** - Biometric auth, encryption, audit trails
-- **Offline Capabilities** - Field operations without connectivity
-- **Professional UI/UX** - Beautiful, intuitive interfaces
-
-### **Business Value**
-- **Complete Program Digitization** - End-to-end workflow support
-- **Quality Assurance** - Built-in QC and verification systems
-- **Scalable Architecture** - Supports 500+ enterprises
-- **Data-Driven Insights** - Real-time analytics and reporting
-- **Professional Certification** - Industry-standard certificate system
+The app works without internet after the first login:
+- Data loaded from the server is cached to local SQLite automatically
+- Forms, sessions, and IAP updates are queued when offline
+- When connectivity returns, the sync queue replays to the server
+- The interceptor detects connection state and switches modes automatically
 
 ---
 
-## 📚 **Documentation**
-
-- **[API Documentation](docs/API_DOCUMENTATION.md)** - Complete REST API reference (40+ endpoints)
-- **[User Manual](docs/USER_MANUAL.md)** - Comprehensive guides for all 11 user roles
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - System design, patterns, and technical architecture
-- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md)** - Complete setup and deployment instructions
-- **[Database Schema](docs/setup.sql)** - PostgreSQL database structure and initialization
-
----
-
-## 🤝 **Contributing**
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
----
-
-## 📄 **License**
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🏆 **Hackathon Submission**
-
-**Project Category**: Enterprise Digital Transformation  
-**Target Users**: 500+ Ethiopian MSEs, 11 user roles  
-**Impact**: Scalable coaching app with measurable outcomes  
-
-### **Demo Highlights**
-- Live certificate generation with QR verification
-- Role-based workflow demonstration
-- Offline field operations
-- Real-time analytics dashboard
-- Biometric authentication showcase
-
----
-
-**🚀 Ready for Production • 🏆 Hackathon Winner • 📱 Mobile-First Design**
-
----
-
-## 🗺️ **Development Roadmap**
+## Development Roadmap
 
 | Phase | Goal | Status |
 |---|---|---|
-| **1. Foundation** | Architecture, Core Infra, 74-File Skeleton | ✅ COMPLETE |
-| **2. Auth & Security** | JWT flows, Biometric, Roles & Protected Guards | ✅ COMPLETE |
-| **3. Onboarding** | Enterprise Registration, CSV Import, Consent Capture | ✅ COMPLETE |
-| **4. Diagnosis** | Assessment Tool, Scoring & Result Summary | ✅ COMPLETE |
-| **5. Coaching** | Session Tracking, IAP, Evidence Upload, Phone Logs | ✅ COMPLETE |
-| **6. Progress** | Baseline vs. Midline KPI Visualization | 🔄 Partial — charts wired, progress dashboard placeholder |
-| **7. Oversight** | Supervisor Reports & Program Analytics | 🔄 Partial — screens exist, some data stubs |
-| **8. Final Polish** | Brand consistency, Animations, Demo Prep | 🔄 In progress |
+| 1. Foundation | Architecture, Core Infra | ✅ Complete |
+| 2. Auth & Security | JWT, Biometric, RBAC | ✅ Complete |
+| 3. Onboarding | Enterprise Registration, Consent, CSV Import | ✅ Complete |
+| 4. Diagnosis | Assessment Tool, Scoring, Results | ✅ Complete |
+| 5. Coaching | Sessions, IAP, Evidence, Phone Logs | ✅ Complete |
+| 6. Progress | Baseline vs. Current KPI Charts | ✅ Complete |
+| 7. Oversight | Supervisor Reports, Regional Analytics | 🔄 Partial |
+| 8. Final Polish | Animations, Brand Consistency | 🔄 In progress |
+
+---
+
+## Documentation
+
+- [DEMO_SETUP.md](./DEMO_SETUP.md) — how to run the app
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — Railway deployment guide
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — system design
+- [docs/API_DOCUMENTATION.md](./docs/API_DOCUMENTATION.md) — REST API reference
+- [docs/USER_MANUAL.md](./docs/USER_MANUAL.md) — per-role user guides
