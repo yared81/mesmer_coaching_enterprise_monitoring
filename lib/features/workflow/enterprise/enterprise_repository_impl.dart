@@ -2,17 +2,6 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
 import 'package:mesmer_digital_coaching/core/errors/failure.dart';
-import 'enterprise_entity.dart';
-import 'enterprise_repository.dart';
-import 'enterprise_remote_datasource.dart';
-import 'enterprise_model.dart';
-import 'enterprise_dashboard_stats.dart';
-import 'enterprise_dashboard_model.dart';
-
-import 'dart:convert';
-import 'package:dartz/dartz.dart';
-import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
-import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 import 'package:mesmer_digital_coaching/core/db/local_database.dart';
 import 'enterprise_entity.dart';
@@ -152,10 +141,12 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
     // Simple local fallback (not full stats, but keeps app from crashing)
     final enterprises = await _localDatabase.getEnterprises();
     return Right(EnterpriseDashboardStats(
-      totalEnterprises: enterprises.length,
-      activeEnterprises: enterprises.where((e) => e['status'] == 'active').length,
-      graduatedEnterprises: enterprises.where((e) => e['status'] == 'graduated').length,
-      recentActivity: [],
+      enterpriseId: '',
+      businessName: '',
+      sector: '',
+      radarScores: [],
+      latestRecommendation: '',
+      totalSessions: 0,
     ));
   }
 

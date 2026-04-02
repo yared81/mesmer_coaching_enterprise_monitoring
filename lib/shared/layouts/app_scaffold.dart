@@ -1,7 +1,3 @@
-// TODO: Common app scaffold with navigation drawer (for supervisor/admin)
-// and bottom navigation bar (for coach role)
-// Reads current user role from authProvider to decide nav type
-
 import 'package:flutter/material.dart';
 
 class AppScaffold extends StatelessWidget {
@@ -20,7 +16,16 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Implement role-aware navigation wrapper
-    throw UnimplementedError();
+    return Scaffold(
+      appBar: title != null
+          ? AppBar(
+              title: Text(title!),
+              actions: actions,
+              elevation: 0,
+            )
+          : null,
+      body: body,
+      floatingActionButton: floatingActionButton,
+    );
   }
 }

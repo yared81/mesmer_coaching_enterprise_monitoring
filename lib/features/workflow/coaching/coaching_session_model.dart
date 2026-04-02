@@ -25,6 +25,31 @@ class CoachingSessionModel extends CoachingSessionEntity {
     super.notes,
   });
 
+  factory CoachingSessionModel.fromEntity(CoachingSessionEntity e, {String? overrideId}) {
+    return CoachingSessionModel(
+      id: overrideId ?? e.id,
+      title: e.title,
+      enterpriseId: e.enterpriseId,
+      coachId: e.coachId,
+      scheduledDate: e.scheduledDate,
+      status: e.status,
+      sessionNumber: e.sessionNumber,
+      followupType: e.followupType,
+      revenueGrowthPercent: e.revenueGrowthPercent,
+      currentEmployees: e.currentEmployees,
+      jobsCreated: e.jobsCreated,
+      qcStatus: e.qcStatus,
+      qcFeedback: e.qcFeedback,
+      latitude: e.latitude,
+      longitude: e.longitude,
+      templateId: e.templateId,
+      enterpriseName: e.enterpriseName,
+      problemsIdentified: e.problemsIdentified,
+      recommendations: e.recommendations,
+      notes: e.notes,
+    );
+  }
+
   factory CoachingSessionModel.fromJson(Map<String, dynamic> json) {
     return CoachingSessionModel(
       id: json['id'] as String,

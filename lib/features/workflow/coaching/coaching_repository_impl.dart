@@ -4,19 +4,6 @@ import 'package:dartz/dartz.dart';
 import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
 import 'package:mesmer_digital_coaching/core/db/local_database.dart';
 import 'package:mesmer_digital_coaching/core/errors/failure.dart';
-import 'coaching_session_entity.dart';
-import 'coaching_repository.dart';
-import 'coaching_remote_datasource.dart';
-import 'coaching_session_model.dart';
-import 'phone_followup_entity.dart';
-import 'phone_followup_model.dart';
-
-import 'dart:convert';
-import 'dart:math';
-import 'package:dartz/dartz.dart';
-import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
-import 'package:mesmer_digital_coaching/core/db/local_database.dart';
-import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 import 'coaching_session_entity.dart';
 import 'coaching_repository.dart';
@@ -58,7 +45,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   Future<Either<Failure, CoachingSessionEntity>> _localCreateSession(CoachingSessionEntity session) async {
     final finalId = session.id.isEmpty ? _generateOfflineId() : session.id;
-    final model = CoachingSessionModel.fromEntity(session).copyWith(id: finalId);
+    final model = CoachingSessionModel.fromEntity(session, overrideId: finalId);
     final data = model.toJson();
     
     await localDatabase.saveSession(finalId, data);
@@ -150,7 +137,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       throw Exception('Offline mode active');
     } catch (e) {
       final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
-      final model = PhoneFollowupModel.fromEntity(log).copyWith(id: finalId);
+      final model = PhoneFollowupModel.fromEntity(log, overrideId: finalId);
       await localDatabase.enqueueSyncAction('POST', 'phone-followups', jsonEncode(model.toJson()));
       return Right(model);
     }

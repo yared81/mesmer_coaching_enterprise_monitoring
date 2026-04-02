@@ -15,6 +15,21 @@ class PhoneFollowupModel extends PhoneFollowupEntity {
     super.coachName,
   });
 
+  factory PhoneFollowupModel.fromEntity(PhoneFollowupEntity e, {String? overrideId}) {
+    return PhoneFollowupModel(
+      id: overrideId ?? e.id,
+      enterpriseId: e.enterpriseId,
+      coachId: e.coachId,
+      date: e.date,
+      purpose: e.purpose,
+      issueAddressed: e.issueAddressed,
+      adviceGiven: e.adviceGiven,
+      nextAction: e.nextAction,
+      enterpriseName: e.enterpriseName,
+      coachName: e.coachName,
+    );
+  }
+
   factory PhoneFollowupModel.fromJson(Map<String, dynamic> json) {
     return PhoneFollowupModel(
       id: json['id']?.toString() ?? '',

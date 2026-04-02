@@ -62,3 +62,7 @@ class CacheFailure extends Failure {
 class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure({String message = 'Unauthorized'}) : super(message);
 }
+
+class LocalFailure extends Failure {
+  const LocalFailure({String message = 'Local data error'}) : super(message);
+}
