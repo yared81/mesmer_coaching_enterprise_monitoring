@@ -57,9 +57,24 @@ class CoachingRepositoryImpl implements CoachingRepository {
   @override
   Future<Either<Failure, List<CoachingSessionEntity>>> getMySessions() async {
     if (offlineNotifier.state) {
-      // For now, we don't have a 'getMySessions' local filter, 
-      // but we can return empty or allcached if needed.
-      return const Right([]); 
+      try {
+        final db = await localDatabase.database;
+        final maps = await db.query('coaching_sessions');
+        final sessions = maps
+            .map((m) {
+              try {
+                return CoachingSessionModel.fromJson(
+                    jsonDecode(m['data'] as String) as Map<String, dynamic>);
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<CoachingSessionEntity>()
+            .toList();
+        return Right(sessions);
+      } catch (e) {
+        return const Right([]);
+      }
     }
 
     try {
@@ -69,7 +84,25 @@ class CoachingRepositoryImpl implements CoachingRepository {
       }
       return Right(result);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      // Fallback to local cache on connection error
+      try {
+        final db = await localDatabase.database;
+        final maps = await db.query('coaching_sessions');
+        final sessions = maps
+            .map((m) {
+              try {
+                return CoachingSessionModel.fromJson(
+                    jsonDecode(m['data'] as String) as Map<String, dynamic>);
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<CoachingSessionEntity>()
+            .toList();
+        return Right(sessions);
+      } catch (_) {
+        return Left(Failure.fromException(e));
+      }
     }
   }
 
@@ -127,15 +160,19 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, PhoneFollowupEntity>> createPhoneFollowup(PhoneFollowupEntity log) async {
-    // Basic connectivity check fallback
+    if (offlineNotifier.state) {
+      final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
+      final model = PhoneFollowupModel.fromEntity(log, overrideId: finalId);
+      await localDatabase.enqueueSyncAction('POST', 'phone-followups', jsonEncode(model.toJson()));
+      return Right(model);
+    }
+
     try {
-      if (!offlineNotifier.state) {
-        final model = PhoneFollowupModel.fromEntity(log);
-        final result = await remoteDataSource.createPhoneFollowup(model);
-        return Right(result);
-      }
-      throw Exception('Offline mode active');
+      final model = PhoneFollowupModel.fromEntity(log);
+      final result = await remoteDataSource.createPhoneFollowup(model);
+      return Right(result);
     } catch (e) {
+      // Connection error — queue for sync
       final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
       final model = PhoneFollowupModel.fromEntity(log, overrideId: finalId);
       await localDatabase.enqueueSyncAction('POST', 'phone-followups', jsonEncode(model.toJson()));

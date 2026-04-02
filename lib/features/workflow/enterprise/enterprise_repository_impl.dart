@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
 import 'package:mesmer_digital_coaching/core/errors/failure.dart';
 import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
@@ -130,15 +131,24 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
 
   @override
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats() async {
-    try {
-      if (!_offlineNotifier.state) {
+    if (!_offlineNotifier.state) {
+      try {
         final data = await _remoteDatasource.getEnterpriseDashboardStats();
-        // Caching stats could be done in Hive
         return Right(EnterpriseDashboardStats.fromJson(data));
+      } on DioException catch (e) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          // Genuine offline — fall through to local
+        } else {
+          return Left(Failure.fromException(e));
+        }
+      } catch (e) {
+        return Left(ServerFailure(message: e.toString()));
       }
-    } catch (_) {}
-    
-    // Simple local fallback (not full stats, but keeps app from crashing)
+    }
+
+    // Offline fallback — build minimal stats from local cache
     final enterprises = await _localDatabase.getEnterprises();
     return Right(EnterpriseDashboardStats(
       enterpriseId: '',

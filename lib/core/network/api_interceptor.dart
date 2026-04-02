@@ -21,8 +21,17 @@ class ApiInterceptor extends Interceptor {
   }
 
   @override
+  Future<void> onResponse(Response response, ResponseInterceptorHandler handler) async {
+    // Clear offline mode on any successful response — server is reachable
+    if (_offlineNotifier.state) {
+      _offlineNotifier.setOffline(false);
+    }
+    super.onResponse(response, handler);
+  }
+
+  @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    // 1. Detect Connection Failures
+    // 1. Detect Connection Failures → switch to offline mode
     if (err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.sendTimeout ||
         err.type == DioExceptionType.receiveTimeout ||
@@ -30,11 +39,12 @@ class ApiInterceptor extends Interceptor {
         (err.type == DioExceptionType.badResponse && err.response?.statusCode == 503)) {
       
       _offlineNotifier.setOffline(true);
-      // We don't call super.onError yet because we want the repository to handle the fallback
+    } else {
+      // Server responded (even with an error) — we're online
+      if (_offlineNotifier.state) {
+        _offlineNotifier.setOffline(false);
+      }
     }
-
-    // 2. Clear Offline Mode on successful manual retry or specific status codes if needed
-    // (Usually handled by explicit 'Retry' buttons in UI)
 
     // 3. Handle Token Refresh (Original Logic)
     if (err.response?.statusCode == 401 &&
