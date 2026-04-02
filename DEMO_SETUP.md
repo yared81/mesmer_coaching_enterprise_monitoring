@@ -1,42 +1,53 @@
-# MESMER Demo Setup — 5 Steps
+# MESMER — Running the App
 
-This guide gets the app running locally in under 10 minutes using the bundled SQLite database. No PostgreSQL installation required.
-
----
-
-## Prerequisites
-
-- [Node.js 18+](https://nodejs.org)
-- [Flutter SDK 3.11+](https://flutter.dev/docs/get-started/install)
-- Git
+There are two ways to run this app. Choose based on your situation.
 
 ---
 
-## Step 1 — Clone & Install
+## Option A — Live Deployment (Recommended)
+
+The app is deployed on Railway with a real PostgreSQL database. Works on any phone, any network.
+
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the full Railway setup guide.
+
+Once deployed, build the APK with the Railway URL:
 
 ```bash
-git clone <repository-url>
-cd mesmer_coaching_enterprise_monitoring
+# Set API_BASE_URL in .env to your Railway URL first
+flutter build apk --release --dart-define-from-file=.env
+```
+
+Install the APK on any Android phone. Done.
+
+---
+
+## Option B — Local Demo (No Internet Required)
+
+Run everything on your machine using the bundled SQLite database. Useful for offline demos or development.
+
+### Prerequisites
+- Node.js 18+
+- Flutter SDK 3.11+
+
+### Step 1 — Install dependencies
+
+```bash
 flutter pub get
 cd server && npm install && cd ..
 ```
 
----
+### Step 2 — Configure server for SQLite mode
 
-## Step 2 — Configure the Server for Offline/Demo Mode
-
-Open `server/.env` and add these two lines at the bottom:
+Open `server/.env` and add:
 
 ```env
 DB_DIALECT=sqlite
 DB_STORAGE=./data/mesmer.sqlite
 ```
 
-The `mesmer.sqlite` file is already bundled with seeded demo data (13 users, 3 enterprises, 18 coaching sessions, 90 audit logs).
+The `mesmer.sqlite` file is pre-seeded with demo data (13 users, 3 enterprises, 18 sessions).
 
----
-
-## Step 3 — Start the Backend
+### Step 3 — Start the server
 
 ```bash
 cd server
@@ -49,23 +60,22 @@ You should see:
 🚀 MESMER Server running on http://0.0.0.0:3000
 ```
 
----
+### Step 4 — Configure the Flutter app
 
-## Step 4 — Configure the Flutter App
-
-Open `.env` in the project root and set:
+Open `.env` at the project root:
 
 ```env
+# Android emulator
 API_BASE_URL=http://10.0.2.2:3000/api/v1
+
+# Web or desktop
+API_BASE_URL=http://localhost:3000/api/v1
+
+# Physical phone on same WiFi (use your machine's local IP)
+API_BASE_URL=http://192.168.x.x:3000/api/v1
 ```
 
-> Use `http://10.0.2.2:3000/api/v1` for Android emulator.
-> Use `http://localhost:3000/api/v1` for web or desktop.
-> Use your machine's local IP (e.g. `http://192.168.1.x:3000/api/v1`) for a physical device.
-
----
-
-## Step 5 — Run the App
+### Step 5 — Run the app
 
 ```bash
 flutter run --dart-define-from-file=.env
@@ -77,41 +87,26 @@ flutter run --dart-define-from-file=.env
 
 | Role | Email | Password |
 |---|---|---|
-| Super Admin | admin@mesmer.app | admin123 |
-| Program Manager | pm@mesmer.app | admin123 |
-| Regional Coordinator | rc@mesmer.app | admin123 |
-| Coach | coach@mesmer.app | admin123 |
-| Enterprise User | enterprise@mesmer.app | admin123 |
-| M&E Officer | me@mesmer.app | admin123 |
-| Enumerator | enumerator@mesmer.app | admin123 |
-
----
-
-## What the Demo Shows
-
-- Role-based dashboards — each login shows a different interface
-- Enterprise management — 3 seeded enterprises with coaching history
-- Coaching sessions — 18 sessions with diagnosis reports
-- IAP task tracking — action plans with evidence upload
-- Certificate generation — PDF with QR verification code
-- QC workflow — audit history with 90 logged entries
-- Offline mode — disconnect the server and the app falls back to local SQLite cache
-
----
-
-## Switching Back to PostgreSQL (Production Mode)
-
-Remove or comment out the two lines added in Step 2, then configure your PostgreSQL credentials in `server/.env` as documented in `docs/DEPLOYMENT_GUIDE.md`.
+| Super Admin | superadmin@mesmer.com | 123456 |
+| Program Manager | programmanager@mesmer.com | 123456 |
+| Regional Coordinator | regionalcoordinator@mesmer.com | 123456 |
+| Coach | coach@mesmer.com | 123456 |
+| Enterprise User | enterprise@mesmer.com | 123456 |
+| M&E Officer | meofficer@mesmer.com | 123456 |
+| Enumerator | enumerator@mesmer.com | 123456 |
 
 ---
 
 ## Troubleshooting
 
 **App shows "No internet connection"**
-→ Check that the server is running and `API_BASE_URL` matches your setup.
+→ Check the server is running and `API_BASE_URL` matches your setup.
 
 **Server fails to start**
 → Run `npm install` inside the `server/` folder.
 
 **Flutter build errors**
 → Run `flutter clean && flutter pub get` then retry.
+
+**Physical phone can't connect**
+→ Make sure phone and laptop are on the same WiFi. Use your machine's local IP, not `localhost`.

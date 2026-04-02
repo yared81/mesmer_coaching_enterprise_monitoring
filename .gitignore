@@ -16,6 +16,7 @@ migrate_working_dir/
 .env
 .env.local
 .env.*.local
+server/.env
 server/seed_db_mockdata.json
 # ── IDE & Editor ──────────────────────────────────────────────
 *.iml
@@ -42,6 +43,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# Keep the seeded SQLite for local demo
+!server/data/mesmer.sqlite
 
 # Local/dev scripts 
 server/scripts/
