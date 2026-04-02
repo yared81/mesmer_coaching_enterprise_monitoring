@@ -25,11 +25,6 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
     String? status,
     String? coachId,
   }) async {
-    // 1. Check Offline Mode or attempt remote
-    if (_offlineNotifier.state) {
-      return _localGetEnterprises();
-    }
-
     try {
       final models = await _remoteDatasource.getEnterprises(
         search: search,
@@ -37,15 +32,17 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
         status: status,
         coachId: coachId,
       );
-      
-      // Cache all to SQLite for standalone use
+      // Cache for offline use
       for (var m in models) {
         await _localDatabase.saveEnterprise(m['id'], m);
       }
-
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
+    } on DioException catch (e) {
+      if (_isConnectionError(e)) {
+        return _localGetEnterprises();
+      }
+      return Left(Failure.fromException(e));
     } catch (e) {
-      // Automatic fallback on connection error
       return _localGetEnterprises();
     }
   }
@@ -61,15 +58,16 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
 
   @override
   Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id) async {
-    if (_offlineNotifier.state) {
-      final local = await _localDatabase.getEnterpriseById(id);
-      if (local != null) return Right(EnterpriseModel.fromJson(local).toEntity());
-    }
-
     try {
       final map = await _remoteDatasource.getEnterpriseById(id);
-      await _localDatabase.saveEnterprise(id, map); // Refresh local
+      await _localDatabase.saveEnterprise(id, map);
       return Right(EnterpriseModel.fromJson(map).toEntity());
+    } on DioException catch (e) {
+      if (_isConnectionError(e)) {
+        final local = await _localDatabase.getEnterpriseById(id);
+        if (local != null) return Right(EnterpriseModel.fromJson(local).toEntity());
+      }
+      return Left(Failure.fromException(e));
     } catch (e) {
       final local = await _localDatabase.getEnterpriseById(id);
       if (local != null) return Right(EnterpriseModel.fromJson(local).toEntity());
@@ -79,14 +77,13 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
 
   @override
   Future<Either<Failure, EnterpriseEntity>> registerEnterprise(Map<String, dynamic> data) async {
-    if (_offlineNotifier.state) {
-      return _localRegister(data);
-    }
-
     try {
       final map = await _remoteDatasource.createEnterprise(data);
       await _localDatabase.saveEnterprise(map['id'], map);
       return Right(EnterpriseModel.fromJson(map).toEntity());
+    } on DioException catch (e) {
+      if (_isConnectionError(e)) return _localRegister(data);
+      return Left(Failure.fromException(e));
     } catch (e) {
       return _localRegister(data);
     }
@@ -105,17 +102,23 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
 
   @override
   Future<Either<Failure, EnterpriseEntity>> updateEnterprise(String id, Map<String, dynamic> data) async {
-    if (_offlineNotifier.state) {
-      return _localUpdate(id, data);
-    }
-
     try {
       final map = await _remoteDatasource.updateEnterprise(id, data);
       await _localDatabase.saveEnterprise(id, map);
       return Right(EnterpriseModel.fromJson(map).toEntity());
+    } on DioException catch (e) {
+      if (_isConnectionError(e)) return _localUpdate(id, data);
+      return Left(Failure.fromException(e));
     } catch (e) {
       return _localUpdate(id, data);
     }
+  }
+
+  bool _isConnectionError(DioException e) {
+    return e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.sendTimeout;
   }
 
   Future<Either<Failure, EnterpriseEntity>> _localUpdate(String id, Map<String, dynamic> data) async {
@@ -131,21 +134,19 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
 
   @override
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats() async {
-    if (!_offlineNotifier.state) {
-      try {
-        final data = await _remoteDatasource.getEnterpriseDashboardStats();
-        return Right(EnterpriseDashboardStats.fromJson(data));
-      } on DioException catch (e) {
-        if (e.type == DioExceptionType.connectionError ||
-            e.type == DioExceptionType.connectionTimeout ||
-            e.type == DioExceptionType.receiveTimeout) {
-          // Genuine offline — fall through to local
-        } else {
-          return Left(Failure.fromException(e));
-        }
-      } catch (e) {
-        return Left(ServerFailure(message: e.toString()));
+    try {
+      final data = await _remoteDatasource.getEnterpriseDashboardStats();
+      return Right(EnterpriseDashboardStats.fromJson(data));
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        // Genuine offline — fall through to local
+      } else {
+        return Left(Failure.fromException(e));
       }
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
     }
 
     // Offline fallback — build minimal stats from local cache

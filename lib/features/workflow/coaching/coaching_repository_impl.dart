@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
 import 'package:mesmer_digital_coaching/core/db/local_database.dart';
 import 'package:mesmer_digital_coaching/core/errors/failure.dart';
@@ -23,23 +24,30 @@ class CoachingRepositoryImpl implements CoachingRepository {
     required this.offlineNotifier,
   });
 
+  bool _isConnectionError(dynamic e) {
+    if (e is DioException) {
+      return e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout;
+    }
+    return false;
+  }
+
   String _generateOfflineId() {
-    return 'off_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}';
+    return 'off_${DateTime.now().millisecondsSinceEpoch}';
   }
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> createSession(CoachingSessionEntity session) async {
-    if (offlineNotifier.state) {
-      return _localCreateSession(session);
-    }
-
     try {
       final model = CoachingSessionModel.fromEntity(session);
       final result = await remoteDataSource.createSession(model);
       await localDatabase.saveSession(result.id, result.toJson());
       return Right(result);
     } catch (e) {
-      return _localCreateSession(session);
+      if (_isConnectionError(e)) return _localCreateSession(session);
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -56,27 +64,6 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, List<CoachingSessionEntity>>> getMySessions() async {
-    if (offlineNotifier.state) {
-      try {
-        final db = await localDatabase.database;
-        final maps = await db.query('coaching_sessions');
-        final sessions = maps
-            .map((m) {
-              try {
-                return CoachingSessionModel.fromJson(
-                    jsonDecode(m['data'] as String) as Map<String, dynamic>);
-              } catch (_) {
-                return null;
-              }
-            })
-            .whereType<CoachingSessionEntity>()
-            .toList();
-        return Right(sessions);
-      } catch (e) {
-        return const Right([]);
-      }
-    }
-
     try {
       final result = await remoteDataSource.getMySessions();
       for (var s in result) {
@@ -108,10 +95,6 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, List<CoachingSessionEntity>>> getEnterpriseSessions(String enterpriseId) async {
-    if (offlineNotifier.state) {
-      return _localGetEnterpriseSessions(enterpriseId);
-    }
-
     try {
       final result = await remoteDataSource.getEnterpriseSessions(enterpriseId);
       for (var s in result) {
@@ -119,7 +102,8 @@ class CoachingRepositoryImpl implements CoachingRepository {
       }
       return Right(result);
     } catch (e) {
-      return _localGetEnterpriseSessions(enterpriseId);
+      if (_isConnectionError(e)) return _localGetEnterpriseSessions(enterpriseId);
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -134,17 +118,14 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> updateSession(CoachingSessionEntity session) async {
-    if (offlineNotifier.state) {
-      return _localUpdateSession(session);
-    }
-
     try {
       final model = CoachingSessionModel.fromEntity(session);
       final result = await remoteDataSource.updateSession(model);
       await localDatabase.saveSession(result.id, result.toJson());
       return Right(result);
     } catch (e) {
-      return _localUpdateSession(session);
+      if (_isConnectionError(e)) return _localUpdateSession(session);
+      return Left(Failure.fromException(e));
     }
   }
 
@@ -160,13 +141,6 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, PhoneFollowupEntity>> createPhoneFollowup(PhoneFollowupEntity log) async {
-    if (offlineNotifier.state) {
-      final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
-      final model = PhoneFollowupModel.fromEntity(log, overrideId: finalId);
-      await localDatabase.enqueueSyncAction('POST', 'phone-followups', jsonEncode(model.toJson()));
-      return Right(model);
-    }
-
     try {
       final model = PhoneFollowupModel.fromEntity(log);
       final result = await remoteDataSource.createPhoneFollowup(model);
