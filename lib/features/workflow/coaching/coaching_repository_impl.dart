@@ -11,84 +11,75 @@ import 'coaching_session_model.dart';
 import 'phone_followup_entity.dart';
 import 'phone_followup_model.dart';
 
+import 'dart:convert';
+import 'dart:math';
+import 'package:dartz/dartz.dart';
+import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/db/local_database.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
+import 'coaching_session_entity.dart';
+import 'coaching_repository.dart';
+import 'coaching_remote_datasource.dart';
+import 'coaching_session_model.dart';
+import 'phone_followup_entity.dart';
+import 'phone_followup_model.dart';
+
 class CoachingRepositoryImpl implements CoachingRepository {
   final CoachingRemoteDataSource remoteDataSource;
   final LocalDatabase localDatabase;
+  final OfflineModeNotifier offlineNotifier;
 
   CoachingRepositoryImpl({
     required this.remoteDataSource,
     required this.localDatabase,
+    required this.offlineNotifier,
   });
 
   String _generateOfflineId() {
-    return 'offline_\${DateTime.now().millisecondsSinceEpoch}_\${Random().nextInt(10000)}';
+    return 'off_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}';
   }
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> createSession(CoachingSessionEntity session) async {
+    if (offlineNotifier.state) {
+      return _localCreateSession(session);
+    }
+
     try {
-      final model = CoachingSessionModel(
-        id: session.id,
-        title: session.title,
-        enterpriseId: session.enterpriseId,
-        coachId: session.coachId,
-        scheduledDate: session.scheduledDate,
-        status: session.status,
-        sessionNumber: session.sessionNumber,
-        followupType: session.followupType,
-        revenueGrowthPercent: session.revenueGrowthPercent,
-        currentEmployees: session.currentEmployees,
-        jobsCreated: session.jobsCreated,
-        qcStatus: session.qcStatus,
-        templateId: session.templateId,
-        enterpriseName: session.enterpriseName,
-        problemsIdentified: session.problemsIdentified,
-        recommendations: session.recommendations,
-        notes: session.notes,
-      );
+      final model = CoachingSessionModel.fromEntity(session);
       final result = await remoteDataSource.createSession(model);
+      await localDatabase.saveSession(result.id, result.toJson());
       return Right(result);
     } catch (e) {
-      final failure = Failure.fromException(e);
-      if (failure is NetworkFailure) {
-        // SPOOF OFFLINE ID
-        final finalId = session.id.isEmpty ? _generateOfflineId() : session.id;
-        final offlineModel = CoachingSessionModel(
-          id: finalId,
-          title: session.title,
-          enterpriseId: session.enterpriseId,
-          coachId: session.coachId,
-          scheduledDate: session.scheduledDate,
-          status: session.status,
-          sessionNumber: session.sessionNumber,
-          followupType: session.followupType,
-          revenueGrowthPercent: session.revenueGrowthPercent,
-          currentEmployees: session.currentEmployees,
-          jobsCreated: session.jobsCreated,
-          qcStatus: session.qcStatus,
-          templateId: session.templateId,
-          enterpriseName: session.enterpriseName,
-          problemsIdentified: session.problemsIdentified,
-          recommendations: session.recommendations,
-          notes: session.notes,
-        );
-
-        await localDatabase.enqueueSyncAction(
-          'POST',
-          'coaching-sessions',
-          jsonEncode(offlineModel.toJson()),
-        );
-
-        return Right(offlineModel);
-      }
-      return Left(failure);
+      return _localCreateSession(session);
     }
+  }
+
+  Future<Either<Failure, CoachingSessionEntity>> _localCreateSession(CoachingSessionEntity session) async {
+    final finalId = session.id.isEmpty ? _generateOfflineId() : session.id;
+    final model = CoachingSessionModel.fromEntity(session).copyWith(id: finalId);
+    final data = model.toJson();
+    
+    await localDatabase.saveSession(finalId, data);
+    await localDatabase.enqueueSyncAction('POST', 'coaching-sessions', jsonEncode(data));
+    
+    return Right(model);
   }
 
   @override
   Future<Either<Failure, List<CoachingSessionEntity>>> getMySessions() async {
+    if (offlineNotifier.state) {
+      // For now, we don't have a 'getMySessions' local filter, 
+      // but we can return empty or allcached if needed.
+      return const Right([]); 
+    }
+
     try {
       final result = await remoteDataSource.getMySessions();
+      for (var s in result) {
+        await localDatabase.saveSession(s.id, (s as CoachingSessionModel).toJson());
+      }
       return Right(result);
     } catch (e) {
       return Left(Failure.fromException(e));
@@ -97,89 +88,71 @@ class CoachingRepositoryImpl implements CoachingRepository {
 
   @override
   Future<Either<Failure, List<CoachingSessionEntity>>> getEnterpriseSessions(String enterpriseId) async {
+    if (offlineNotifier.state) {
+      return _localGetEnterpriseSessions(enterpriseId);
+    }
+
     try {
       final result = await remoteDataSource.getEnterpriseSessions(enterpriseId);
+      for (var s in result) {
+        await localDatabase.saveSession(s.id, (s as CoachingSessionModel).toJson());
+      }
       return Right(result);
     } catch (e) {
-      return Left(Failure.fromException(e));
+      return _localGetEnterpriseSessions(enterpriseId);
+    }
+  }
+
+  Future<Either<Failure, List<CoachingSessionEntity>>> _localGetEnterpriseSessions(String enterpriseId) async {
+    try {
+      final localData = await localDatabase.getSessionsByEnterprise(enterpriseId);
+      return Right(localData.map((m) => CoachingSessionModel.fromJson(m)).toList());
+    } catch (e) {
+      return Left(LocalFailure(message: 'Offline sessions unavailable'));
     }
   }
 
   @override
   Future<Either<Failure, CoachingSessionEntity>> updateSession(CoachingSessionEntity session) async {
-    final model = CoachingSessionModel(
-        id: session.id,
-        title: session.title,
-        enterpriseId: session.enterpriseId,
-        coachId: session.coachId,
-        scheduledDate: session.scheduledDate,
-        status: session.status,
-        sessionNumber: session.sessionNumber,
-        followupType: session.followupType,
-        revenueGrowthPercent: session.revenueGrowthPercent,
-        currentEmployees: session.currentEmployees,
-        jobsCreated: session.jobsCreated,
-        qcStatus: session.qcStatus,
-        templateId: session.templateId,
-        enterpriseName: session.enterpriseName,
-        problemsIdentified: session.problemsIdentified,
-        recommendations: session.recommendations,
-      );
+    if (offlineNotifier.state) {
+      return _localUpdateSession(session);
+    }
+
     try {
+      final model = CoachingSessionModel.fromEntity(session);
       final result = await remoteDataSource.updateSession(model);
+      await localDatabase.saveSession(result.id, result.toJson());
       return Right(result);
     } catch (e) {
-      final failure = Failure.fromException(e);
-      if (failure is NetworkFailure) {
-        await localDatabase.enqueueSyncAction(
-          'PUT',
-          'coaching-sessions/\${session.id}',
-          jsonEncode(model.toJson()),
-        );
-        return Right(model);
-      }
-      return Left(failure);
+      return _localUpdateSession(session);
     }
+  }
+
+  Future<Either<Failure, CoachingSessionEntity>> _localUpdateSession(CoachingSessionEntity session) async {
+    final model = CoachingSessionModel.fromEntity(session);
+    final data = model.toJson();
+    
+    await localDatabase.saveSession(session.id, data);
+    await localDatabase.enqueueSyncAction('PUT', 'coaching-sessions/${session.id}', jsonEncode(data));
+    
+    return Right(model);
   }
 
   @override
   Future<Either<Failure, PhoneFollowupEntity>> createPhoneFollowup(PhoneFollowupEntity log) async {
+    // Basic connectivity check fallback
     try {
-      final model = PhoneFollowupModel(
-        id: log.id,
-        enterpriseId: log.enterpriseId,
-        coachId: log.coachId,
-        date: log.date,
-        purpose: log.purpose,
-        issueAddressed: log.issueAddressed,
-        adviceGiven: log.adviceGiven,
-        nextAction: log.nextAction,
-      );
-      final result = await remoteDataSource.createPhoneFollowup(model);
-      return Right(result);
-    } catch (e) {
-      final failure = Failure.fromException(e);
-      if (failure is NetworkFailure) {
-        final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
-        final offlineModel = PhoneFollowupModel(
-          id: finalId,
-          enterpriseId: log.enterpriseId,
-          coachId: log.coachId,
-          date: log.date,
-          purpose: log.purpose,
-          issueAddressed: log.issueAddressed,
-          adviceGiven: log.adviceGiven,
-          nextAction: log.nextAction,
-        );
-
-        await localDatabase.enqueueSyncAction(
-          'POST',
-          'phone-followups',
-          jsonEncode(offlineModel.toJson()),
-        );
-        return Right(offlineModel);
+      if (!offlineNotifier.state) {
+        final model = PhoneFollowupModel.fromEntity(log);
+        final result = await remoteDataSource.createPhoneFollowup(model);
+        return Right(result);
       }
-      return Left(failure);
+      throw Exception('Offline mode active');
+    } catch (e) {
+      final finalId = log.id.isEmpty ? _generateOfflineId() : log.id;
+      final model = PhoneFollowupModel.fromEntity(log).copyWith(id: finalId);
+      await localDatabase.enqueueSyncAction('POST', 'phone-followups', jsonEncode(model.toJson()));
+      return Right(model);
     }
   }
 

@@ -9,9 +9,24 @@ import 'enterprise_model.dart';
 import 'enterprise_dashboard_stats.dart';
 import 'enterprise_dashboard_model.dart';
 
+import 'dart:convert';
+import 'package:dartz/dartz.dart';
+import 'package:mesmer_digital_coaching/core/storage/hive_storage.dart';
+import 'package:mesmer_digital_coaching/core/errors/failure.dart';
+import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
+import 'package:mesmer_digital_coaching/core/db/local_database.dart';
+import 'enterprise_entity.dart';
+import 'enterprise_repository.dart';
+import 'enterprise_remote_datasource.dart';
+import 'enterprise_model.dart';
+import 'enterprise_dashboard_stats.dart';
+import 'enterprise_dashboard_model.dart';
+
 class EnterpriseRepositoryImpl implements EnterpriseRepository {
-  EnterpriseRepositoryImpl(this._remoteDatasource);
+  EnterpriseRepositoryImpl(this._remoteDatasource, this._localDatabase, this._offlineNotifier);
   final EnterpriseRemoteDatasource _remoteDatasource;
+  final LocalDatabase _localDatabase;
+  final OfflineModeNotifier _offlineNotifier;
 
   @override
   Future<Either<Failure, List<EnterpriseEntity>>> getEnterprises({
@@ -20,6 +35,11 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
     String? status,
     String? coachId,
   }) async {
+    // 1. Check Offline Mode or attempt remote
+    if (_offlineNotifier.state) {
+      return _localGetEnterprises();
+    }
+
     try {
       final models = await _remoteDatasource.getEnterprises(
         search: search,
@@ -28,65 +48,115 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
         coachId: coachId,
       );
       
-      // Save full array to cache
-      final jsonList = models.map((m) => EnterpriseModel.fromJson(m).toJson()).toList();
-      await HiveStorage.cacheEnterprises('default_list', jsonEncode(jsonList));
+      // Cache all to SQLite for standalone use
+      for (var m in models) {
+        await _localDatabase.saveEnterprise(m['id'], m);
+      }
 
       return Right(models.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
     } catch (e) {
-      final failure = Failure.fromException(e);
-      if (failure is NetworkFailure) {
-        try {
-          final cachedString = HiveStorage.getCachedEnterprises('default_list');
-          if (cachedString != null) {
-            final List<dynamic> jsonList = jsonDecode(cachedString);
-            final cachedModels = jsonList.map((m) => EnterpriseModel.fromJson(m as Map<String, dynamic>)).toList();
-            return Right(cachedModels.map((m) => m.toEntity()).toList());
-          }
-        } catch (_) {}
-      }
-      return Left(failure);
+      // Automatic fallback on connection error
+      return _localGetEnterprises();
+    }
+  }
+
+  Future<Either<Failure, List<EnterpriseEntity>>> _localGetEnterprises() async {
+    try {
+      final localData = await _localDatabase.getEnterprises();
+      return Right(localData.map((m) => EnterpriseModel.fromJson(m).toEntity()).toList());
+    } catch (e) {
+      return Left(LocalFailure(message: 'Offline data unavailable'));
     }
   }
 
   @override
   Future<Either<Failure, EnterpriseEntity>> getEnterpriseById(String id) async {
+    if (_offlineNotifier.state) {
+      final local = await _localDatabase.getEnterpriseById(id);
+      if (local != null) return Right(EnterpriseModel.fromJson(local).toEntity());
+    }
+
     try {
       final map = await _remoteDatasource.getEnterpriseById(id);
+      await _localDatabase.saveEnterprise(id, map); // Refresh local
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
+      final local = await _localDatabase.getEnterpriseById(id);
+      if (local != null) return Right(EnterpriseModel.fromJson(local).toEntity());
       return Left(Failure.fromException(e));
     }
   }
 
   @override
   Future<Either<Failure, EnterpriseEntity>> registerEnterprise(Map<String, dynamic> data) async {
+    if (_offlineNotifier.state) {
+      return _localRegister(data);
+    }
+
     try {
       final map = await _remoteDatasource.createEnterprise(data);
+      await _localDatabase.saveEnterprise(map['id'], map);
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
-      return Left(Failure.fromException(e));
+      return _localRegister(data);
     }
+  }
+
+  Future<Either<Failure, EnterpriseEntity>> _localRegister(Map<String, dynamic> data) async {
+    // Generate a temporary ID (prefixed with 'off_') for offline records
+    final id = 'off_${DateTime.now().millisecondsSinceEpoch}';
+    final fullData = {...data, 'id': id, 'is_offline': true};
+    
+    await _localDatabase.saveEnterprise(id, fullData);
+    await _localDatabase.enqueueSyncAction('POST', 'enterprises', jsonEncode(data));
+    
+    return Right(EnterpriseModel.fromJson(fullData).toEntity());
   }
 
   @override
   Future<Either<Failure, EnterpriseEntity>> updateEnterprise(String id, Map<String, dynamic> data) async {
+    if (_offlineNotifier.state) {
+      return _localUpdate(id, data);
+    }
+
     try {
       final map = await _remoteDatasource.updateEnterprise(id, data);
+      await _localDatabase.saveEnterprise(id, map);
       return Right(EnterpriseModel.fromJson(map).toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
+      return _localUpdate(id, data);
     }
+  }
+
+  Future<Either<Failure, EnterpriseEntity>> _localUpdate(String id, Map<String, dynamic> data) async {
+    final existing = await _localDatabase.getEnterpriseById(id);
+    if (existing == null) return Left(LocalFailure(message: 'Record not found locally'));
+
+    final updated = {...existing, ...data};
+    await _localDatabase.saveEnterprise(id, updated);
+    await _localDatabase.enqueueSyncAction('PUT', 'enterprises/$id', jsonEncode(data));
+
+    return Right(EnterpriseModel.fromJson(updated).toEntity());
   }
 
   @override
   Future<Either<Failure, EnterpriseDashboardStats>> getEnterpriseDashboardStats() async {
     try {
-      final data = await _remoteDatasource.getEnterpriseDashboardStats();
-      return Right(EnterpriseDashboardStats.fromJson(data));
-    } catch (e) {
-      return Left(ServerFailure(message: e.toString()));
-    }
+      if (!_offlineNotifier.state) {
+        final data = await _remoteDatasource.getEnterpriseDashboardStats();
+        // Caching stats could be done in Hive
+        return Right(EnterpriseDashboardStats.fromJson(data));
+      }
+    } catch (_) {}
+    
+    // Simple local fallback (not full stats, but keeps app from crashing)
+    final enterprises = await _localDatabase.getEnterprises();
+    return Right(EnterpriseDashboardStats(
+      totalEnterprises: enterprises.length,
+      activeEnterprises: enterprises.where((e) => e['status'] == 'active').length,
+      graduatedEnterprises: enterprises.where((e) => e['status'] == 'graduated').length,
+      recentActivity: [],
+    ));
   }
 
   @override

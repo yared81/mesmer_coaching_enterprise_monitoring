@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
 import 'package:mesmer_digital_coaching/core/db/local_database.dart';
+import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 import 'coaching_remote_datasource.dart';
 import 'coaching_repository_impl.dart';
 import 'coaching_repository.dart';
@@ -15,6 +16,7 @@ final coachingRepositoryProvider = Provider<CoachingRepository>((ref) {
   return CoachingRepositoryImpl(
     remoteDataSource: ref.watch(coachingRemoteDataSourceProvider),
     localDatabase: ref.watch(localDatabaseProvider),
+    offlineNotifier: ref.watch(offlineModeProvider.notifier),
   );
 });
 

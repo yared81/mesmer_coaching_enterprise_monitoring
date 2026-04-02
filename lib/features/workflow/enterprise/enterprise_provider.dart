@@ -9,6 +9,8 @@ import 'update_enterprise_usecase.dart';
 import 'enterprise_entity.dart';
 import 'enterprise_dashboard_stats.dart';
 import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/core/db/local_database.dart';
+import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 
 // 1. Datasource Provider
 final enterpriseRemoteDataSourceProvider = Provider<EnterpriseRemoteDatasource>((ref) {
@@ -17,7 +19,11 @@ final enterpriseRemoteDataSourceProvider = Provider<EnterpriseRemoteDatasource>(
 
 // 2. Repository Provider
 final enterpriseRepositoryProvider = Provider<EnterpriseRepository>((ref) {
-  return EnterpriseRepositoryImpl(ref.watch(enterpriseRemoteDataSourceProvider));
+  return EnterpriseRepositoryImpl(
+    ref.watch(enterpriseRemoteDataSourceProvider),
+    ref.watch(localDatabaseProvider),
+    ref.watch(offlineModeProvider.notifier),
+  );
 });
 
 // 3. UseCase Providers

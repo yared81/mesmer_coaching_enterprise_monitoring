@@ -1353,6 +1353,28 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
 
   // ─── TAB 4: Documents & Evidence ──────────────────────────────────────────
 
+  IconData _fileIcon(String fileName, String? fileType) {
+    final ext = fileName.split('.').last.toLowerCase();
+    final type = (fileType ?? '').toLowerCase();
+    if (ext == 'pdf' || type.contains('pdf')) return Icons.picture_as_pdf_rounded;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext) || type.contains('image')) return Icons.image_rounded;
+    if (['mp4', 'mov', 'avi'].contains(ext) || type.contains('video')) return Icons.videocam_rounded;
+    if (['doc', 'docx'].contains(ext) || type.contains('word')) return Icons.description_rounded;
+    if (['xls', 'xlsx'].contains(ext) || type.contains('sheet')) return Icons.table_chart_rounded;
+    return Icons.insert_drive_file_outlined;
+  }
+
+  Color _fileIconColor(String fileName, String? fileType) {
+    final ext = fileName.split('.').last.toLowerCase();
+    final type = (fileType ?? '').toLowerCase();
+    if (ext == 'pdf' || type.contains('pdf')) return Colors.red;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext) || type.contains('image')) return Colors.green;
+    if (['mp4', 'mov', 'avi'].contains(ext) || type.contains('video')) return Colors.purple;
+    if (['doc', 'docx'].contains(ext) || type.contains('word')) return const Color(0xFF1565C0);
+    if (['xls', 'xlsx'].contains(ext) || type.contains('sheet')) return Colors.teal;
+    return const Color(0xFF3D5AFE);
+  }
+
   Widget _buildDocumentsTab() {
     return Consumer(
       builder: (context, ref, _) {
@@ -1393,12 +1415,18 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                 },
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 leading: Container(
+                  width: 48,
+                  height: 48,
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: const Color(0xFF3D5AFE).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.insert_drive_file_outlined, color: Color(0xFF3D5AFE)),
+                  child: Icon(
+                    _fileIcon(doc.fileName, doc.fileType),
+                    color: _fileIconColor(doc.fileName, doc.fileType),
+                    size: 24,
+                  ),
                 ),
                 title: Text(
                   doc.fileName,

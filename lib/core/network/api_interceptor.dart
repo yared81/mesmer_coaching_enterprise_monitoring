@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:mesmer_digital_coaching/core/storage/secure_storage.dart';
 import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
+import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 
 class ApiInterceptor extends Interceptor {
-  ApiInterceptor(this._secureStorage);
+  ApiInterceptor(this._secureStorage, this._offlineNotifier);
   final SecureStorage _secureStorage;
+  final OfflineModeNotifier _offlineNotifier;
 
   bool _isRefreshing = false;
   final List<_PendingRequest> _pendingRequests = [];
@@ -20,13 +22,26 @@ class ApiInterceptor extends Interceptor {
 
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Only attempt refresh for 401s (not on the auth endpoints themselves)
+    // 1. Detect Connection Failures
+    if (err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.sendTimeout ||
+        err.type == DioExceptionType.receiveTimeout ||
+        err.type == DioExceptionType.connectionError ||
+        (err.type == DioExceptionType.badResponse && err.response?.statusCode == 503)) {
+      
+      _offlineNotifier.setOffline(true);
+      // We don't call super.onError yet because we want the repository to handle the fallback
+    }
+
+    // 2. Clear Offline Mode on successful manual retry or specific status codes if needed
+    // (Usually handled by explicit 'Retry' buttons in UI)
+
+    // 3. Handle Token Refresh (Original Logic)
     if (err.response?.statusCode == 401 &&
         err.requestOptions.path != 'auth/refresh' &&
         err.requestOptions.path != 'auth/login') {
 
       if (_isRefreshing) {
-        // Queue this request to retry after the refresh completes
         _pendingRequests.add(_PendingRequest(err.requestOptions, handler));
         return;
       }
@@ -41,7 +56,6 @@ class ApiInterceptor extends Interceptor {
           return;
         }
 
-        // Create a separate Dio to avoid interceptor loop
         final refreshDio = Dio(BaseOptions(baseUrl: ApiConstants.dioBaseUrl));
         final response = await refreshDio.post(
           'auth/refresh',
@@ -55,14 +69,11 @@ class ApiInterceptor extends Interceptor {
             refreshToken: refreshToken,
           );
 
-          // Retry the original failed request with the new token
           err.requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
           final retryDio = Dio(BaseOptions(baseUrl: ApiConstants.dioBaseUrl));
           final retryResponse = await retryDio.fetch(err.requestOptions);
 
-          // Retry all queued requests too
           _retryAll(newAccessToken);
-
           handler.resolve(retryResponse);
         } else {
           await _secureStorage.clearTokens();

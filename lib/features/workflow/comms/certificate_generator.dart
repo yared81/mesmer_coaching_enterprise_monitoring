@@ -119,16 +119,30 @@ class CertificateGenerator {
   /// Build official seal
   static pw.Widget _buildSeal() {
     return pw.Container(
-      width: 60,
-      height: 60,
+      width: 70,
+      height: 70,
       decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.amber, width: 2),
+        border: pw.Border.all(color: PdfColors.amber700, width: 2),
         shape: pw.BoxShape.circle,
+        color: PdfColors.amber50,
       ),
       child: pw.Center(
-        child: pw.Text(
-          'SEAL',
-          style: pw.TextStyle(fontSize: 10, color: PdfColors.amber800),
+        child: pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.center,
+          children: [
+            pw.Text(
+              'OFFICIAL',
+              style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold, color: PdfColors.amber900),
+            ),
+            pw.Text(
+              'GRADUATE',
+              style: pw.TextStyle(fontSize: 7, color: PdfColors.amber800),
+            ),
+            pw.Text(
+              'MESMER',
+              style: pw.TextStyle(fontSize: 6, color: PdfColors.amber800),
+            ),
+          ],
         ),
       ),
     );
@@ -298,26 +312,27 @@ class CertificateGenerator {
               ),
             ),
             pw.SizedBox(height: 5),
-            _buildQRCodePlaceholder(data.verificationCode),
+            _buildQRCode(data.verificationCode),
           ],
         ),
       ],
     );
   }
 
-  /// Build QR code placeholder
-  static pw.Widget _buildQRCodePlaceholder(String verificationCode) {
+  /// Build QR code
+  static pw.Widget _buildQRCode(String verificationCode) {
     return pw.Container(
-      width: 60,
-      height: 60,
+      width: 70,
+      height: 70,
+      padding: const pw.EdgeInsets.all(5),
       decoration: pw.BoxDecoration(
         border: pw.Border.all(color: PdfColors.grey300),
+        color: PdfColors.white,
       ),
-      child: pw.Center(
-        child: pw.Text(
-          'QR\nCODE',
-          style: pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
-        ),
+      child: pw.BarcodeWidget(
+        barcode: pw.Barcode.qrCode(),
+        data: 'https://mesmer-verify.com/verify/$verificationCode',
+        drawText: false,
       ),
     );
   }

@@ -39,17 +39,22 @@ class CertificateState {
   }
 }
 
+import 'package:mesmer_digital_coaching/features/workflow/enterprise/enterprise_provider.dart';
+import 'package:mesmer_digital_coaching/features/workflow/coaching/coaching_provider.dart';
+import 'package:mesmer_digital_coaching/core/providers/core_providers.dart';
+
 class CertificateNotifier extends StateNotifier<CertificateState> {
   final Dio _dio;
+  final GraduationValidator _validator;
 
-  CertificateNotifier(this._dio) : super(const CertificateState());
+  CertificateNotifier(this._dio, this._validator) : super(const CertificateState());
 
   /// Validate enterprise graduation readiness
   Future<void> validateGraduation(String enterpriseId) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     
     try {
-      final result = await GraduationValidator.validateGraduation(enterpriseId);
+      final result = await _validator.validateGraduation(enterpriseId);
       state = state.copyWith(
         isLoading: false,
         validationResult: result,
@@ -75,7 +80,7 @@ class CertificateNotifier extends StateNotifier<CertificateState> {
     
     try {
       // First validate graduation requirements
-      final validation = await GraduationValidator.validateGraduation(enterpriseId);
+      final validation = await _validator.validateGraduation(enterpriseId);
       if (!validation.isEligible) {
         state = state.copyWith(
           isLoading: false,
@@ -302,15 +307,34 @@ class CertificateNotifier extends StateNotifier<CertificateState> {
   }
 }
 
+  /// Get certificates by enterprise
+  CertificateTemplate? getCertificateByEnterprise(String enterpriseId) {
+    try {
+      return state.certificates.firstWhere((cert) => cert.enterpriseId == enterpriseId);
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
 // Providers
+final graduationValidatorProvider = Provider<GraduationValidator>((ref) {
+  return GraduationValidator(
+    ref.watch(enterpriseRepositoryProvider),
+    ref.watch(coachingRepositoryProvider),
+  );
+});
+
 final certificateProvider = StateNotifierProvider<CertificateNotifier, CertificateState>((ref) {
-  final dio = Dio(); // TODO: Use proper Dio instance from dependencies
-  return CertificateNotifier(dio);
+  return CertificateNotifier(
+    ref.watch(dioProvider),
+    ref.watch(graduationValidatorProvider),
+  );
 });
 
 final graduationValidationProvider = FutureProvider.family<GraduationValidationResult, String>((ref, enterpriseId) async {
-  final result = await GraduationValidator.validateGraduation(enterpriseId);
-  return result;
+  final validator = ref.watch(graduationValidatorProvider);
+  return await validator.validateGraduation(enterpriseId);
 });
 
 final certificateVerificationProvider = FutureProvider.family<CertificateTemplate?, String>((ref, verificationCode) async {

@@ -16,7 +16,7 @@ migrate_working_dir/
 .env
 .env.local
 .env.*.local
-
+server/seed_db_mockdata.json
 # ── IDE & Editor ──────────────────────────────────────────────
 *.iml
 *.ipr

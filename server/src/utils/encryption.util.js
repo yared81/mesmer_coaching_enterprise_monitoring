@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 
 // In a real production app, this key should be in an environment variable (32 bytes)
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'mesmer-coaching-encryption-key-00'; 
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'mesmer-coaching-encryption-key-012'; // 32 bytes
 const IV_LENGTH = 16; // For AES, this is always 16
 
 function encrypt(text) {
