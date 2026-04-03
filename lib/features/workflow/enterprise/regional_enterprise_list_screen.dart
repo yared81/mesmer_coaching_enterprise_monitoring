@@ -66,7 +66,7 @@ class _RegionalEnterpriseListScreenState extends ConsumerState<RegionalEnterpris
     final user = ref.watch(authProvider).user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         elevation: 0,
         title: Column(
@@ -95,7 +95,7 @@ class _RegionalEnterpriseListScreenState extends ConsumerState<RegionalEnterpris
                 Container(
                   height: 48,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextField(
@@ -280,8 +280,8 @@ class _RegionalEnterpriseListScreenState extends ConsumerState<RegionalEnterpris
                           icon: const Icon(Icons.sync_rounded, size: 18),
                           label: const Text('REASSIGN'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3D5AFE),
-                            foregroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                       ),
@@ -361,8 +361,8 @@ class _ReassignCoachDialogState extends ConsumerState<_ReassignCoachDialog> {
         ElevatedButton(
           onPressed: _isSubmitting ? null : _submit,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF3D5AFE),
-            foregroundColor: Colors.white,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
           child: _isSubmitting 
             ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))

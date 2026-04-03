@@ -24,7 +24,7 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
     final coachesAsync = ref.watch(coachListProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: NestedScrollView(
         headerSliverBuilder: (context, _) => [
           SliverAppBar(
@@ -88,7 +88,7 @@ class _CoachListScreenState extends ConsumerState<CoachListScreen> {
                               backgroundColor: Colors.white.withOpacity(0.85),
                               selectedColor: Colors.white,
                               labelStyle: TextStyle(
-                                color: selected ? const Color(0xFF3D5AFE) : Colors.black,
+                                color: selected ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyMedium?.color,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
                               ),
@@ -181,11 +181,11 @@ class _CoachCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.04),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -241,10 +241,10 @@ class _CoachCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               coach.name,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Color(0xFF1A1A1A),
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -287,7 +287,7 @@ class _CoachCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Icon(Icons.chevron_right_rounded, color: Colors.grey[300], size: 24),
+                Icon(Icons.chevron_right_rounded, color: Theme.of(context).dividerColor, size: 24),
               ],
             ),
           ),
@@ -335,9 +335,9 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 80, color: Colors.grey[300]),
+          Icon(icon, size: 80, color: Theme.of(context).dividerColor),
           const SizedBox(height: 16),
-          Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black54)),
+          Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).hintColor)),
           const SizedBox(height: 6),
           Text(subtitle, style: TextStyle(color: Colors.grey[500])),
         ],

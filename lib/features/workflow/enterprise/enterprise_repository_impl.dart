@@ -43,7 +43,11 @@ class EnterpriseRepositoryImpl implements EnterpriseRepository {
       }
       return Left(Failure.fromException(e));
     } catch (e) {
-      return _localGetEnterprises();
+      // If it's a parsing error (not connection), return the actual error so we can debug
+      if (e is DioException) {
+        return _localGetEnterprises();
+      }
+      return Left(ServerFailure(message: 'Parse error: $e'));
     }
   }
 

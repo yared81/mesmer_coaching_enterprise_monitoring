@@ -18,11 +18,11 @@ class SuccessStoryEditorScreen extends StatelessWidget {
           children: [
             Container(
               color: Theme.of(context).cardColor,
-              child: const TabBar(
-                labelColor: Color(0xFFDB2777),
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Color(0xFFDB2777),
-                tabs: [
+              child: TabBar(
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).hintColor,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                tabs: const [
                   Tab(text: 'DRAFTS (3)'),
                   Tab(text: 'PUBLISHED (8)'),
                 ],
@@ -41,9 +41,9 @@ class SuccessStoryEditorScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateDialog(context),
-        backgroundColor: const Color(0xFFDB2777),
-        icon: const Icon(Icons.add_photo_alternate, color: Colors.white),
-        label: const Text('NEW STORY', style: TextStyle(color: Colors.white)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        icon: Icon(Icons.add_photo_alternate, color: Theme.of(context).colorScheme.onPrimary),
+        label: Text('NEW STORY', style: TextStyle(color: Theme.of(context).colorScheme.onPrimary)),
       ),
     );
   }
@@ -113,8 +113,8 @@ class SuccessStoryEditorScreen extends StatelessWidget {
                   icon: Icon(isDraft ? Icons.edit : Icons.visibility, size: 18),
                   label: Text(isDraft ? 'EDIT' : 'VIEW'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isDraft ? const Color(0xFFDB2777) : Colors.grey[800],
-                    foregroundColor: Colors.white,
+                    backgroundColor: isDraft ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ],

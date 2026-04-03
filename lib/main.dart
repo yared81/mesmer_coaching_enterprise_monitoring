@@ -21,6 +21,7 @@ void main() async {
   } else if (defaultTargetPlatform == TargetPlatform.linux || 
              defaultTargetPlatform == TargetPlatform.windows || 
              defaultTargetPlatform == TargetPlatform.macOS) {
+    sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
 

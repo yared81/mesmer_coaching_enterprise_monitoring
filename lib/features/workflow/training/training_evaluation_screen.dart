@@ -64,8 +64,8 @@ class _TrainingEvaluationScreenState extends ConsumerState<TrainingEvaluationScr
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Workshop Evaluation', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF1E293B),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+        foregroundColor: Theme.of(context).colorScheme.onInverseSurface,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -89,7 +89,7 @@ class _TrainingEvaluationScreenState extends ConsumerState<TrainingEvaluationScr
                 hintText: 'Anything else you would like to share...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               ),
             ),
             const SizedBox(height: 40),
@@ -137,7 +137,7 @@ class _TrainingEvaluationScreenState extends ConsumerState<TrainingEvaluationScr
                     size: 40,
                   ),
                   const SizedBox(height: 4),
-                  Text('$value', style: TextStyle(color: isSelected ? Colors.black : Colors.grey)),
+                  Text('$value', style: TextStyle(color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).hintColor)),
                 ],
               ),
             );

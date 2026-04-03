@@ -29,11 +29,11 @@ class SurveyManagementHubScreen extends ConsumerWidget {
     final filteredTypes = surveyTypes;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FE),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Survey Management Hub'),
-        backgroundColor: const Color(0xFF311B92),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         actions: [
           if (role == UserRole.superAdmin || role == UserRole.programManager || role == UserRole.meOfficer)
             IconButton(
@@ -48,10 +48,11 @@ class SurveyManagementHubScreen extends ConsumerWidget {
           child: Column(
             children: [
               Container(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 child: TabBar(
-                  labelColor: const Color(0xFF311B92),
-                  indicatorColor: const Color(0xFF311B92),
+                  labelColor: Theme.of(context).colorScheme.primary,
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  unselectedLabelColor: Theme.of(context).hintColor,
                   isScrollable: true,
                   tabs: filteredTypes.map((t) => Tab(text: t['label'])).toList(),
                 ),
@@ -78,9 +79,9 @@ class SurveyManagementHubScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[300]),
+            Icon(Icons.inventory_2_outlined, size: 64, color: Theme.of(context).dividerColor),
             const SizedBox(height: 16),
-            Text('No $type surveys found.', style: TextStyle(color: Colors.grey[600])),
+            Text('No $type surveys found.', style: TextStyle(color: Theme.of(context).hintColor)),
           ],
         ),
       );

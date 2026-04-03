@@ -15,23 +15,23 @@ class NotificationRepositoryImpl implements NotificationRepository {
 
   @override
   Future<List<NotificationEntity>> getNotifications() async {
-    final response = await _dio.get('/api/v1/notifications');
+    final response = await _dio.get('/notifications');
     final List data = (response.data['data'] as List?) ?? [];
     return data.map((json) => NotificationModel.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   @override
   Future<void> markAsRead(String id) async {
-    await _dio.put('/api/v1/notifications/$id/read');
+    await _dio.put('/notifications/$id/read');
   }
 
   @override
   Future<void> markAllAsRead() async {
-    await _dio.put('/api/v1/notifications/read-all');
+    await _dio.put('/notifications/read-all');
   }
 
   @override
   Future<void> deleteNotification(String id) async {
-    await _dio.delete('/api/v1/notifications/$id');
+    await _dio.delete('/notifications/$id');
   }
 }

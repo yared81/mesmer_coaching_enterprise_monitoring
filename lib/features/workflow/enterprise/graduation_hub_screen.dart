@@ -17,8 +17,8 @@ class GraduationHubScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Graduation Hub'),
-        backgroundColor: const Color(0xFF3D5AFE),
-        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: readyListAsync.when(
         data: (list) {
@@ -27,10 +27,10 @@ class GraduationHubScreen extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.school_outlined, size: 64, color: Colors.grey[300]),
+                  Icon(Icons.school_outlined, size: 64, color: Theme.of(context).dividerColor),
                   const SizedBox(height: 16),
-                  const Text('No enterprises ready for graduation.',
-                      style: TextStyle(color: Colors.grey)),
+                  Text('No enterprises ready for graduation.',
+                      style: TextStyle(color: Theme.of(context).hintColor)),
                 ],
               ),
             );
@@ -103,7 +103,7 @@ class GraduationHubScreen extends ConsumerWidget {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: checklistPassed
                                     ? Colors.green
-                                    : Colors.grey[400],
+                                    : Theme.of(context).disabledColor,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                               ),
@@ -178,7 +178,7 @@ class GraduationHubScreen extends ConsumerWidget {
             child: Text(label,
                 style: TextStyle(
                     fontSize: 12,
-                    color: passed ? Colors.black87 : Colors.grey)),
+                    color: passed ? null : Colors.grey)),
           ),
         ],
       ),

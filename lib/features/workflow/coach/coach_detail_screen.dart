@@ -75,7 +75,7 @@ class CoachDetailScreen extends ConsumerWidget {
     final sessions = []; 
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           // ── Gradient Header ─────────────────────────────────────────────
@@ -211,10 +211,10 @@ class CoachDetailScreen extends ConsumerWidget {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 16, offset: const Offset(0, 6)),
+                            BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.03), blurRadius: 16, offset: const Offset(0, 6)),
                           ],
                         ),
                         child: Row(
@@ -233,7 +233,7 @@ class CoachDetailScreen extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(e.businessName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF1A1A1A))),
+                                  Text(e.businessName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface)),
                                   Text(e.sector.name.toUpperCase(), style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                 ],
                               ),
@@ -327,7 +327,7 @@ class CoachDetailScreen extends ConsumerWidget {
   void _showAssignBottomSheet(BuildContext context, WidgetRef ref, String coachId) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return Consumer(
@@ -412,10 +412,10 @@ class _MiniMetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 6)),
+          BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.04), blurRadius: 16, offset: const Offset(0, 6)),
         ],
       ),
       child: Column(
@@ -452,7 +452,7 @@ class _SectionTitle extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Flexible(child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)), overflow: TextOverflow.ellipsis)),
+                Flexible(child: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface), overflow: TextOverflow.ellipsis)),
                 const SizedBox(width: 8),
                 Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
               ],

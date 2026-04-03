@@ -23,15 +23,15 @@ class QcRecordDetailScreen extends ConsumerWidget {
         return Scaffold(
           appBar: AppBar(
             title: Text('${audit.targetType.name.toUpperCase()} Review'),
-            backgroundColor: audit.targetType == QcTargetType.baseline ? Colors.blue : Colors.orange,
-            foregroundColor: Colors.white,
+            backgroundColor: audit.targetType == QcTargetType.baseline ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildAuditInfo(audit),
+                _buildAuditInfo(context, audit),
                 const Divider(height: 40),
                 const Text('Parent Record Data', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
@@ -54,13 +54,17 @@ class QcRecordDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildAuditInfo(QcAuditEntity audit) {
+  Widget _buildAuditInfo(BuildContext context, QcAuditEntity audit) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: audit.isRandomSample == true ? Colors.blue[50] : Colors.red[50],
+        color: audit.isRandomSample == true 
+          ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.1) 
+          : Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: audit.isRandomSample == true ? Colors.blue[200]! : Colors.red[200]!),
+        border: Border.all(color: audit.isRandomSample == true 
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3) 
+          : Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,9 +168,13 @@ class QcRecordDetailScreen extends ConsumerWidget {
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: audit.status == QcAuditStatus.passed ? Colors.green[50] : Colors.red[50],
+          color: audit.status == QcAuditStatus.passed 
+            ? Colors.green.withValues(alpha: 0.1) 
+            : Theme.of(context).colorScheme.errorContainer.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: audit.status == QcAuditStatus.passed ? Colors.green[200]! : Colors.red[200]!),
+          border: Border.all(color: audit.status == QcAuditStatus.passed 
+            ? Colors.green.withValues(alpha: 0.3) 
+            : Theme.of(context).colorScheme.error.withValues(alpha: 0.3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
