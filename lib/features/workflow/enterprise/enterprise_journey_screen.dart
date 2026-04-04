@@ -24,12 +24,20 @@ class EnterpriseJourneyScreen extends ConsumerWidget {
         child: Column(
           children: [
             Container(
-              color: Theme.of(context).appBarTheme.backgroundColor,
-              child: const TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
-                indicatorColor: Colors.white,
-                tabs: [
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.surface,
+              child: TabBar(
+                labelColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white70
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                indicatorColor: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.primary,
+                tabs: const [
                   Tab(text: 'SESSIONS'),
                   Tab(text: 'TRAININGS'),
                 ],
@@ -96,16 +104,16 @@ class _SessionsTab extends ConsumerWidget {
                         height: 40,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isCompleted ? Colors.green : Colors.blue[50],
+                          color: isCompleted ? Colors.green : Theme.of(context).colorScheme.primaryContainer,
                           border: Border.all(
-                            color: isCompleted ? Colors.green : Colors.blue,
+                            color: isCompleted ? Colors.green : Theme.of(context).colorScheme.primary,
                             width: 2,
                           ),
                         ),
                         child: Icon(
                           isCompleted ? Icons.check : Icons.schedule,
                           size: 20,
-                          color: isCompleted ? Colors.white : Colors.blue,
+                          color: isCompleted ? Colors.white : Theme.of(context).colorScheme.primary,
                         ),
                       ),
                       if (index < sessions.length - 1)
@@ -118,7 +126,7 @@ class _SessionsTab extends ConsumerWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey[200]!),
+                        side: BorderSide(color: Theme.of(context).dividerColor),
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -238,8 +246,8 @@ class _TrainingsTab extends ConsumerWidget {
               ),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.purple[50],
-                  child: const Icon(Icons.school, color: Colors.purple),
+                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                  child: Icon(Icons.school, color: Theme.of(context).colorScheme.onSecondaryContainer),
                 ),
                 title: Text(
                   a.enterpriseName ?? 'Training Session',
@@ -262,7 +270,7 @@ class _TrainingsTab extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.green[50],
+                        color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(

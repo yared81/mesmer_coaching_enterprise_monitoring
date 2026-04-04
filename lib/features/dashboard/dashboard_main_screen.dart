@@ -191,13 +191,13 @@ class DashboardMainScreen extends ConsumerWidget {
       ));
     } else if (userRole == UserRole.enterprise) {
       navItems.add(const NavigationDestination(
-        icon: Icon(Icons.trending_up_outlined),
-        selectedIcon: Icon(Icons.trending_up, color: Colors.blue),
+        icon: Icon(Icons.bar_chart_outlined),
+        selectedIcon: Icon(Icons.bar_chart_rounded, color: Colors.blue),
         label: 'Progress',
       ));
       navItems.add(const NavigationDestination(
-        icon: Icon(Icons.timeline_outlined),
-        selectedIcon: Icon(Icons.timeline, color: Colors.blue),
+        icon: Icon(Icons.route_outlined),
+        selectedIcon: Icon(Icons.route_rounded, color: Colors.blue),
         label: 'Journey',
       ));
     } else if (userRole == UserRole.meOfficer) {

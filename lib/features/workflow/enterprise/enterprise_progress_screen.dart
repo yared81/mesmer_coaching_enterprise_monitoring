@@ -34,7 +34,7 @@ class EnterpriseProgressScreen extends ConsumerWidget {
             children: [
               _buildScoreOverview(stats, baselineScore),
               const SizedBox(height: 24),
-              _buildRadarChart(stats),
+              _buildRadarChart(context, stats),
               const SizedBox(height: 24),
               _buildCategoryBreakdown(stats),
               const SizedBox(height: 24),
@@ -73,7 +73,9 @@ class EnterpriseProgressScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: improvement >= 0 ? Colors.green[50] : Colors.red[50],
+                    color: improvement >= 0
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.red.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -126,13 +128,13 @@ class EnterpriseProgressScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRadarChart(EnterpriseDashboardStats stats) {
+  Widget _buildRadarChart(BuildContext context, EnterpriseDashboardStats stats) {
     if (stats.radarScores.isEmpty) {
       return Card(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFFE5E7EB)),
+          side: BorderSide(color: Theme.of(context).dividerColor),
         ),
         child: const Padding(
           padding: EdgeInsets.all(32),
@@ -150,11 +152,19 @@ class EnterpriseProgressScreen extends ConsumerWidget {
       );
     }
 
+    // RadarChart requires minimum 3 data points
+    final scores = stats.radarScores.length >= 3
+        ? stats.radarScores
+        : [
+            ...stats.radarScores,
+            ...List.generate(3 - stats.radarScores.length, (i) => RadarScore(name: '-', value: 0)),
+          ];
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: Color(0xFFE5E7EB)),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -171,18 +181,18 @@ class EnterpriseProgressScreen extends ConsumerWidget {
                       fillColor: Colors.blue.withOpacity(0.25),
                       borderColor: Colors.blue,
                       entryRadius: 4,
-                      dataEntries: stats.radarScores.map((e) => RadarEntry(value: e.value)).toList(),
+                      dataEntries: scores.map((e) => RadarEntry(value: e.value)).toList(),
                     ),
                   ],
                   radarBackgroundColor: Colors.transparent,
                   borderData: FlBorderData(show: false),
-                  radarBorderData: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                  radarBorderData: BorderSide(color: Theme.of(context).dividerColor, width: 1),
                   titlePositionPercentageOffset: 0.2,
                   titleTextStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  getTitle: (index, angle) => RadarChartTitle(text: stats.radarScores[index].name),
+                  getTitle: (index, angle) => RadarChartTitle(text: scores[index].name),
                   tickCount: 5,
                   ticksTextStyle: const TextStyle(color: Colors.transparent),
-                  gridBorderData: const BorderSide(color: Color(0xFFE5E7EB), width: 0.5),
+                  gridBorderData: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
                 ),
               ),
             ),

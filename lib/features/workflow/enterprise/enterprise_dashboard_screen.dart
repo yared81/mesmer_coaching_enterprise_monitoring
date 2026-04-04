@@ -128,6 +128,14 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
       );
     }
 
+    // RadarChart requires minimum 3 data points — pad if needed
+    final scores = stats.radarScores.length >= 3
+        ? stats.radarScores
+        : [
+            ...stats.radarScores,
+            ...List.generate(3 - stats.radarScores.length, (i) => RadarScore(name: '-', value: 0)),
+          ];
+
     return AspectRatio(
       aspectRatio: 1.3,
       child: Card(
@@ -147,9 +155,7 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
                         fillColor: Colors.blue.withOpacity(0.3),
                         borderColor: Colors.blue,
                         entryRadius: 3,
-                        dataEntries: stats.radarScores
-                            .map((e) => RadarEntry(value: e.value))
-                            .toList(),
+                        dataEntries: scores.map((e) => RadarEntry(value: e.value)).toList(),
                       ),
                     ],
                     radarBackgroundColor: Colors.transparent,
@@ -157,9 +163,7 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
                     radarBorderData: const BorderSide(color: Colors.grey, width: 0.5),
                     titlePositionPercentageOffset: 0.2,
                     titleTextStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    getTitle: (index, angle) {
-                      return RadarChartTitle(text: stats.radarScores[index].name);
-                    },
+                    getTitle: (index, angle) => RadarChartTitle(text: scores[index].name),
                     tickCount: 5,
                     ticksTextStyle: const TextStyle(color: Colors.transparent),
                     gridBorderData: const BorderSide(color: Colors.grey, width: 0.5),
@@ -175,7 +179,23 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
 
   Widget _buildActionPlan(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
-    final enterpriseId = user?.enterpriseId;
+    // Try direct enterpriseId first, then fall back to finding by user_id in the list
+    String? enterpriseId = user?.enterpriseId;
+
+    if (enterpriseId == null) {
+      // Look up enterprise linked to this user from the enterprise list
+      final enterprisesAsync = ref.watch(enterpriseListProvider);
+      enterpriseId = enterprisesAsync.maybeWhen(
+        data: (list) {
+          try {
+            return list.firstWhere((e) => e.coachId == user?.id || e.id.isNotEmpty).id;
+          } catch (_) {
+            return list.isNotEmpty ? list.first.id : null;
+          }
+        },
+        orElse: () => null,
+      );
+    }
 
     if (enterpriseId == null) {
       return const SizedBox.shrink();
@@ -220,14 +240,14 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
           children: [
             const Text('Your Specific Action Plan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            ...iap.tasks.map((task) => _buildTaskCard(task)).toList(),
+            ...iap.tasks.map((task) => _buildTaskCard(context, task)).toList(),
           ],
         );
       },
     );
   }
 
-  Widget _buildTaskCard(IapTaskEntity task) {
+  Widget _buildTaskCard(BuildContext context, IapTaskEntity task) {
     final isDone = task.status == IapTaskStatus.completed;
     final isOverdue = task.deadline.isBefore(DateTime.now()) && !isDone;
 
@@ -236,7 +256,7 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[200]!),
+        side: BorderSide(color: Theme.of(context).dividerColor),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -384,9 +404,9 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
                     margin: const EdgeInsets.only(right: 16),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.blue[50],
+                      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.blue[100]!),
+                      border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.2)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +430,7 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
                         const SizedBox(height: 8),
                         Text(
                           'Feedback from Trainer',
-                          style: TextStyle(fontSize: 11, color: Colors.blue[700], fontStyle: FontStyle.italic),
+                          style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.primary, fontStyle: FontStyle.italic),
                         ),
                       ],
                     ),
