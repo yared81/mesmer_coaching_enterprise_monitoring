@@ -25,6 +25,10 @@ The backend is deployed and running. Install the APK and log in immediately — 
 | Comms Officer | commsofficer@mesmer.com |
 | Enterprise User | beneficiary@mesmer.com |
 | Stakeholder | stakeholder@mesmer.com |
+| Bahir Dar Tilfet Center | owner1@mesmer.com |
+| Gondar Honey Hub | owner2@mesmer.com |
+| Dessie Leather Works | owner3@mesmer.com|
+
 
 ---
 
