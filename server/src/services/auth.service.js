@@ -72,7 +72,7 @@ class AuthService {
         tokenVersion: user.token_version 
       },
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: process.env.JWT_ACCESS_EXPIRE || '15m' }
+      { expiresIn: process.env.JWT_ACCESS_EXPIRE || '8h' }  // default 8h not 15m
     );
 
     const refreshToken = jwt.sign(

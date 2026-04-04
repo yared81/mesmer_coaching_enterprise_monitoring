@@ -10,6 +10,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/theme/settings_provider.dart';
 import 'core/services/security_service.dart';
+import 'core/providers/core_providers.dart';
 import 'features/auth/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,6 +51,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     
     Future.microtask(() async {
+      // Register the force-logout callback so the Dio interceptor can
+      // trigger logout when the refresh token expires
+      globalForceLogoutCallback = () {
+        if (mounted) {
+          ref.read(authProvider.notifier).logout();
+        }
+      };
+
       await ref.read(authProvider.notifier).checkAuthStatus();
       
       // Only trigger biometric on startup if explicitly enabled in settings

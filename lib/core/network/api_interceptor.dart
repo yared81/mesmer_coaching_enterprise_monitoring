@@ -4,9 +4,11 @@ import 'package:mesmer_digital_coaching/core/constants/api_constants.dart';
 import 'package:mesmer_digital_coaching/core/network/offline_provider.dart';
 
 class ApiInterceptor extends Interceptor {
-  ApiInterceptor(this._secureStorage, this._offlineNotifier);
+  ApiInterceptor(this._secureStorage, this._offlineNotifier, {this.onForceLogout});
   final SecureStorage _secureStorage;
   final OfflineModeNotifier _offlineNotifier;
+  /// Called when refresh token is invalid/expired — triggers app-level logout
+  final void Function()? onForceLogout;
 
   bool _isRefreshing = false;
   final List<_PendingRequest> _pendingRequests = [];
@@ -88,11 +90,13 @@ class ApiInterceptor extends Interceptor {
         } else {
           await _secureStorage.clearTokens();
           _rejectAll();
+          onForceLogout?.call(); // ← notify app to log out
           super.onError(err, handler);
         }
       } catch (_) {
         await _secureStorage.clearTokens();
         _rejectAll();
+        onForceLogout?.call(); // ← notify app to log out
         super.onError(err, handler);
       } finally {
         _isRefreshing = false;

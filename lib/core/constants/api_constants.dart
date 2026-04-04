@@ -4,7 +4,7 @@ abstract class ApiConstants {
   // Base URL — set from .env or build config using --dart-define-from-file
   static const String _rawBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/api/v1',
+    defaultValue: 'https://mesmercoachingenterprisemonitoring-production.up.railway.app/api/v1',
   );
 
   // For manual string concatenations: '${ApiConstants.baseUrl}/path' (Guarantees NO trailing slash)
@@ -34,7 +34,7 @@ abstract class ApiConstants {
   static const String adminStats = 'dashboard/admin';
   static const String supervisorStats = 'dashboard/supervisor';
   static const String coachStats = 'dashboard/coach';
-  static String coachStatsById(String id) => '/dashboard/coach/$id';
+  static String coachStatsById(String id) => 'dashboard/coach/$id';
 
   // Enterprise Dashboard
   static const String enterpriseDashboardStats = 'enterprise-dashboard/stats';

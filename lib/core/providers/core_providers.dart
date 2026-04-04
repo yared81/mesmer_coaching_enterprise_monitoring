@@ -13,9 +13,14 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
   return SecureStorage(ref.watch(flutterSecureStorageProvider));
 });
 
+/// Callback registered by main.dart to force logout when refresh token expires.
+/// This breaks the circular dependency between dioProvider and authProvider.
+void Function()? globalForceLogoutCallback;
+
 final dioProvider = Provider<Dio>((ref) {
   return DioClient.createDio(
     ref.watch(secureStorageProvider),
     ref.watch(offlineModeProvider.notifier),
+    onForceLogout: () => globalForceLogoutCallback?.call(),
   );
 });

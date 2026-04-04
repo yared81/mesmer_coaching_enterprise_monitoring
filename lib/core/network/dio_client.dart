@@ -5,7 +5,11 @@ import 'api_interceptor.dart';
 import 'package:mesmer_digital_coaching/core/storage/secure_storage.dart';
 
 class DioClient {
-  static Dio createDio(SecureStorage secureStorage, OfflineModeNotifier offlineNotifier) {
+  static Dio createDio(
+    SecureStorage secureStorage,
+    OfflineModeNotifier offlineNotifier, {
+    void Function()? onForceLogout,
+  }) {
     final dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.dioBaseUrl,
@@ -14,10 +18,9 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.addAll([
-      ApiInterceptor(secureStorage, offlineNotifier),
-      LogInterceptor(responseBody: true, requestBody: true), // For dev visibility
-    ]);
+    dio.interceptors.add(
+      ApiInterceptor(secureStorage, offlineNotifier, onForceLogout: onForceLogout),
+    );
 
     return dio;
   }
