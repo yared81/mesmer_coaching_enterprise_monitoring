@@ -12,7 +12,6 @@ import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 import 'enterprise_filter_sheet.dart';
 import 'package:file_picker/file_picker.dart';
 import 'csv_import_service.dart';
-import 'dart:io';
 import 'package:mesmer_digital_coaching/core/widgets/custom_toaster.dart';
 import 'enterprise_model.dart';
 
@@ -51,13 +50,13 @@ class _EnterpriseListScreenState extends ConsumerState<EnterpriseListScreen> {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
+      withData: true, // Always get bytes — works on both web and mobile
     );
 
-    if (result == null || result.files.single.path == null) return;
+    if (result == null || result.files.single.bytes == null) return;
 
     try {
-      final file = File(result.files.single.path!);
-      final content = await file.readAsString();
+      final content = String.fromCharCodes(result.files.single.bytes!);
       
       final auth = ref.read(authProvider);
       final coachId = auth.user?.id ?? '';

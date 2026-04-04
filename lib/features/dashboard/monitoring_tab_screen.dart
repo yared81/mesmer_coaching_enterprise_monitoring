@@ -51,10 +51,10 @@ class MonitoringTabScreen extends ConsumerWidget {
             height: constraints.maxHeight,
             child: Column(
               children: [
-                // Theme-aware header
+                // Theme-aware header — blue in light mode, dark surface in dark mode
                 Container(
-                  color: Theme.of(context).brightness == Brightness.light 
-                      ? AppColors.primary 
+                  color: Theme.of(context).brightness == Brightness.light
+                      ? AppColors.primary
                       : Theme.of(context).colorScheme.surface,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,22 +64,22 @@ class MonitoringTabScreen extends ConsumerWidget {
                         child: Text(
                           'Monitoring & Data',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: Theme.of(context).brightness == Brightness.light 
-                                    ? Colors.white 
+                                color: Theme.of(context).brightness == Brightness.light
+                                    ? Colors.white
                                     : Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                       ),
                       TabBar(
-                        labelColor: Theme.of(context).brightness == Brightness.light 
-                            ? Colors.white 
+                        labelColor: Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
                             : Theme.of(context).colorScheme.primary,
-                        unselectedLabelColor: Theme.of(context).brightness == Brightness.light 
-                            ? Colors.white60 
+                        unselectedLabelColor: Theme.of(context).brightness == Brightness.light
+                            ? Colors.white60
                             : Theme.of(context).colorScheme.onSurfaceVariant,
-                        indicatorColor: Theme.of(context).brightness == Brightness.light 
-                            ? Colors.white 
+                        indicatorColor: Theme.of(context).brightness == Brightness.light
+                            ? Colors.white
                             : Theme.of(context).colorScheme.primary,
                         indicatorWeight: 3,
                         tabs: tabs,

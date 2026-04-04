@@ -63,11 +63,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Change Password', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -86,9 +84,9 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Please enter your current password and your new desired password.',
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(color: Theme.of(context).hintColor),
               ),
               const SizedBox(height: 32),
 

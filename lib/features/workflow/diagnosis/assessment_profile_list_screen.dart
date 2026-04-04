@@ -14,7 +14,7 @@ class AssessmentProfileListScreen extends ConsumerWidget {
     final templatesAsync = ref.watch(allTemplatesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: hideAppBar ? null : AppBar(
         title: const Text('Assessment Profiles', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
@@ -79,7 +79,7 @@ class AssessmentProfileListScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const Text(
             'No Assessment Profiles Found',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A1A)),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           const Text(
@@ -163,9 +163,11 @@ class _AssessmentProfileCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: isActive ? Border.all(color: const Color(0xFF00B09B), width: 1.5) : Border.all(color: Colors.grey[200]!),
+        border: isActive
+            ? Border.all(color: const Color(0xFF00B09B), width: 1.5)
+            : Border.all(color: Theme.of(context).dividerColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -184,12 +186,14 @@ class _AssessmentProfileCard extends StatelessWidget {
             leading: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFF00B09B).withOpacity(0.1) : Colors.grey[100],
+            color: isActive
+                ? const Color(0xFF00B09B).withOpacity(0.1)
+                : Theme.of(context).colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
             Icons.article_rounded,
-            color: isActive ? const Color(0xFF00B09B) : Colors.grey[500],
+            color: isActive ? const Color(0xFF00B09B) : Theme.of(context).colorScheme.onSurfaceVariant,
             size: 28,
           ),
         ),
@@ -198,7 +202,7 @@ class _AssessmentProfileCard extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1A1A1A)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ],

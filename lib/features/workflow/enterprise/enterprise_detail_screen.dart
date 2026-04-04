@@ -770,14 +770,21 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
   Widget _buildTrendChartCard(List<dynamic> trends, dynamic latestHealthPercentageRaw) {
     if (trends.isEmpty) return const SizedBox.shrink();
 
-    // Parse all dates and compute hour-offset from earliest session
-    final parsedDates = trends.map((t) => DateTime.parse(t['date'].toString())).toList();
+    // Parse all dates — skip entries with null/invalid dates
+    final validTrends = trends.where((t) {
+      final d = t['date'];
+      if (d == null || d.toString() == 'null' || d.toString().isEmpty) return false;
+      return DateTime.tryParse(d.toString()) != null;
+    }).toList();
+
+    if (validTrends.isEmpty) return const SizedBox.shrink();
+
+    final parsedDates = validTrends.map((t) => DateTime.parse(t['date'].toString())).toList();
     final firstDate = parsedDates.reduce((a, b) => a.isBefore(b) ? a : b);
 
-    final List<FlSpot> spots = List.generate(trends.length, (i) {
-      // Use hours to avoid everything being collapsed to Day 0 when sessions are close
+    final List<FlSpot> spots = List.generate(validTrends.length, (i) {
       final hourOffset = parsedDates[i].difference(firstDate).inHours.toDouble();
-      final score = NumUtils.toDouble(trends[i]?['score']);
+      final score = NumUtils.toDouble(validTrends[i]?['score']);
       return FlSpot(hourOffset, score);
     });
 
@@ -817,7 +824,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${improved ? '▲' : '▼'} ${delta.abs().toStringAsFixed(1)} pts over ${trends.length} sessions',
+                  '${improved ? '▲' : '▼'} ${delta.abs().toStringAsFixed(1)} pts over ${validTrends.length} sessions',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -848,7 +855,7 @@ class _EnterpriseDetailScreenState extends ConsumerState<EnterpriseDetailScreen>
                       return touchedSpots.map((spot) {
                         // Find the matching trend data
                         final matchIdx = spots.indexWhere((s) => s.x == spot.x && s.y == spot.y);
-                        final title = matchIdx >= 0 ? (trends[matchIdx]['sessionTitle'] ?? '') : '';
+                        final title = matchIdx >= 0 ? (validTrends[matchIdx]['sessionTitle'] ?? '') : '';
                         final date = matchIdx >= 0 ? DateFormat('MMM dd').format(parsedDates[matchIdx]) : '';
                         return LineTooltipItem(
                           '$title\n$date: ${spot.y.toStringAsFixed(1)}/5.0',

@@ -9,23 +9,19 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
-          'My Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('My Profile', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => _showEditProfileSheet(context, ref, user?.name ?? '', user?.email ?? ''),
           ),
         ],
-        backgroundColor: Colors.white,
         elevation: 0,
-        foregroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -34,30 +30,30 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             CircleAvatar(
               radius: 50,
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+              backgroundColor: theme.primaryColor.withOpacity(0.1),
               child: Text(
                 user?.name.substring(0, 1).toUpperCase() ?? 'U',
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+                  color: theme.primaryColor,
                 ),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               user?.name ?? 'Unknown User',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: theme.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -65,25 +61,24 @@ class ProfileScreen extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+                  color: theme.primaryColor,
                   letterSpacing: 1,
                 ),
               ),
             ),
             const SizedBox(height: 40),
-            _buildProfileItem(
+            _buildProfileItem(context,
               icon: Icons.email_outlined,
               title: 'Email',
               value: user?.email ?? 'No email',
             ),
             const SizedBox(height: 16),
-            _buildProfileItem(
+            _buildProfileItem(context,
               icon: Icons.business_outlined,
               title: 'Institution',
               value: user?.institutionName ?? 'Assigned Institution',
             ),
             const SizedBox(height: 40),
-            // Logout button removed as it's redundant (available in Settings)
           ],
         ),
       ),
@@ -98,15 +93,14 @@ class ProfileScreen extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 20,
-          right: 20,
-          top: 20,
+          left: 20, right: 20, top: 20,
         ),
         child: Form(
           key: formKey,
@@ -114,10 +108,7 @@ class ProfileScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Edit Profile',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
+              const Text('Edit Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               TextFormField(
                 controller: nameController,
@@ -163,19 +154,20 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileItem({
+  Widget _buildProfileItem(BuildContext context, {
     required IconData icon,
     required String title,
     required String value,
   }) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -186,10 +178,10 @@ class ProfileScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.grey[700]),
+            child: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -200,17 +192,17 @@ class ProfileScreen extends ConsumerWidget {
                   title,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey[500],
+                    color: theme.hintColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
