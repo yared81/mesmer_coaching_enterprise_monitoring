@@ -6,9 +6,8 @@ const { protect, authorize } = require('../middleware/auth.middleware');
 router.use(protect);
 
 // Get list of enterprises ready for graduation
-router.get('/ready', authorize('super_admin', 'admin', 'program_manager'), graduationController.getReady);
+router.get('/ready', authorize('super_admin', 'admin', 'program_manager', 'comms_officer', 'regional_coordinator'), graduationController.getReady);
 
-// Only managers/admins can graduate an enterprise after review
-router.post('/:id/graduate', authorize('super_admin', 'admin', 'program_manager'), graduationController.graduateEnterprise);
+router.post('/:id/graduate', authorize('super_admin', 'admin', 'program_manager', 'comms_officer'), graduationController.graduateEnterprise);
 
 module.exports = router;

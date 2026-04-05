@@ -20,13 +20,13 @@ router.post(
 
 router.get(
   '/', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'comms_officer'),
   enterpriseController.list
 );
 
 router.get(
   '/:id', 
-  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise'),
+  authorize('super_admin', 'admin', 'supervisor', 'coach', 'me_officer', 'program_manager', 'regional_coordinator', 'enterprise', 'comms_officer'),
   restrictToOwnEnterprise,
   enterpriseController.getById
 );

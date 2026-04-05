@@ -11,8 +11,8 @@ import 'package:dio/dio.dart';
 
 final graduationReadyProvider = FutureProvider<List<dynamic>>((ref) async {
   final dio = ref.watch(dioProvider);
-  final response = await dio.get('/api/v1/graduation/ready');
-  return response.data['data'] as List;
+  final response = await dio.get('graduation/ready');
+  return response.data['data'] as List? ?? [];
 });
 
 class GraduationReadyScreen extends ConsumerWidget {

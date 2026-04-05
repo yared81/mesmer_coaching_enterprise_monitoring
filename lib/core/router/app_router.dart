@@ -435,6 +435,8 @@ class _DashboardHome extends ConsumerWidget {
     if (role == UserRole.coach) return CoachDashboardScreen();
     if (role == UserRole.dataVerifier) return const QcDashboardScreen(hideAppBar: true);
     if (role == UserRole.enumerator) return const IntakeQueueScreen();
+    if (role == UserRole.commsOfficer) return const GraduationReadyScreen();
+    if (role == UserRole.stakeholder) return AdminDashboardScreen();
     
     return const Scaffold(
       body: Center(

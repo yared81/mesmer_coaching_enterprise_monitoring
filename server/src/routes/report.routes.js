@@ -23,7 +23,7 @@ router.get(
  */
 router.get(
   '/system/csv',
-  authorize('super_admin', 'admin', 'supervisor', 'program_manager', 'regional_coordinator', 'me_officer'),
+  authorize('super_admin', 'admin', 'supervisor', 'program_manager', 'regional_coordinator', 'me_officer', 'comms_officer'),
   ReportController.exportSystemCSV
 );
 
