@@ -74,6 +74,7 @@ class CoachingRepositoryImpl implements CoachingRepository {
       // Fallback to local cache on connection error
       try {
         final db = await localDatabase.database;
+        if (db == null) return Left(Failure.fromException(e));
         final maps = await db.query('coaching_sessions');
         final sessions = maps
             .map((m) {

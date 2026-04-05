@@ -8,17 +8,14 @@ final localCacheRepositoryProvider = Provider<LocalCacheRepository>((ref) {
 
 class LocalCacheRepository {
   final LocalDatabase _db;
-
   LocalCacheRepository(this._db);
 
   // --- Enterprises ---
   Future<void> cacheEnterprises(List<Map<String, dynamic>> enterprises) async {
     final db = await _db.database;
+    if (db == null) return;
     final batch = db.batch();
-    
-    // Clear old cache
     batch.delete('enterprises');
-    
     for (final e in enterprises) {
       batch.insert('enterprises', {
         'id': e['id'] ?? e['_id'],
@@ -33,6 +30,7 @@ class LocalCacheRepository {
 
   Future<List<Map<String, dynamic>>> getCachedEnterprises() async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('enterprises');
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
@@ -40,10 +38,9 @@ class LocalCacheRepository {
   // --- Coaching Sessions ---
   Future<void> cacheEnterpriseSessions(String enterpriseId, List<Map<String, dynamic>> sessions) async {
     final db = await _db.database;
+    if (db == null) return;
     final batch = db.batch();
-    
     batch.delete('coaching_sessions', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
-    
     for (final s in sessions) {
       batch.insert('coaching_sessions', {
         'id': s['id'] ?? s['_id'],
@@ -58,6 +55,7 @@ class LocalCacheRepository {
 
   Future<List<Map<String, dynamic>>> getCachedEnterpriseSessions(String enterpriseId) async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('coaching_sessions', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
@@ -65,10 +63,9 @@ class LocalCacheRepository {
   // --- Phone Follow-ups ---
   Future<void> cacheEnterprisePhoneLogs(String enterpriseId, List<Map<String, dynamic>> logs) async {
     final db = await _db.database;
+    if (db == null) return;
     final batch = db.batch();
-    
     batch.delete('phone_logs', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
-    
     for (final l in logs) {
       batch.insert('phone_logs', {
         'id': l['id'] ?? l['_id'],
@@ -83,6 +80,7 @@ class LocalCacheRepository {
 
   Future<List<Map<String, dynamic>>> getCachedEnterprisePhoneLogs(String enterpriseId) async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('phone_logs', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
@@ -90,6 +88,7 @@ class LocalCacheRepository {
   // --- Training ---
   Future<void> cacheTrainings(List<Map<String, dynamic>> trainings) async {
     final db = await _db.database;
+    if (db == null) return;
     final batch = db.batch();
     batch.delete('trainings');
     for (final t in trainings) {
@@ -105,6 +104,7 @@ class LocalCacheRepository {
 
   Future<List<Map<String, dynamic>>> getCachedTrainings() async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('trainings');
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
@@ -112,6 +112,7 @@ class LocalCacheRepository {
   // --- Equipment ---
   Future<void> cacheEnterpriseEquipment(String enterpriseId, List<Map<String, dynamic>> equipment) async {
     final db = await _db.database;
+    if (db == null) return;
     final batch = db.batch();
     batch.delete('equipment', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
     for (final e in equipment) {
@@ -128,6 +129,7 @@ class LocalCacheRepository {
 
   Future<List<Map<String, dynamic>>> getCachedEnterpriseEquipment(String enterpriseId) async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('equipment', where: 'enterprise_id = ?', whereArgs: [enterpriseId]);
     return maps.map((m) => jsonDecode(m['data'] as String) as Map<String, dynamic>).toList();
   }
@@ -135,17 +137,19 @@ class LocalCacheRepository {
   // --- Offline Sync Queue ---
   Future<void> enqueueSyncAction(String actionType, String endpoint, Map<String, dynamic> payload) async {
     final db = await _db.database;
+    if (db == null) return;
     await db.insert('sync_queue', {
       'action_type': actionType,
       'endpoint': endpoint,
       'payload': jsonEncode(payload),
       'created_at': DateTime.now().toIso8601String(),
-      'status': 0, // 0 = pending, 1 = processing, -1 = failed
+      'status': 0,
     });
   }
 
   Future<List<Map<String, dynamic>>> getPendingSyncActions() async {
     final db = await _db.database;
+    if (db == null) return [];
     final maps = await db.query('sync_queue', where: 'status = ?', whereArgs: [0], orderBy: 'id ASC');
     return maps.map((m) => {
       'id': m['id'],
@@ -158,11 +162,13 @@ class LocalCacheRepository {
 
   Future<void> markSyncActionComplete(int id) async {
     final db = await _db.database;
-    await db.delete('sync_queue', where: 'id = ?', whereArgs: [id]); // or mark status = 2
+    if (db == null) return;
+    await db.delete('sync_queue', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> markSyncActionFailed(int id, String errorMessage) async {
     final db = await _db.database;
+    if (db == null) return;
     await db.update('sync_queue', {'status': -1, 'error_message': errorMessage}, where: 'id = ?', whereArgs: [id]);
   }
 }
