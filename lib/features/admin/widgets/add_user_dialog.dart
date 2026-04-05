@@ -16,6 +16,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  late TextEditingController _phoneController;
   UserRole? _selectedRole;
   String? _selectedInstitution;
 
@@ -25,6 +26,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
     _nameController = TextEditingController(text: widget.user?.name ?? '');
     _emailController = TextEditingController(text: widget.user?.email ?? '');
     _passwordController = TextEditingController();
+    _phoneController = TextEditingController(text: widget.user?.phone ?? '');
     _selectedRole = widget.user?.role;
     _selectedInstitution = widget.user?.institutionId;
   }
@@ -59,6 +61,11 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
                   obscureText: true,
                   validator: (v) => v!.length < 6 ? 'Password must be at least 6 chars' : null,
                 ),
+              TextFormField(
+                controller: _phoneController,
+                decoration: const InputDecoration(labelText: 'Phone (optional)'),
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(height: 16),
               DropdownButtonFormField<UserRole>(
                 value: _selectedRole,
@@ -105,6 +112,7 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
       'email': _emailController.text,
       'role': _selectedRole?.snakeCase,
       'institution_id': _selectedInstitution,
+      if (_phoneController.text.isNotEmpty) 'phone': _phoneController.text,
     };
 
     if (widget.user == null) {

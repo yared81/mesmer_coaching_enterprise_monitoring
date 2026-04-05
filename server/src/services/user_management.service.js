@@ -49,24 +49,28 @@ class UserManagementService {
    * Create a new user
    */
   async createUser(userData) {
-    const { email, password, name, role, institution_id } = userData;
+    const { email, password, name, role, institution_id, phone } = userData;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      throw new Error('User with this email already exists');
-    }
+    if (!password) throw new Error('Password is required');
 
     const password_hash = await User.hashPassword(password);
 
-    return await User.create({
-      email,
-      password_hash,
-      name,
-      role,
-      institution_id,
-      is_active: true
-    });
+    try {
+      return await User.create({
+        email,
+        password_hash,
+        name,
+        role,
+        institution_id,
+        phone: phone || null,
+        is_active: true
+      });
+    } catch (err) {
+      if (err.name === 'SequelizeUniqueConstraintError') {
+        throw new Error('User with this email already exists');
+      }
+      throw err;
+    }
   }
 
   /**
@@ -81,10 +85,7 @@ class UserManagementService {
     const { email, name, role, institution_id, is_active } = userData;
 
     if (email && email !== user.email) {
-      const existingUser = await User.findOne({ where: { email, id: { [Op.ne]: userId } } });
-      if (existingUser) {
-        throw new Error('Email already in use by another user');
-      }
+      // Can't query encrypted email directly — rely on DB unique constraint
       user.email = email;
     }
 

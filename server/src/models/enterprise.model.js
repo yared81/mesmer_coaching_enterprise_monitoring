@@ -38,11 +38,8 @@ const Enterprise = sequelize.define('Enterprise', {
   },
   email: {
     type: DataTypes.STRING(255),
-    validate: {
-      isEmail: true
-    },
     get() { return decrypt(this.getDataValue('email')); },
-    set(val) { this.setDataValue('email', encrypt(val)); }
+    set(val) { this.setDataValue('email', val ? encrypt(val) : val); }
   },
   owner_age: {
     type: DataTypes.INTEGER,
