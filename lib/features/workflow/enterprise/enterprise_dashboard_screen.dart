@@ -222,13 +222,16 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: Colors.white, size: 24),
+                    Icon(Icons.assignment_outlined, color: Colors.white, size: 24),
                     SizedBox(width: 8),
-                    Text("Coach's Priority", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('Action Plan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 SizedBox(height: 12),
-                Text('Waiting for coach to assign first Action Plan.', style: TextStyle(color: Colors.white70)),
+                Text(
+                  'Your coach has not yet assigned an action plan. Tasks will appear here after your next coaching session.',
+                  style: TextStyle(color: Colors.white70, height: 1.5),
+                ),
               ],
             ),
           );
@@ -335,9 +338,9 @@ class EnterpriseDashboardScreen extends ConsumerWidget {
         Expanded(
           child: _buildStatCard(
             'Last Visit',
-            stats.lastSessionDate != null 
-                ? stats.lastSessionDate!.substring(0, 10) 
-                : 'Never',
+            stats.lastSessionDate != null && stats.lastSessionDate!.isNotEmpty
+                ? stats.lastSessionDate!.substring(0, 10)
+                : stats.totalSessions > 0 ? 'Date pending' : 'None yet',
             Icons.calendar_today,
             Colors.green,
           ),

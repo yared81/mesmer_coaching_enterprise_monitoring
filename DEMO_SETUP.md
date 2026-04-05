@@ -38,6 +38,9 @@ All passwords: `123456`
 | Comms Officer | commsofficer@mesmer.com |
 | Enterprise User | beneficiary@mesmer.com |
 | Stakeholder | stakeholder@mesmer.com |
+| Enterprise User (Bahir Dar Tilfet Center) | owner1@mesmer.com |
+| Enterprise User (Gondar Honey Hub) | owner2@mesmer.com |
+| Enterprise User (Dessie Leather Works) | owner3@mesmer.com |
 
 Works on any network — WiFi or cellular.
 
