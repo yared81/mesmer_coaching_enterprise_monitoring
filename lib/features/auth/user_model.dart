@@ -30,10 +30,10 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as String,
-      email: json['email'] as String,
-      name: json['name'] as String,
+      email: json['email'] as String? ?? '',
+      name: json['name'] as String? ?? '',
       role: _parseRole(json['role']),
-      institutionId: json['institution_id'] as String,
+      institutionId: json['institution_id'] as String? ?? '',
       isActive: json['is_active'] as bool? ?? true,
       institutionName: _parseInstitution(json['institution']),
       enterpriseId: json['enterprise_id'] as String?,

@@ -31,7 +31,10 @@ class UserManagementController {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role
+          role: user.role,
+          institution_id: user.institution_id,
+          is_active: user.is_active,
+          phone: user.phone
         }
       });
     } catch (error) {
