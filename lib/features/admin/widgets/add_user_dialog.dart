@@ -69,9 +69,16 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<UserRole>(
                 value: _selectedRole,
+                isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Role'),
                 items: UserRole.values.map((role) {
-                  return DropdownMenuItem(value: role, child: Text(role.toString().split('.').last.toUpperCase()));
+                  return DropdownMenuItem(
+                    value: role,
+                    child: Text(
+                      role.toString().split('.').last.toUpperCase(),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
                 }).toList(),
                 onChanged: (val) => setState(() => _selectedRole = val),
                 validator: (v) => v == null ? 'Role is required' : null,
@@ -80,9 +87,13 @@ class _AddUserDialogState extends ConsumerState<AddUserDialog> {
               institutionsAsync.when(
                 data: (institutions) => DropdownButtonFormField<String>(
                   value: _selectedInstitution,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Institution'),
                   items: institutions.map((inst) {
-                    return DropdownMenuItem(value: inst.id, child: Text(inst.name));
+                    return DropdownMenuItem(
+                      value: inst.id,
+                      child: Text(inst.name, overflow: TextOverflow.ellipsis),
+                    );
                   }).toList(),
                   onChanged: (val) => setState(() => _selectedInstitution = val),
                   validator: (v) => v == null ? 'Institution is required' : null,
