@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mesmer_digital_coaching/core/router/app_routes.dart';
 import 'package:mesmer_digital_coaching/features/admin/user_management_provider.dart';
 import 'package:mesmer_digital_coaching/features/auth/auth_provider.dart';
+import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 
 class RegionalCoachListScreen extends ConsumerStatefulWidget {
   const RegionalCoachListScreen({super.key});
@@ -67,7 +68,7 @@ class _RegionalCoachListScreenState extends ConsumerState<RegionalCoachListScree
             child: coachesAsync.when(
               data: (users) {
                 final coaches = users.where((u) {
-                  final isCoach = u.role == 'coach';
+                  final isCoach = u.role == UserRole.coach;
                   final matchesSearch = u.name.toLowerCase().contains(_searchQuery) || 
                                        u.email.toLowerCase().contains(_searchQuery);
                   return isCoach && matchesSearch;

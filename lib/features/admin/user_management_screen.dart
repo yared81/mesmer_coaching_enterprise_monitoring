@@ -4,6 +4,7 @@ import 'package:mesmer_digital_coaching/features/auth/user_entity.dart';
 import 'package:mesmer_digital_coaching/core/constants/app_colors.dart';
 import 'package:mesmer_digital_coaching/features/admin/user_management_provider.dart';
 import 'package:mesmer_digital_coaching/features/admin/widgets/add_user_dialog.dart';
+import 'package:mesmer_digital_coaching/features/admin/widgets/add_institution_dialog.dart';
 
 class UserManagementScreen extends ConsumerStatefulWidget {
   const UserManagementScreen({super.key});
@@ -12,18 +13,20 @@ class UserManagementScreen extends ConsumerStatefulWidget {
   ConsumerState<UserManagementScreen> createState() => _UserManagementScreenState();
 }
 
-class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
+class _UserManagementScreenState extends ConsumerState<UserManagementScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback if you need to access ref.read in initState
-    // but better to just use listeners/watch or update filters on interactions.
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -51,43 +54,133 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Management'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.people_outline), text: 'Users'),
+            Tab(icon: Icon(Icons.business_outlined), text: 'Institutions'),
+          ],
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.person_add),
-            tooltip: 'Add User',
-            onPressed: () => _showAddUserDialog(context),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildFilters(institutionsAsync, currentFilters),
-          Expanded(
-            child: usersAsync.when(
-              data: (users) => _buildUserList(users),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 12),
-                      Text('$err', textAlign: TextAlign.center),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () => ref.invalidate(usersListProvider),
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          ListenableBuilder(
+            listenable: _tabController,
+            builder: (context, _) => IconButton(
+              icon: Icon(_tabController.index == 0 ? Icons.person_add : Icons.add_business),
+              tooltip: _tabController.index == 0 ? 'Add User' : 'Add Institution',
+              onPressed: () => _tabController.index == 0
+                  ? _showAddUserDialog(context)
+                  : _showAddInstitutionDialog(context),
             ),
           ),
         ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // Tab 1: Users
+          Column(
+            children: [
+              _buildFilters(institutionsAsync, currentFilters),
+              Expanded(
+                child: usersAsync.when(
+                  data: (users) => _buildUserList(users),
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 12),
+                          Text('$err', textAlign: TextAlign.center),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () => ref.invalidate(usersListProvider),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Retry'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Tab 2: Institutions
+          _buildInstitutionsTab(institutionsAsync),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInstitutionsTab(AsyncValue<List<dynamic>> institutionsAsync) {
+    return institutionsAsync.when(
+      data: (institutions) {
+        if (institutions.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.business_outlined, size: 56, color: Colors.grey),
+                const SizedBox(height: 12),
+                const Text('No institutions yet.'),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => _showAddInstitutionDialog(context),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Institution'),
+                ),
+              ],
+            ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.all(12),
+          itemCount: institutions.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final inst = institutions[index];
+            return Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Theme.of(context).dividerColor),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  child: const Icon(Icons.business, color: AppColors.primary),
+                ),
+                title: Text(inst.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(inst.region ?? inst.contactEmail ?? 'No region set'),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (val) {
+                    if (val == 'edit') _showAddInstitutionDialog(context, institution: inst);
+                  },
+                  itemBuilder: (_) => [
+                    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $err'),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => ref.invalidate(institutionsListProvider('all')),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -380,5 +473,12 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
       context: context,
       builder: (context) => AddUserDialog(user: user),
     );
+  }
+
+  void _showAddInstitutionDialog(BuildContext context, {dynamic institution}) {
+    showDialog(
+      context: context,
+      builder: (context) => AddInstitutionDialog(institution: institution),
+    ).then((_) => ref.invalidate(institutionsListProvider('all')));
   }
 }
